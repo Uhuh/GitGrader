@@ -1,0 +1,29 @@
+{
+  "name": "GitGrader",
+  "version": "1.0.0",
+  "description": "An Electron app to help combine assigner and grader together to make a friendly ui for teachers/graders to use.",
+  "repository": "git@github.com:Uhuh/GitGrader.git",
+  "author": "Dylan Warren <duwtgb@mst.edu>",
+  "license": "MIT",
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js",
+    "start": "yarn build && electron ./build/electron.js"
+  },
+  "dependencies": {
+    "@types/electron": "^1.6.10",
+    "@types/node": "^13.7.0",
+    "node": "^13.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "electron": "^8.0.0",
+    "html-webpack-plugin": "^3.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  }
+}
