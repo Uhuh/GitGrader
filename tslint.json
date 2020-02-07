@@ -1,0 +1,22 @@
+{
+  "rules": {
+    "max-line-length": {
+      "options": [120]
+    },
+    "new-parens": true,
+    "no-any": true,
+    "only-arrow-functions": true,
+    "prefer-for-of": true,
+    "curly": true,
+    "no-async-without-await": true,
+    "no-floating-promises": true,
+    "no-invalid-this": true,
+    "no-this-assignment": true,
+    "no-unused-variable": true,
+    "no-var-keyword": true,
+    "prefer-object-spread": true,
+    "use-isnan": true,
+    "no-require-imports": true,
+    "prefer-const": true
+  }
+}
