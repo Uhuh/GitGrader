@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+const { app, BrowserWindow } = require('electron');
 
 const createWindow = () => {
   const win = new BrowserWindow({
@@ -10,7 +10,7 @@ const createWindow = () => {
   });
 
   // Load the index.html so we can ... insert html.
-  win.loadFile("./index.html");
+  win.loadFile("index.html");
 }
 
 app.on("ready", createWindow);
