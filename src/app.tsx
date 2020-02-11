@@ -1,8 +1,5 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { App } from './modules/index';
 
-const App = () => (
-  <div>What's up dddfools</div>
-);
-
-ReactDOM.render(<App/>, document.getElementById("app"));
+ReactDOM.render(<App/>, document.getElementById('app'));

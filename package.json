@@ -13,7 +13,10 @@
   "dependencies": {
     "@types/electron": "^1.6.10",
     "@types/node": "^13.7.0",
-    "node": "^13.7.0"
+    "@types/react-bootstrap": "^0.32.20",
+    "bootstrap": "^4.4.1",
+    "node": "^13.7.0",
+    "react-bootstrap": "^1.0.0-beta.16"
   },
   "devDependencies": {
     "@types/react": "^16.9.19",
