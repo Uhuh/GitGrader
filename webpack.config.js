@@ -22,9 +22,9 @@ module.exports = [
       extensions: ['.ts', '.tsx', '.js'],
       alias: {
         images: path.join(__dirname, 'src', 'images'),
-        modules: path.join(__dirname, 'src', 'modules'),
+        modules: path.resolve(__dirname, 'src/modules'),
         stores: path.join(__dirname, 'src', 'stores'),
-        api: path.join(__dirname, 'src', 'api'),
+        api: path.resolve(__dirname, 'src/api'),
         time: path.join(__dirname, 'src', 'time'),
         globals: path.join(__dirname, 'src', 'globals')
       }
@@ -56,9 +56,9 @@ module.exports = [
       extensions: ['.ts', '.tsx', '.js'],
       alias: {
         images: path.join(__dirname, 'src', 'images'),
-        modules: path.join(__dirname, 'src', 'modules'),
+        modules: path.resolve(__dirname, 'src/modules'),
         stores: path.join(__dirname, 'src', 'stores'),
-        api: path.join(__dirname, 'src', 'api'),
+        api: path.resolve(__dirname, 'src/api'),
         time: path.join(__dirname, 'src', 'time'),
         globals: path.join(__dirname, 'src', 'globals')
       }
