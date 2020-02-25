@@ -15,7 +15,9 @@
     "@types/electron": "^1.6.10",
     "@types/node": "^13.7.0",
     "@types/react-bootstrap": "^0.32.20",
-    "node": "^13.7.0"
+    "axios": "^0.19.2",
+    "canvas-api": "^3.6.0",
+    "node": "^13.7.0",
   },
   "devDependencies": {
     "@types/react": "^16.9.19",
