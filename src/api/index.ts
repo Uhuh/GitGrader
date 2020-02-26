@@ -11,8 +11,6 @@ interface ICanvas {
   canvas_url: string;
 }
 
-interface ITokens extends IGitlab, ICanvas {}
-
 /**
  * Access to repos.
  * reporter = can't push code but can view everything.
@@ -36,61 +34,26 @@ enum GitVisibility {
 }
 
 /**
- * @class API
+ * @class GitlabBackend
+ * Allow us access to gitlab's API
  * 
- * @constructor Requires all the tokens to be made to be able to properly setup
- *              Canvas and Gitlab
+ * @constructor Requires a users private token, (institute) url, and namespace.
  */
-export class API {
-  private gitlab: GitlabBackend;
-  private canvas: CanvasBackend;
-
-  constructor (private info: ITokens) {
-    this.gitlab = new GitlabBackend({ ...info });
-    this.canvas = new CanvasBackend({ ...info });
-  }
-  canvas_api = {
-    /**
-     * Uses the users canvas_token to gain access to their courses.
-     * 
-     * @TODO - figure out how to do TA and teacher efficiently.
-     * 
-     * @returns Array of courses
-     */
-    getClasses: (): Promise<any> => {
-      return this.canvas
-        .request('GET', 'courses', {
-          enrollment_type: 'ta',
-          enrollment_state: 'active'
-        })
-        .then(res => res)
-        .catch(console.error);
-    },
-    /**
-     * Gets the students in a course
-     * @returns Array of students
-     */
-    getStudents: (course_id: string): Promise<any> => {
-      return this.canvas
-        .students('GET', course_id)
-        .then(console.log)
-        .catch(console.error);
-    }
-  };
-  git_api = {
+export class GitlabBackend {
+  constructor (private info: IGitlab) {}
     /**
      * To format assignment names.
      * 
      * @returns A formatted string
      */
-    build_name: (sem: string, sec: string, n: string, user: string): string => (
+    build_name = (sem: string, sec: string, n: string, user: string): string => (
       `${sem}-${sec}-${n}-${user}`
-    ),
+    )
     /**
      * Creates an assignment within a specific namespace.
      * @returns The git links to clone with.
      */
-    createAssignment: (
+    createAssignment = (
       name: string,
       namespace_id: string,
       section: string,
@@ -98,7 +61,7 @@ export class API {
       username: string
     ): Promise<any> => {
       const params = {
-        'name': this.git_api.build_name(semester, section, name, username),
+        'name': this.build_name(semester, section, name, username),
         'namespace_id': namespace_id,
         'issues_enabled': false,
         'merge_requests_enabled': false,
@@ -108,67 +71,54 @@ export class API {
         'visibility_level': GitVisibility.private,
       };
       // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
-      return this.gitlab
-        .request('POST', '/projects', params)
+      return this.request('POST', '/projects', params)
         .then(res => console.log(`Created project: ${res}`))
         .catch(console.error);
-    },
+    }
     /**
      * Assigns a single user to a project.
      * 
      * @returns Promise<any> // figure out types
      */
-    assignAssignment: (assignment_id: string, user_id: string): Promise<any> => {
-      // Find repo that matches unique name then give perms to username...
+    assignAssignment = (assignment_id: string, user_id: string): Promise<any> => {
       const params = {
         'id': assignment_id,
         'user_id': user_id,
         'access_level': GitAccess.developer
       };
 
-      return this.gitlab.request('POST', `/projects/${params.id}/members/${params.user_id}`, params);
-    },
+      return this.request('POST', `/projects/${params.id}/members/${params.user_id}`, params);
+    }
     /**
      * Archive project, helps clean users repo list
      */
-    archiveAssignment: (assignment_id: string) => {
-      return this.gitlab.request('POST', `/projects/${assignment_id}/archive`, {});
-    },
+    archiveAssignment = (assignment_id: string) => {
+      return this.request('POST', `/projects/${assignment_id}/archive`, {});
+    }
     /**
      * Give a user reporter access to a project
      */
-    lockAssignment: (assignment_id: string, user_id: string): Promise<any> => {
+    lockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
       const params = {
         'id': assignment_id,
         'user_id': user_id,
         'access_level': GitAccess.reporter
       };
 
-      return this.gitlab.request('PUT', `/projects/${params.id}/members/${params.user_id}`, params);
-    },
+      return this.request('PUT', `/projects/${params.id}/members/${params.user_id}`, params);
+    }
     /**
      * Give a user developer access to a project.
      */
-    unlockAssignment: (assignment_id: string, user_id: string): Promise<any> => {
+    unlockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
       const params = {
         'id': assignment_id,
         'user_id': user_id,
         'access_level': GitAccess.developer
       };
 
-      return this.gitlab.request('PUT', `/projects/${params.id}/members/${params.user_id}`, params);
+      return this.request('PUT', `/projects/${params.id}/members/${params.user_id}`, params);
     }
-  };
-}
-
-/**
- * @class GitlabBackend
- * Allow us access to gitlab's API
- * 
- * @constructor Requires a users private token, (institute) url, and namespace.
- */
-class GitlabBackend {
-  constructor (private info: IGitlab) {}
   /**
    * @function request - We can access the api with whatever request
    * @param method - Must be 'GET' | 'POST' | 'PUT' | 'DELETE'
@@ -195,8 +145,38 @@ class GitlabBackend {
   }
 }
 
-class CanvasBackend {
+/**
+ * @class CanvasBackend
+ * Allow us access to canvas' API
+ * 
+ * @constructor Requires a users acces token, (institute) url.
+ */
+export class CanvasBackend {
   constructor (private info: ICanvas) {}
+  /**
+   * Uses the users canvas_token to gain access to their courses.
+   * 
+   * @TODO - figure out how to do TA and teacher efficiently.
+   * 
+   * @returns Array of courses
+   */
+  getClasses = (): Promise<any> => {
+    return this.request('GET', 'courses', {
+        enrollment_type: 'ta',
+        enrollment_state: 'active'
+      })
+      .then(res => res)
+      .catch(console.error);
+  }
+  /**
+   * Gets the students in a course
+   * @returns Array of students
+   */
+  getStudents = (course_id: string): Promise<any> => {
+    return this.students('GET', course_id)
+      .then(console.log)
+      .catch(console.error);
+  }
   /**
    * @function request - We can access the api with whatever request
    * @param method - Must be 'GET' | 'POST' | 'PUT' | 'DELETE'
