@@ -1,7 +1,7 @@
-import { Tab, Tabs } from '@material-ui/core';
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { TabPanel } from './navs';
+import {Grid} from '@material-ui/core';
+import {CourseCard} from './navs/courseCard';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -37,25 +37,24 @@ const CanvasAPI = new Canvas({
  */
 
 export const App = () => {
-  const [val, setVal] = React.useState(0);
-  
-  const handleChange = (event: any, newVal: any) => {
-    setVal(newVal);
-  };
+  const [courses, setCourses] = React.useState([
+    {name:'Ninjas'},
+    {name:'Intro'},
+    {name:'Data structs'}
+  ]);
 
   return (
-    <>
-      <Tabs
-        value={val}
-        onChange={handleChange}
-      >
-        <Tab label='GitGrader' />
-        <Tab label='Canvas' />
-        <Tab label='Gitlab' />
-      </Tabs>
-      <TabPanel value={val} index={0}><p>The GitGrader tab</p></TabPanel>
-      <TabPanel value={val} index={1}><p>The Canvas tab</p></TabPanel>
-      <TabPanel value={val} index={2}><p>The Gitlab tab</p></TabPanel>
-    </>
+    <Grid 
+      container
+      justify='center'
+      alignItems='center'
+      spacing={3}
+    >
+      {courses.map(course => (
+        <Grid item xs={3}>
+          <CourseCard course={course} />
+        </Grid>
+      ))}
+    </Grid>
   );
 };
