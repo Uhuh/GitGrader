@@ -1,7 +1,8 @@
+import {Grid, Paper} from '@material-ui/core';
 import * as React from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import {Grid} from '@material-ui/core';
-import {CourseCard} from './navs/courseCard';
+import {CourseList} from './navs/courseList';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -38,23 +39,20 @@ const CanvasAPI = new Canvas({
 
 export const App = () => {
   const [courses, setCourses] = React.useState([
-    {name:'Ninjas'},
-    {name:'Intro'},
-    {name:'Data structs'}
+    {name:'Ninjas for C++', teacher:'Sabharwhal', students:222},
+    {name:'Intro to lazy', teacher:'Gosnell', students:22},
+    {name:'testing', teacher:'Koob', students:2}
   ]);
 
+  const [user, setUser] = React.useState(true);
+
   return (
-    <Grid 
-      container
-      justify='center'
-      alignItems='center'
-      spacing={3}
-    >
-      {courses.map(course => (
-        <Grid item xs={3}>
-          <CourseCard course={course} />
-        </Grid>
-      ))}
-    </Grid>
+    <main>
+      <Switch>
+        <Route path='/' render={() => <CourseList courses={courses}/>} exact />
+        <Route path='/testing' render={()=><p>hello</p>} />
+      <Route render={()=><p>Route not found!</p>} />
+      </Switch>
+    </main>
   );
 };

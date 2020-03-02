@@ -1,3 +1,4 @@
 import { CourseCard } from './courseCard';
+import { CourseList } from './courseList';
 
-export default CourseCard;
+export {CourseList}
