@@ -179,5 +179,8 @@ export const CanvasPage = () => {
             </li>)} 
        </ol>
       );
+<<<<<<< HEAD
+>>>>>>> able to show a list of all the classes onto the canvas page
+=======
 >>>>>>> able to show a list of all the classes onto the canvas page
 };
