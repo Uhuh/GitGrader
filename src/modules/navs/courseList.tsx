@@ -40,7 +40,7 @@ const useStyles = makeStyles({
   },
   actionButton: {
     color: 'white'
-  }
+  } 
 });
 
 export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
