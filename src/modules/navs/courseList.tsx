@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { CourseCard } from './courseCard';
 
 export const CourseList = (courses: any) => {
-    console.log(courses);
     return(
         <Grid 
             container
@@ -14,8 +13,8 @@ export const CourseList = (courses: any) => {
             style={{ minHeight: '100vh'}}
         >
             {courses.courses.map((course:any) => (
-                <Grid item xs={3} key={course.name}>
-                    <Link to={`/${course.name}`}>
+                <Grid item xs={3} key={course.id}>
+                    <Link to={`/course/${course.id}`}>
                         <CourseCard course={course} />
                     </Link>
                 </Grid>

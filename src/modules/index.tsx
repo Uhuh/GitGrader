@@ -1,6 +1,6 @@
 import {Grid, Paper} from '@material-ui/core';
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import {CourseList} from './navs/courseList';
 
@@ -37,11 +37,21 @@ const CanvasAPI = new Canvas({
   .catch(console.error);
  */
 
+
+// TODO : This needs to be an actual page/component
+const CoursePage =  (obj:{ match: any, location: any}) => {
+  return (
+    <p>
+      {obj.match.params.courseId}
+    </p>
+  );
+};
+
 export const App = () => {
   const [courses, setCourses] = React.useState([
-    {name:'Ninjas for C++', teacher:'Sabharwhal', students:222},
-    {name:'Intro to lazy', teacher:'Gosnell', students:22},
-    {name:'testing', teacher:'Koob', students:2}
+    {name:'Ninjas for C++', teacher:'Sabharwhal', students:222, id:1},
+    {name:'Intro to lazy', teacher:'Gosnell', students:22, id:2},
+    {name:'Awful Homework', teacher:'Koob', students:2, id:3}
   ]);
 
   const [user, setUser] = React.useState(true);
@@ -49,9 +59,10 @@ export const App = () => {
   return (
     <main>
       <Switch>
-        <Route path='/' render={() => <CourseList courses={courses}/>} exact />
-        <Route path='/testing' render={()=><p>hello</p>} />
-      <Route render={()=><p>Route not found!</p>} />
+        <Route exact path='/' key='courses' render={() => <CourseList courses={courses}/>} />
+        <Route exact path='/course/:courseId' component={CoursePage} />
+        <Route exact path='/testing' key='testing' render={()=><p>hello</p>} />
+        <Route key='error' render={()=><Link to='/'><p>Route not found!</p></Link>} />
       </Switch>
     </main>
   );
