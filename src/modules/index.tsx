@@ -101,10 +101,6 @@ export const App = () => {
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
-  if(!courses){
-    return (<div>UwU</div>);
-  }
-
   const [user, setUser] = React.useState(true);
 
   return (
