@@ -101,6 +101,8 @@ export const App = () => {
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
+  const [user, setUser] = React.useState(true);
+
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
