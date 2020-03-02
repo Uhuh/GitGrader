@@ -37,7 +37,7 @@ const useStyles = makeStyles({
     width: '100%',
     textAlign: 'center'
   } 
-});
+}); 
 
 /**
  * We should be able to pass the course as well.
