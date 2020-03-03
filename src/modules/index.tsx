@@ -10,7 +10,7 @@ import { CourseList } from './navs/courseList';
  */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: '',
+  gitlab_token: 'MV-G-edsMHNZbi9EvnGF',
   namespace: '2020-senior-test'
 });
 
