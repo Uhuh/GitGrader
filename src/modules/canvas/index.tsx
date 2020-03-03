@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
-import { CanvasAPI } from '..';
+import { CanvasAPI } from '..'; 
 import { IBaseRepo, ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 
