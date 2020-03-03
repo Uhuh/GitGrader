@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Button, Dialog , DialogActions, DialogContent, 
   DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
@@ -153,10 +152,6 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
       </Dialog>
     </>
   );
-=======
-import * as React from 'react';
-import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-
 var data: string[];
 data = [];
 
