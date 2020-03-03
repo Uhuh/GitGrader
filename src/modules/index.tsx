@@ -54,7 +54,7 @@ export const App = () => {
   const relations = JSON.parse(localStorage.getItem('relations') || 'null');
 
   console.log(relations);
-
+ 
   const toggleTheme = () => {
     localStorage.setItem('theme', theme == 'dark' ? 'light' : 'dark');
     setTheme(theme == 'dark' ? 'light' : 'dark');
