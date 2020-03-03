@@ -36,7 +36,7 @@ const useStyles = makeStyles({
   centerItem: {
     width: '100%',
     textAlign: 'center'
-  }
+  } 
 });
 
 /**
