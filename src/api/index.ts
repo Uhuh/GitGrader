@@ -48,30 +48,61 @@ export class GitlabBackend {
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
     const repo = await this.request('POST', '/projects', params);
 
-    return new Promise(() => ({
-      username,
-      id: repo.id,
-      name: repo.name,
-      namespace: repo.namespace.name
-    }));
+    return new Promise((res, rej) => {
+      if(!repo || repo === null) {
+        /**
+         * It might be an username or namespace issue.
+         */
+        rej({
+          status: 'failed',
+          namespace_id,
+          name,
+          username
+        });
+      }
+
+      res({
+        username,
+        id: repo.id,
+        name: repo.name,
+        namespace: repo.namespace.name
+      });
+    });
   }
   /**
    * Assigns a single user to a project.
    *
    * @returns Promise<any> // figure out types
    */
-  assignAssignment = (assignment_id: string, user_id: string): Promise<any> => {
+  assignAssignment = async (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
       access_level: GitAccess.developer
     };
 
-    return this.request(
+    const assigned = await this.request(
       'POST',
-      `/projects/${params.id}/members/${params.user_id}`,
+      `/projects/${params.id}/members`,
       params
     );
+
+    return new Promise((res, rej) => {
+      if(!assigned) {
+        rej({
+          status: 'failed',
+          assignment_id,
+          user_id
+        });
+      }
+
+      res({
+        id: assigned.id,
+        name: assigned.name, // Student's full name
+        username: assigned.username,
+        access_level: assigned.access_level
+      });
+    });
   }
   /**
    * Archive project, helps clean users repo list

@@ -8,33 +8,32 @@ import { TabPanel } from './navs';
  */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: 'MV-G-edsMHNZbi9EvnGF',
+  gitlab_token: '',
   namespace: '2020-senior-test'
 });
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
-  canvas_token: '2006~Zmq2qCmC9QkzviZoSYoYG1FzYbK2T3mg7egBn6nTiRSXYcKSVCXBK7teCQ8BMtqL'
+  canvas_token: ''
 });
 
-/* GitLabAPI.createAssignment(
-  'hw4',
+GitLabAPI.createAssignment(
+  'hw1',
   '2453',
   '001',
   '2020-SP',
-  'duwtgb'
+  'mrmk8'
 )
-.then(console.log)
+.then(assignment => {
+  GitLabAPI.getUserId('mrmk8')
+    .then(user => {
+      GitLabAPI.assignAssignment(assignment.id, user.id)
+        .then(console.log)
+        .catch(console.error);
+    })
+    .catch(console.error);
+})
 .catch(console.error);
- */
-
-GitLabAPI.getUserId('duwtgb')
-  .then(console.log)
-  .catch(console.error);
-
-GitLabAPI.getUserId('ddddd')
-  .then(console.log)
-  .catch(console.error);
 
 
 CanvasAPI.getClasses()
