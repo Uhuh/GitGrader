@@ -22,7 +22,7 @@ GitLabAPI.setHost(JSON.parse(localStorage.getItem('GHdata') || 'null') || 'https
 const CanvasAPI = new Canvas();
 export { CanvasAPI };
 CanvasAPI.setToken(JSON.parse(localStorage.getItem('CTdata') || 'null') || '');
-CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || '');
+CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || ''); 
 
 const Centered = styled.div`
   margin: 0;
