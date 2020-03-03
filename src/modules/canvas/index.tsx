@@ -27,7 +27,7 @@ const useStyles = makeStyles({
   },
   pos: {
     marginBottom: 12,
-  },
+  }, 
   addIcon: {
     display: 'flex',
     justifyContent: 'center',
