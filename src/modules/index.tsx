@@ -11,7 +11,7 @@ import { CourseList } from './navs/courseList';
  */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: 'MV-G-edsMHNZbi9EvnGF',
+  gitlab_token: '',
   namespace: '2020-senior-test'
 });
 
