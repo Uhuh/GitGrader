@@ -466,7 +466,7 @@ export class CanvasBackend {
         people.filter((p: any) =>
           p.role !== 'TaEnrollment' && p.role !== 'TeacherEnrollment'
         )
-      );
+      ); 
     });      
   }
 }
