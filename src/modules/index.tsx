@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
 import { CourseList } from './navs/courseList';
-import console = require('console');
 
 
 /**
@@ -12,7 +11,7 @@ import console = require('console');
  */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: '',
+  gitlab_token: 'MV-G-edsMHNZbi9EvnGF',
   namespace: '2020-senior-test'
 });
 
@@ -38,21 +37,6 @@ const CanvasAPI = new Canvas({
 //     .catch(console.error);
 // })
 // .catch(console.error);
-
-let data: ICanvasClass[];
-  data = [];  
-let stuff: String;
-stuff = 'a';
-  CanvasAPI.getClasses()
-  .then(classes => 
-    {
-      for(const course of classes){
-        data.push(course);
-    }})
-  .catch(console.error);
-*/
-
-  console.log(data);
 
 // CanvasAPI.getStudents('42771')
 //   .then(console.log)
