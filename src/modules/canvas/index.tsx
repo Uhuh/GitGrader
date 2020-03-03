@@ -179,3 +179,4 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
       </Dialog>
     </>
   );};
+
