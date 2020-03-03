@@ -184,18 +184,17 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
 =======
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { FormControlStatic } from 'react-bootstrap';
 
-
-var data = [''];
+var data: string[];
+data = [];
 
 const CanvasAPI = new Canvas({
     canvas_url: 'https://mst.instructure.com',
-    canvas_token: ''
+    canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
   });
 
 CanvasAPI.getClasses().then(function(result) {
-    data.pop()
+
     for(let i=0; i<result.length; i++){
         data.push(result[i].name);
     }
