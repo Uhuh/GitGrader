@@ -9,13 +9,13 @@ import { SetUp } from './settings/index';
  */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: '',
+  gitlab_token: 'MV-G-edsMHNZbi9EvnGF',
   namespace: '2020-senior-test'
 });
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
-  canvas_token: ''
+  canvas_token: '2006~Zmq2qCmC9QkzviZoSYoYG1FzYbK2T3mg7egBn6nTiRSXYcKSVCXBK7teCQ8BMtqL'
 });
 
 /*
