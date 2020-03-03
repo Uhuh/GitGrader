@@ -1,8 +1,8 @@
+import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { BackButton, CourseList, SettingsButton } from './navs';
-import { SetUp } from './settings/index';
+import { CourseList } from './navs/courseList';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -57,9 +57,7 @@ CanvasAPI.getStudents('42771')
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
-  return (
-    <p>This is course {obj.match.params.courseID}</p>
-  );
+  return <p>{obj.match.params.courseId}</p>;
 };
 
 export const App = () => {
@@ -73,8 +71,6 @@ export const App = () => {
 
   return (
     <main>
-      <BackButton />
-      <SettingsButton />
       <Switch>
         <Route
           exact
@@ -82,16 +78,12 @@ export const App = () => {
           key='courses'
           render={() => <CourseList courses={courses} />}
         />
+        <Route exact path='/course/:courseId' component={CoursePage} />
         <Route
           exact
-          path='/settings'
-          key='settings'
-          render={() => <SetUp />}
-        />
-        <Route 
-          exact 
-          path='/course/:courseId' 
-          component={CoursePage}
+          path='/testing'
+          key='testing'
+          render={() => <p>hello</p>}
         />
         <Route
           key='error'
