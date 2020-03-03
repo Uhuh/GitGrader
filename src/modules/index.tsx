@@ -129,7 +129,7 @@ export const App = () => {
           render={() => <SetUp />}
         />
         <Route 
-          exact 
+          exact  
           path='/course/:courseId' 
           render={({ match }) => {
             // Match will be the course id.
