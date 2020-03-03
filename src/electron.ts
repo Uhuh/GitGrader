@@ -10,21 +10,21 @@ const createWindow = () => {
   });
 
   // Load the index.html so we can ... insert html.
-  win.loadFile("index.html");
+  win.loadFile('index.html');
 
-  win.webContents.openDevTools()
-}
+  win.webContents.openDevTools();
+};
 
-app.whenReady().then(createWindow)
+app.whenReady().then(createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
+    createWindow();
   }
-})
+});
