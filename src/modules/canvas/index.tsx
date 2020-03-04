@@ -53,7 +53,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   const [users, setUsers] = React.useState<IGitUser[]>([]);
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState(false);
-
+ 
   React.useEffect(() => {
     CanvasAPI.getStudents(course.id)
       .then(s => { // s is all students
