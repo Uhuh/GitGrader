@@ -5,8 +5,8 @@ import { CourseCard } from './courseCard';
 
 export const CourseList = (courses: any) => {
   return (
-    <div>
-    <Button href="#/">Return</Button>
+    <>
+    <Button variant="outlined" href="#/">Home</Button>
     <>
       <Grid
         container
@@ -24,6 +24,6 @@ export const CourseList = (courses: any) => {
         ))}
       </Grid>
     </>
-    </div>
+    </>
   );
 };
