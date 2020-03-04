@@ -79,12 +79,13 @@ export const App = () => {
         <Route
           exact
           path='/'
-          key='Home'
+          key='home'
           render={() => <Navigation />}
         />
         <Route
           exact
           path='/setup'
+          key='setup'
           render={() => <SetUp />}
         />
         <Route

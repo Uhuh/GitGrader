@@ -4,6 +4,7 @@ import * as React from 'react';
 export const SetUp = () => {
     return (
       <div>
+        <Button href="#/">Return</Button>
         <form>
           <div>
             <label>
@@ -20,8 +21,6 @@ export const SetUp = () => {
             <input type="submit" value="Submit" />
           </div>
         </form>
-        <p>keys: <span id="canvasKey"></span></p>
-        <Button href="#/">Return</Button>
       </div>
     );
   };
