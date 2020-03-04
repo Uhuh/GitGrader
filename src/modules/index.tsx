@@ -1,9 +1,12 @@
-import { Button, Dialog, DialogActions, DialogContent,
-         DialogContentText, DialogTitle, Tab, Tabs, TextField } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { TabPanel } from './navs';
+import { CourseList } from './navs/courseList';
 
+/**
+ * Make sure to use your token for testing. Might want to use an .env file for this
+ */
 const GitLabAPI = new GL({
   gitlab_host: 'https://git-classes.mst.edu',
   gitlab_token: '',
@@ -15,63 +18,81 @@ const CanvasAPI = new Canvas({
   canvas_token: ''
 });
 
-export const firstTimeDialog = () => {
-  const [open, setOpen] = React.useState(false);
+GitLabAPI.createAssignment(
+  'hw1',
+  '2453',
+  '001',
+  '2020-SP',
+  'mrmk8'
+)
+.then(assignment => {
+  GitLabAPI.getUserId('mrmk8')
+    .then(user => {
+      GitLabAPI.assignAssignment(assignment.id, user.id)
+        .then(console.log)
+        .catch(console.error);
+    })
+    .catch(console.error);
+})
+.catch(console.error);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+CanvasAPI.getClasses()
+  .then(classes => console.log(classes[1]))
+  .catch(console.error);
 
-  return (
-    <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Open form dialog
-      </Button>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>First Time Setup</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <TextField id="standard-basic" label="GitLab Access Key" />
-            <TextField id="standard-basic" label="Canvas Access Key" />
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>
-            Done
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
+CanvasAPI.getStudents('42771')
+  .then(console.log)
+  .catch(console.error);
+
+/* GitLabAPI.lockAssignment('', '')
+  .then(console.log)
+  .catch(console.error); */
+
+/* canvas.getStudents('')
+  .then(console.log)
+  .catch(console.error);
+ */
+
+// TODO : This needs to be an actual page/component
+const CoursePage = (obj: { match: any; location: any }) => {
+  return <p>{obj.match.params.courseId}</p>;
 };
 
 export const App = () => {
-  const [val, setVal] = React.useState(0);
-  
-  const handleChange = (event: any, newVal: any) => {
-    setVal(newVal);
-  };
+  const [courses, setCourses] = React.useState([
+    { name: 'Ninjas for C++', teacher: 'Sabharwhal', students: 222, id: 1 },
+    { name: 'Intro to lazy', teacher: 'Gosnell', students: 22, id: 2 },
+    { name: 'Awful Homework', teacher: 'Koob', students: 2, id: 3 }
+  ]);
+
+  const [user, setUser] = React.useState(true);
 
   return (
-    <>
-      <Tabs
-        value={val}
-        onChange={handleChange}
-      >
-        <Tab label='GitGrader' />
-        <Tab label='Canvas' />
-        <Tab label='Gitlab' />
-      </Tabs>
-      <TabPanel value={val} index={0}>
-        <p>The GitGrader tab</p>
-        <Button variant="outlined" color="primary" onClick={firstTimeDialog}>Setup</Button>
-      </TabPanel>
-      <TabPanel value={val} index={1}><p>The Canvas tab</p></TabPanel>
-      <TabPanel value={val} index={2}><p>The Gitlab tab</p></TabPanel>
-    </>
+    <main>
+      <Switch>
+        <Route
+          exact
+          path='/'
+          key='courses'
+          render={() => <CourseList courses={courses} />}
+        />
+        <Route exact path='/course/:courseId' component={CoursePage} />
+        <Route
+          exact
+          path='/testing'
+          key='testing'
+          render={() => <p>hello</p>}
+        />
+        <Route
+          key='error'
+          render={() => (
+            <Link to='/'>
+              <p>Route not found!</p>
+            </Link>
+          )}
+        />
+      </Switch>
+    </main>
   );
 };
