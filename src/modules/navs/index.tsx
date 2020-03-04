@@ -1,18 +1,19 @@
 import { CourseCard } from './courseCard';
 import { CourseList } from './courseList';
-import { Button } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import * as React from 'react';
 
 export const Navigation = () => {
     return (
-      <div>
-        <Button href="#/courses">
+      <>
+        <Typography variant="h3">GitGrader Home</Typography>
+        <Button variant="outlined" href="#/courses">
           Courses
         </Button>
-        <Button href="#/setup">
+        <Button variant="outlined" href="#/setup">
           Settings
         </Button>
-      </div>
+      </>
     )
   }
 

@@ -60,7 +60,7 @@ CanvasAPI.getStudents('42771')
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
   return (
-    <Button href="#/courses">Return</Button>
+    <Button variant="outlined" href="#/courses">Courses</Button>
   );
 };
 
