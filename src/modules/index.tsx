@@ -2,7 +2,10 @@ import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
+import { ICanvasClass } from '../api/interfaces';
 import { CourseList } from './navs/courseList';
+import console = require('console');
+
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -15,36 +18,45 @@ const GitLabAPI = new GL({
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
-  canvas_token: ''
+  canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
 });
 
-/*
-GitLabAPI.createAssignment(
-  'hw1',
-  '2453',
-  '001',
-  '2020-SP',
-  'mrmk8'
-)
-.then(assignment => {
-  GitLabAPI.getUserId('mrmk8')
-    .then(user => {
-      GitLabAPI.assignAssignment(assignment.id, user.id)
-        .then(console.log)
-        .catch(console.error);
-    })
-    .catch(console.error);
-})
-.catch(console.error);
+// GitLabAPI.createAssignment(
+//   'hw1',
+//   '2453',
+//   '001',
+//   '2020-SP',
+//   'mrmk8'
+// )
+// .then(assignment => {
+//   GitLabAPI.getUserId('mrmk8')
+//     .then(user => {
+//       GitLabAPI.assignAssignment(assignment.id, user.id)
+//         .then(console.log)
+//         .catch(console.error);
+//     })
+//     .catch(console.error);
+// })
+// .catch(console.error);
 
-CanvasAPI.getClasses()
-  .then(classes => console.log(classes[1]))
-  .catch(console.error);
-
-CanvasAPI.getStudents('42771')
-  .then(console.log)
+let data: ICanvasClass[];
+  data = [];  
+let stuff: String;
+stuff = 'a';
+  CanvasAPI.getClasses()
+  .then(classes => 
+    {
+      for(const course of classes){
+        data.push(course);
+    }})
   .catch(console.error);
 */
+
+  console.log(data);
+
+// CanvasAPI.getStudents('42771')
+//   .then(console.log)
+//   .catch(console.error);
 
 /* GitLabAPI.lockAssignment('', '')
   .then(console.log)
@@ -60,11 +72,21 @@ const CoursePage = (obj: { match: any; location: any }) => {
   return <p>{obj.match.params.courseId}</p>;
 };
 
+// console.log(data[0]['name']);
+
 export const App = () => {
+  // let stuff: String;
+  // stuff = 'a';
+  // for(const course of data){
+  //   console.log(course['name']);
+  // }
+
+  // console.log(stuff);
+
   const [courses, setCourses] = React.useState([
-    { name: 'Test Class 1', teacher: 'Professor 1', students: 222, id: 1 },
-    { name: 'Test Class 2', teacher: 'Professor 2', students: 22, id: 2 },
-    { name: 'Test Class 3', teacher: 'Professor 3', students: 2, id: 3 }
+    { name: 'data[1].name', teacher: 'Sabharwhal', students: 222, id: 1 },
+    { name: 'Intro to lazy', teacher: 'Gosnell', students: 22, id: 2 },
+    { name: 'Awful Homework', teacher: 'Koob', students: 2, id: 3 }
   ]);
 
   const [user, setUser] = React.useState(true);
