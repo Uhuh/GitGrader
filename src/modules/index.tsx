@@ -1,9 +1,7 @@
-import { Button, Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { CourseList } from './navs/courseList';
-import { Navigation } from './navs/index'
+import { BackButton, CourseList, SettingsButton } from './navs';
 import { SetUp } from './settings/index';
 
 /**
@@ -60,7 +58,7 @@ CanvasAPI.getStudents('42771')
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
   return (
-    <Button variant="outlined" href="#/courses">Courses</Button>
+    <p>This is course {obj.match.params.courseID}</p>
   );
 };
 
@@ -75,35 +73,25 @@ export const App = () => {
 
   return (
     <main>
+      <BackButton />
+      <SettingsButton />
       <Switch>
         <Route
           exact
           path='/'
-          key='home'
-          render={() => <Navigation />}
-        />
-        <Route
-          exact
-          path='/setup'
-          key='setup'
-          render={() => <SetUp />}
-        />
-        <Route
-          exact
-          path='/courses'
           key='courses'
           render={() => <CourseList courses={courses} />}
+        />
+        <Route
+          exact
+          path='/settings'
+          key='settings'
+          render={() => <SetUp />}
         />
         <Route 
           exact 
           path='/course/:courseId' 
           component={CoursePage}
-        />
-        <Route
-          exact
-          path='/testing'
-          key='testing'
-          render={() => <p>TEST PAGE</p>}
         />
         <Route
           key='error'

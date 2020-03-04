@@ -1,20 +1,6 @@
 import { CourseCard } from './courseCard';
 import { CourseList } from './courseList';
-import { Button, Typography } from '@material-ui/core';
-import * as React from 'react';
+import { BackButton, SettingsButton } from './floatingButtons'
+import { Navigation } from './navigation';
 
-export const Navigation = () => {
-    return (
-      <>
-        <Typography variant="h3">GitGrader Home</Typography>
-        <Button variant="outlined" href="#/courses">
-          Courses
-        </Button>
-        <Button variant="outlined" href="#/setup">
-          Settings
-        </Button>
-      </>
-    )
-  }
-
-export { CourseList };
+export { CourseList, Navigation, SettingsButton, BackButton };
