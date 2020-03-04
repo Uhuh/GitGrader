@@ -1,7 +1,8 @@
-import { Tab, Tabs } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { TabPanel } from './navs';
+import { CourseList } from './navs/courseList';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -53,26 +54,45 @@ CanvasAPI.getStudents('42771')
   .catch(console.error);
  */
 
+// TODO : This needs to be an actual page/component
+const CoursePage = (obj: { match: any; location: any }) => {
+  return <p>{obj.match.params.courseId}</p>;
+};
+
 export const App = () => {
-  const [val, setVal] = React.useState(0);
-  
-  const handleChange = (event: any, newVal: any) => {
-    setVal(newVal);
-  };
+  const [courses, setCourses] = React.useState([
+    { name: 'Ninjas for C++', teacher: 'Sabharwhal', students: 222, id: 1 },
+    { name: 'Intro to lazy', teacher: 'Gosnell', students: 22, id: 2 },
+    { name: 'Awful Homework', teacher: 'Koob', students: 2, id: 3 }
+  ]);
+
+  const [user, setUser] = React.useState(true);
 
   return (
-    <>
-      <Tabs
-        value={val}
-        onChange={handleChange}
-      >
-        <Tab label='GitGrader' />
-        <Tab label='Canvas' />
-        <Tab label='Gitlab' />
-      </Tabs>
-      <TabPanel value={val} index={0}><p>The GitGrader tab</p></TabPanel>
-      <TabPanel value={val} index={1}><p>The Canvas tab</p></TabPanel>
-      <TabPanel value={val} index={2}><p>The Gitlab tab</p></TabPanel>
-    </>
+    <main>
+      <Switch>
+        <Route
+          exact
+          path='/'
+          key='courses'
+          render={() => <CourseList courses={courses} />}
+        />
+        <Route exact path='/course/:courseId' component={CoursePage} />
+        <Route
+          exact
+          path='/testing'
+          key='testing'
+          render={() => <p>hello</p>}
+        />
+        <Route
+          key='error'
+          render={() => (
+            <Link to='/'>
+              <p>Route not found!</p>
+            </Link>
+          )}
+        />
+      </Switch>
+    </main>
   );
 };
