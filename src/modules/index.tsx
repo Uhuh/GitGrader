@@ -1,8 +1,10 @@
-import { Grid, Paper } from '@material-ui/core';
+import { Button, Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { CourseList } from './navs/courseList';
+import { Navigation } from './navs/index'
+import { SetUp } from './settings/index';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -18,6 +20,7 @@ const CanvasAPI = new Canvas({
   canvas_token: ''
 });
 
+/*
 GitLabAPI.createAssignment(
   'hw1',
   '2453',
@@ -36,7 +39,6 @@ GitLabAPI.createAssignment(
 })
 .catch(console.error);
 
-
 CanvasAPI.getClasses()
   .then(classes => console.log(classes[1]))
   .catch(console.error);
@@ -44,6 +46,7 @@ CanvasAPI.getClasses()
 CanvasAPI.getStudents('42771')
   .then(console.log)
   .catch(console.error);
+*/
 
 /* GitLabAPI.lockAssignment('', '')
   .then(console.log)
@@ -56,14 +59,16 @@ CanvasAPI.getStudents('42771')
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
-  return <p>{obj.match.params.courseId}</p>;
+  return (
+    <Button href="#/courses">Return</Button>
+  );
 };
 
 export const App = () => {
   const [courses, setCourses] = React.useState([
-    { name: 'Ninjas for C++', teacher: 'Sabharwhal', students: 222, id: 1 },
-    { name: 'Intro to lazy', teacher: 'Gosnell', students: 22, id: 2 },
-    { name: 'Awful Homework', teacher: 'Koob', students: 2, id: 3 }
+    { name: 'Test Class 1', teacher: 'Professor 1', students: 222, id: 1 },
+    { name: 'Test Class 2', teacher: 'Professor 2', students: 22, id: 2 },
+    { name: 'Test Class 3', teacher: 'Professor 3', students: 2, id: 3 }
   ]);
 
   const [user, setUser] = React.useState(true);
@@ -74,21 +79,36 @@ export const App = () => {
         <Route
           exact
           path='/'
+          key='Home'
+          render={() => <Navigation />}
+        />
+        <Route
+          exact
+          path='/setup'
+          render={() => <SetUp />}
+        />
+        <Route
+          exact
+          path='/courses'
           key='courses'
           render={() => <CourseList courses={courses} />}
         />
-        <Route exact path='/course/:courseId' component={CoursePage} />
+        <Route 
+          exact 
+          path='/course/:courseId' 
+          component={CoursePage}
+        />
         <Route
           exact
           path='/testing'
           key='testing'
-          render={() => <p>hello</p>}
+          render={() => <p>TEST PAGE</p>}
         />
         <Route
           key='error'
           render={() => (
             <Link to='/'>
-              <p>Route not found!</p>
+              <p>Page not found.</p>
             </Link>
           )}
         />
