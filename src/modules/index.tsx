@@ -101,16 +101,6 @@ export const App = () => {
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
-  const [courses, setCourses] = React.useState<ICanvasClass[]>();
-
-  React.useEffect(() => {
-    CanvasAPI.getClasses()
-      .then(classes => { 
-        setCourses(classes);
-      })
-      .catch(console.error);
-  });
-
   if(!courses){
     return (<div>UwU</div>);
   }
