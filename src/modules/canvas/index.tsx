@@ -161,7 +161,6 @@ const CanvasAPI = new Canvas({
   });
 
 CanvasAPI.getClasses().then(function(result) {
-
     for(let i=0; i<result.length; i++){
         data.push(result[i].name);
     }
