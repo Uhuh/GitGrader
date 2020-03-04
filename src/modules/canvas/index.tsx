@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
 
-var data: string[];
+let data: string[];
 data = [];
 
 const CanvasAPI = new Canvas({
@@ -10,7 +10,6 @@ const CanvasAPI = new Canvas({
   });
 
 CanvasAPI.getClasses().then(function(result) {
-
     for(let i=0; i<result.length; i++){
         data.push(result[i].name);
     }

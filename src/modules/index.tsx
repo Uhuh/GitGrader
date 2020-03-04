@@ -16,7 +16,7 @@ const GitLabAPI = new GL({
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
-  canvas_token: ''
+  canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
 });
 
 // GitLabAPI.createAssignment(
@@ -41,6 +41,10 @@ const CanvasAPI = new Canvas({
 //   .then(console.log)
 //   .catch(console.error);
 
+// CanvasAPI.getStudents('42771')
+//   .then(console.log)
+//   .catch(console.error);
+
 /* GitLabAPI.lockAssignment('', '')
   .then(console.log)
   .catch(console.error); */
@@ -54,6 +58,8 @@ const CanvasAPI = new Canvas({
 const CoursePage = (obj: { match: any; location: any }) => {
   return <p>{obj.match.params.courseId}</p>;
 };
+
+// console.log(data[0]['name']);
 
 export const App = () => {
 
