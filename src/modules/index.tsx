@@ -6,6 +6,7 @@ import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
+import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
 import { MissingSettings, SetUp } from './settings';
@@ -115,8 +116,11 @@ export const App = () => {
         <Route 
           exact 
           path='/course/:courseId' 
-          component={CoursePage} 
-          />
+          render={({ match }) => (
+            // Match will be the course id.
+            <CanvasPage { ...match.params } />
+          )} 
+        />
         <Route
           key='error'
           render={() => (
