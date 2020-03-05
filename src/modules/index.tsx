@@ -47,7 +47,7 @@ const lightTheme = createMuiTheme({
     primary: grey,
   }
 });
-
+ 
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasNamespace[]>();
   const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'dark');
