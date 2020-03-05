@@ -6,13 +6,14 @@ import styled from 'styled-components';
 
 const BackButton = () => {
   const Floating = styled.div`
-    position: relative;
-    float: left;
+    position: absolute;
+    left: 10px;
+    top: 10px;
   `;
   return(
     <Floating>
       <Link to='/'>
-        <ArrowBackIcon />
+        <ArrowBackIcon fontSize='large'/>
       </Link>
     </Floating>
   );
@@ -20,13 +21,14 @@ const BackButton = () => {
 
 const SettingsButton = () => {
   const Floating = styled.div`
-    position: relative;
-    float: right;
+    position: absolute;
+    right: 10px;
+    top: 10px;
   `;
   return(
     <Floating>
       <Link to='/settings'>
-        <SettingsIcon />
+        <SettingsIcon fontSize='large'/>
       </Link>
     </Floating>
   );

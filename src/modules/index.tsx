@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
 import { BackButton, CourseList, SettingsButton } from './navs';
-import { SetUp } from './settings';
+import { darkTheme, GlobalStyles, lightTheme, SetUp } from './settings';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -62,6 +63,8 @@ const CoursePage = (obj: { match: any; location: any }) => {
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
+  const [theme, setTheme] = React.useState('light');
+
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
     CanvasAPI.getClasses()
@@ -74,41 +77,44 @@ export const App = () => {
 
   return (
     <main>
-      <BackButton />
-      <SettingsButton />
-      <Switch>
-        <Route
-          exact
-          path='/'
-          key='courses'
-          render={() => 
-            <>
-              {courses ? 
-              <CourseList courses={courses}/> :
-              <p>No Courses loaded yet</p>}
-            </>
-          }
-        />
-        <Route
-          exact
-          path='/settings'
-          key='settings'
-          render={() => <SetUp />}
-        />
-        <Route 
-          exact 
-          path='/course/:courseId' 
-          component={CoursePage} 
-        />
-        <Route
-          key='error'
-          render={() => (
-            <Link to='/'>
-              <p>Route not found!</p>
-            </Link>
-          )}
-        />
-      </Switch>
+      <ThemeProvider theme={darkTheme}>
+        <GlobalStyles />
+        <BackButton />
+        <SettingsButton />
+        <Switch>
+          <Route
+            exact
+            path='/'
+            key='courses'
+            render={() => 
+              <>
+                {courses ? 
+                <CourseList courses={courses}/> :
+                <p>No Courses loaded yet</p>}
+              </>
+            }
+            />
+          <Route
+            exact
+            path='/settings'
+            key='settings'
+            render={() => <SetUp />}
+            />
+          <Route 
+            exact 
+            path='/course/:courseId' 
+            component={CoursePage} 
+            />
+          <Route
+            key='error'
+            render={() => (
+              <Link to='/'>
+                <p>Route not found!</p>
+              </Link>
+            )}
+            />
+        </Switch>
+      </ThemeProvider>
     </main>
   );
 };
