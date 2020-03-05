@@ -39,7 +39,7 @@ const colors = [
 
 export const CourseCard = (props: {course: ICanvasClass}) => {
   const classes = useStyles();
-  const color = colors[Math.floor(Math.random() * 11)];
+  const color = colors[Number(props.course.id) % 11];
 
   const ImagePlaceholder = styled.div`
     background-image: linear-gradient(-70deg, ${color.l}, ${color.r});
