@@ -101,7 +101,19 @@ export const App = () => {
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
-  const [user, setUser] = React.useState(true);
+  const [courses, setCourses] = React.useState<ICanvasClass[]>();
+
+  React.useEffect(() => {
+    CanvasAPI.getClasses()
+      .then(classes => { 
+        setCourses(classes);
+      })
+      .catch(console.error);
+  });
+
+  if(!courses){
+    return (<div>UwU</div>);
+  }
 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
