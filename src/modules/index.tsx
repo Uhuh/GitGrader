@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
+import { ICanvasClass } from '../api/interfaces';
 import { BackButton, CourseList, SettingsButton } from './navs';
-import { SetUp } from './settings/index';
+import { SetUp } from './settings';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -15,36 +16,34 @@ const GitLabAPI = new GL({
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
-  canvas_token: ''
+  canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
 });
 
-/*
-GitLabAPI.createAssignment(
-  'hw1',
-  '2453',
-  '001',
-  '2020-SP',
-  'mrmk8'
-)
-.then(assignment => {
-  GitLabAPI.getUserId('mrmk8')
-    .then(user => {
-      GitLabAPI.assignAssignment(assignment.id, user.id)
-        .then(console.log)
-        .catch(console.error);
-    })
-    .catch(console.error);
-})
-.catch(console.error);
+// GitLabAPI.createAssignment(
+//   'hw1',
+//   '2453',
+//   '001',
+//   '2020-SP',
+//   'mrmk8'
+// )
+// .then(assignment => {
+//   GitLabAPI.getUserId('mrmk8')
+//     .then(user => {
+//       GitLabAPI.assignAssignment(assignment.id, user.id)
+//         .then(console.log)
+//         .catch(console.error);
+//     })
+//     .catch(console.error);
+// })
+// .catch(console.error);
 
-CanvasAPI.getClasses()
-  .then(classes => console.log(classes[1]))
-  .catch(console.error);
+// CanvasAPI.getStudents('42771')
+//   .then(console.log)
+//   .catch(console.error);
 
-CanvasAPI.getStudents('42771')
-  .then(console.log)
-  .catch(console.error);
-*/
+// CanvasAPI.getStudents('42771')
+//   .then(console.log)
+//   .catch(console.error);
 
 /* GitLabAPI.lockAssignment('', '')
   .then(console.log)
@@ -57,19 +56,21 @@ CanvasAPI.getStudents('42771')
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
-  return (
-    <p>This is course {obj.match.params.courseID}</p>
-  );
+  return <p>{obj.match.params.courseId}</p>;
 };
 
 export const App = () => {
-  const [courses, setCourses] = React.useState([
-    { name: 'Test Class 1', teacher: 'Professor 1', students: 222, id: 1 },
-    { name: 'Test Class 2', teacher: 'Professor 2', students: 22, id: 2 },
-    { name: 'Test Class 3', teacher: 'Professor 3', students: 2, id: 3 }
-  ]);
+  const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
-  const [user, setUser] = React.useState(true);
+  // We need the data from canas so on initial render let's try.
+  React.useEffect(() => {
+    CanvasAPI.getClasses()
+      .then(classes => {
+        setCourses(classes);
+      })
+      .catch(console.error);
+      // The CanvasAPI won't change so this prevents re-rendering.
+  }, [CanvasAPI]);
 
   return (
     <main>
@@ -80,7 +81,13 @@ export const App = () => {
           exact
           path='/'
           key='courses'
-          render={() => <CourseList courses={courses} />}
+          render={() => 
+            <>
+              {courses ? 
+              <CourseList courses={courses}/> :
+              <p>No Courses loaded yet</p>}
+            </>
+          }
         />
         <Route
           exact
@@ -91,13 +98,13 @@ export const App = () => {
         <Route 
           exact 
           path='/course/:courseId' 
-          component={CoursePage}
+          component={CoursePage} 
         />
         <Route
           key='error'
           render={() => (
             <Link to='/'>
-              <p>Page not found.</p>
+              <p>Route not found!</p>
             </Link>
           )}
         />
