@@ -59,21 +59,20 @@ const CoursePage = (obj: { match: any; location: any }) => {
 // console.log(data[0]['name']);
 
 export const App = () => {
-  // let stuff: String;
-  // stuff = 'a';
-  // for(const course of data){
-  //   console.log(course['name']);
-  // }
 
-  // console.log(stuff);
+  const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
-  const [courses, setCourses] = React.useState([
-    { name: 'data[1].name', teacher: 'Sabharwhal', students: 222, id: 1 },
-    { name: 'Intro to lazy', teacher: 'Gosnell', students: 22, id: 2 },
-    { name: 'Awful Homework', teacher: 'Koob', students: 2, id: 3 }
-  ]);
+  React.useEffect(() => {
+    CanvasAPI.getClasses()
+      .then(classes => { 
+        setCourses(classes);
+      })
+      .catch(console.error);
+  });
 
-  const [user, setUser] = React.useState(true);
+  if(!courses){
+    return (<div>UwU</div>);
+  }
 
   return (
     <main>
