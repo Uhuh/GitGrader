@@ -68,21 +68,20 @@ export const App = () => {
       // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
-  // Placeholder till API loads
-  if(!courses){
-    return(<div>Loading course data...</div>);
-  }
-
   return (
     <Switch>
-      {courses && 
-        <Route
-          exact
-          path='/'
-          key='courses'
-          render={() => <CourseList courses={courses} />}
-        />
-      }
+      <Route
+        exact
+        path='/'
+        key='courses'
+        render={() => 
+          <>
+            {courses ? 
+            <CourseList courses={courses}/> :
+            <p>No Courses loaded yet</p>}
+          </>
+        }
+      />
       <Route exact path='/course/:courseId' component={CoursePage} />
       <Route
         exact
