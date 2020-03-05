@@ -59,7 +59,6 @@ const CoursePage = (obj: { match: any; location: any }) => {
 };
 
 export const App = () => {
-
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
   // We need the data from canas so on initial render let's try.
