@@ -1,4 +1,3 @@
-import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
@@ -58,8 +57,6 @@ const CanvasAPI = new Canvas({
 const CoursePage = (obj: { match: any; location: any }) => {
   return <p>{obj.match.params.courseId}</p>;
 };
-
-// console.log(data[0]['name']);
 
 export const App = () => {
 
