@@ -1,10 +1,8 @@
-import { Grid, Paper } from '@material-ui/core';
 import * as React from 'react';
-import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
+import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
 import { CourseList } from './navs/courseList';
-
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -56,49 +54,50 @@ const CoursePage = (obj: { match: any; location: any }) => {
   return <p>{obj.match.params.courseId}</p>;
 };
 
-// console.log(data[0]['name']);
-
 export const App = () => {
 
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
+  // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
     CanvasAPI.getClasses()
-      .then(classes => { 
+      .then(classes => {
         setCourses(classes);
       })
       .catch(console.error);
-  });
+      // The CanvasAPI won't change so this prevents re-rendering.
+  }, [CanvasAPI]);
 
+  // Placeholder till API loads
   if(!courses){
-    return (<div>UwU</div>);
+    return(<div>Loading course data...</div>);
   }
 
   return (
-    <main>
-      <Switch>
+    <Switch>
+      {courses && 
         <Route
           exact
           path='/'
           key='courses'
           render={() => <CourseList courses={courses} />}
         />
-        <Route exact path='/course/:courseId' component={CoursePage} />
-        <Route
-          exact
-          path='/testing'
-          key='testing'
-          render={() => <p>hello</p>}
-        />
-        <Route
-          key='error'
-          render={() => (
-            <Link to='/'>
-              <p>Page not found.</p>
-            </Link>
-          )}
-        />
-      </Switch>
-    </main>
+      }
+      <Route exact path='/course/:courseId' component={CoursePage} />
+      <Route
+        exact
+        path='/testing'
+        key='testing'
+        render={() => <p>hello</p>}
+      />
+      <Route
+        key='error'
+        render={() => (
+          <Link to='/'>
+            <p>Route not found!</p>
+          </Link>
+        )}
+      />
+    </Switch>
   );
 };
