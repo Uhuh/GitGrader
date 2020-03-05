@@ -2,7 +2,8 @@ import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
-import { CourseList } from './navs/courseList';
+import { BackButton, CourseList, SettingsButton } from './navs';
+import { SetUp } from './settings';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -72,34 +73,42 @@ export const App = () => {
   }, [CanvasAPI]);
 
   return (
-    <Switch>
-      <Route
-        exact
-        path='/'
-        key='courses'
-        render={() => 
-          <>
-            {courses ? 
-            <CourseList courses={courses}/> :
-            <p>No Courses loaded yet</p>}
-          </>
-        }
-      />
-      <Route exact path='/course/:courseId' component={CoursePage} />
-      <Route
-        exact
-        path='/testing'
-        key='testing'
-        render={() => <p>hello</p>}
-      />
-      <Route
-        key='error'
-        render={() => (
-          <Link to='/'>
-            <p>Route not found!</p>
-          </Link>
-        )}
-      />
-    </Switch>
+    <main>
+      <BackButton />
+      <SettingsButton />
+      <Switch>
+        <Route
+          exact
+          path='/'
+          key='courses'
+          render={() => 
+            <>
+              {courses ? 
+              <CourseList courses={courses}/> :
+              <p>No Courses loaded yet</p>}
+            </>
+          }
+        />
+        <Route
+          exact
+          path='/settings'
+          key='settings'
+          render={() => <SetUp />}
+        />
+        <Route 
+          exact 
+          path='/course/:courseId' 
+          component={CoursePage} 
+        />
+        <Route
+          key='error'
+          render={() => (
+            <Link to='/'>
+              <p>Route not found!</p>
+            </Link>
+          )}
+        />
+      </Switch>
+    </main>
   );
 };
