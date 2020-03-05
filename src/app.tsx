@@ -6,6 +6,7 @@ import { App } from './modules/index';
 ReactDOM.render(
   <HashRouter>
     <App />
-  </HashRouter>,
+  </HashRouter>
+  ,
   document.getElementById('app')
 ); 
