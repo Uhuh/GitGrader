@@ -12,6 +12,18 @@ export const SetUp = () => {
   return ( 
     <CenteredDiv>
       <form>
+        <div>
+          <TextField
+              id='canvasHost'
+              label='Canvas Host'
+              variant='outlined'
+              />
+            <TextField
+              id='gitlabHost'
+              label='GitLab Host'
+              variant='outlined'
+              />
+        </div>
         <TextField
           id='canvasKey'
           label='Canvas Access Key'

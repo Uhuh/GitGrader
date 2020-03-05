@@ -58,7 +58,7 @@ CanvasAPI.getStudents('42771')
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
   return (
-    <p>This is course {obj.match.params.courseID}</p>
+    <p>This is course {obj.match.params.courseId}</p>
   );
 };
 
