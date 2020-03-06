@@ -34,6 +34,10 @@ const GlobalStyles = createGlobalStyle`
     height: 100%;
   }
 
+  a {
+    color ${({ theme }) => (theme as ITheme).text}
+  }
+
   body {
     align-items: center;
     background: ${({ theme }) => (theme as ITheme).body};
@@ -47,4 +51,5 @@ const GlobalStyles = createGlobalStyle`
     transition: all 0.25s linear;
   }
 `;
+
 export { lightTheme, darkTheme, GlobalStyles };
