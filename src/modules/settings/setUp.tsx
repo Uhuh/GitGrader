@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, InputLabel, OutlinedInput } from '@material-ui/core';
+import { Button, FormControl, Grid, InputLabel, OutlinedInput, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -32,7 +32,16 @@ export const SetUp = () => {
     event.preventDefault();
     console.log('Canvas Host:', canvasHost, 'GitLab Host:', gitlabHost);
     console.log('Canvas Key:', canvasKey, 'GitLab Key:', gitlabKey);
+    localStorage.setItem('CHdata', JSON.stringify(canvasHost));
+    localStorage.setItem('GHdata', JSON.stringify(gitlabHost));
+    localStorage.setItem('CKdata', JSON.stringify(canvasKey));
+    localStorage.setItem('GKdata', JSON.stringify(gitlabKey));
   };
+
+  const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || '{}');
+  const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || '{}');
+  const CanvasKey = JSON.parse(localStorage.getItem('CKdata') || '{}');
+  const GitlabKey = JSON.parse(localStorage.getItem('GKdata') || '{}');
 
   return ( 
     <Grid 
@@ -44,20 +53,36 @@ export const SetUp = () => {
       <form onSubmit={handleSubmit} noValidate autoComplete='off'>
         <FormControl variant='outlined'>
           <InputLabel htmlFor='canvasHost'>Canvas Host</InputLabel>
-          <OutlinedInput id='canvasHost' value={canvasHost} onChange={handleChangeCH} label='canvasHost' />
+          <OutlinedInput 
+           id='canvasHost' 
+           defaultValue={CanvasHost}
+           onChange={handleChangeCH} 
+           label='canvasHost' />
         </FormControl>
         <FormControl variant='outlined'>
           <InputLabel htmlFor='gitlabHost'>GitLab Host</InputLabel>
-          <OutlinedInput id='gitlabHost' value={gitlabHost} onChange={handleChangeGH} label='gitlabHost' />
+          <OutlinedInput 
+           id='gitlabHost'
+           defaultValue={GitlabHost}
+           onChange={handleChangeGH} 
+           label='gitlabHost' />
         </FormControl>
         <SpacePadding></SpacePadding>
         <FormControl variant='outlined'>
           <InputLabel htmlFor='canvasKey'>Canvas Key</InputLabel>
-          <OutlinedInput id='canvasKey' value={canvasKey} onChange={handleChangeCK} label='canvasKey' />
+          <OutlinedInput 
+           id='canvasKey' 
+           defaultValue={CanvasKey}
+           onChange={handleChangeCK} 
+           label='canvasKey' />
         </FormControl>
         <FormControl variant='outlined'>
           <InputLabel htmlFor='gitlabKey'>GitLab Key</InputLabel>
-          <OutlinedInput id='gitlabKey' value={gitlabKey} onChange={handleChangeGK} label='gitlabKey' />
+          <OutlinedInput 
+           id='gitlabKey' 
+           defaultValue={GitlabKey}
+           onChange={handleChangeGK} 
+           label='gitlabKey' />
         </FormControl>
         <SpacePadding></SpacePadding>
         <Grid 
