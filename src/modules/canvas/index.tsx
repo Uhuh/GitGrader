@@ -1,7 +1,8 @@
 import { Box } from '@material-ui/core';
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { ICanvasUser } from '../../api/interfaces';
+import { ICanvasClass , ICanvasUser } from '../../api/interfaces';
+import { CourseList } from '../navs';
 
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
@@ -13,8 +14,8 @@ const CanvasAPI = new Canvas({
  * @todo this takes quite some time to load. Need to find a way to make it vrooom
  * @param props courseId - Canvas course id
  */
-export const CanvasPage = (props: { courseId: string }) => {
-	const { courseId } = props;
+export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }) => {
+	const { courseId, courses} = props;
 	const [students, setStudents] = React.useState<ICanvasUser[]>();
 
 	React.useEffect(() => {
@@ -25,15 +26,44 @@ export const CanvasPage = (props: { courseId: string }) => {
 			.catch(console.error);
 	}, [courseId]);
 
+	let classIndex = 0;
+	
+	for (const i of courses) {
+	 if(i.id == courseId)
+	 {
+		 break;
+	 }
+	 classIndex++;
+	}
+
+	console.log(courses[classIndex].teachers[0]);
+	console.log(courses[classIndex].teachers[0].name);
 	return (
 		<Box>
+			<div>
+			<p>
+				Class Name: {courses[classIndex].name}
+			</p>
+			<p>
+				Total Student: {courses[classIndex].total_students}
+			</p>
+			<p>
+      	{courses[classIndex].teachers.map(teacher => <li>{teacher.id}</li>)}
+    	</p>
 			{students && students.map(s => {
 				return (
 					<div>
-						<p>{s.sis_user_id}</p>
+						<table>
+							<tbody>
+								<tr>
+									<th key={s.sis_user_id}>{s.sis_user_id}</th>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				);
 			})}
+			</div>
 		</Box>
 	);
 };

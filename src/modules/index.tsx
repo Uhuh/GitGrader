@@ -118,7 +118,7 @@ export const App = () => {
           path='/course/:courseId' 
           render={({ match }) => (
             // Match will be the course id.
-            <CanvasPage { ...match.params } />
+            <CanvasPage { ...match.params } courses={courses}/>
           )} 
         />
         <Route
