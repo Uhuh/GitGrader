@@ -6,7 +6,7 @@ import styled from 'styled-components';
 
 const BackButton = () => {
   const Floating = styled.div`
-    position: absolute;
+    position: fixed;
     left: 10px;
     top: 10px;
   `;
@@ -21,7 +21,7 @@ const BackButton = () => {
 
 const SettingsButton = () => {
   const Floating = styled.div`
-    position: absolute;
+    position: fixed;
     right: 10px;
     top: 10px;
   `;
