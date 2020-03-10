@@ -15,8 +15,8 @@ const BackButton = () => {
         <ArrowBackIcon />
       </Link>
     </Floating>
-  )
-}
+  );
+};
 
 const SettingsButton = () => {
   const Floating = styled.div`
@@ -29,7 +29,7 @@ const SettingsButton = () => {
         <SettingsIcon />
       </Link>
     </Floating>
-  )
-}
+  );
+};
 
 export { BackButton, SettingsButton };

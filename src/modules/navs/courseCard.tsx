@@ -11,6 +11,7 @@ import {
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import styled from 'styled-components';
+import { ICanvasClass } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
@@ -36,9 +37,9 @@ const colors = [
   { l: '#ff758c', r: '#ff7eb3' }
 ];
 
-export const CourseCard = (course: any) => {
+export const CourseCard = (props: {course: ICanvasClass}) => {
   const classes = useStyles();
-  const color = colors[Math.floor(Math.random() * 11)];
+  const color = colors[Number(props.course.id) % 11];
 
   const ImagePlaceholder = styled.div`
     background-image: linear-gradient(-70deg, ${color.l}, ${color.r});
@@ -52,12 +53,12 @@ export const CourseCard = (course: any) => {
         <CardActionArea>
           <ImagePlaceholder />
           <CardContent>
-            <Typography variant='h6'>{course.course.name}</Typography>
+            <Typography variant='h6'>{props.course.name}</Typography>
             <Typography color='textSecondary'>
-              {course.course.teacher}
+              {props.course.teachers[0].name}
             </Typography>
             <PersonIcon></PersonIcon>
-            {course.course.students}
+            {props.course.total_students}
           </CardContent>
         </CardActionArea>
       </Card>
