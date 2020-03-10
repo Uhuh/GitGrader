@@ -4,29 +4,31 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+interface IProps {
+  left: boolean;
+}
+
+const Floating = styled.div<IProps>`
+  position: fixed;
+  ${p => p.left ? 'left' : 'right'}: 10px;
+  top: 10px;
+`;
+
 const BackButton = () => {
-  const Floating = styled.div`
-    position: relative;
-    float: left;
-  `;
   return(
-    <Floating>
+    <Floating left>
       <Link to='/'>
-        <ArrowBackIcon />
+        <ArrowBackIcon fontSize='large'/>
       </Link>
     </Floating>
   );
 };
 
 const SettingsButton = () => {
-  const Floating = styled.div`
-    position: relative;
-    float: right;
-  `;
   return(
-    <Floating>
+    <Floating left={false}>
       <Link to='/settings'>
-        <SettingsIcon />
+        <SettingsIcon fontSize='large'/>
       </Link>
     </Floating>
   );

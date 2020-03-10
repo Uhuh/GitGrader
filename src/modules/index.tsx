@@ -1,3 +1,5 @@
+import { CssBaseline, Paper } from '@material-ui/core';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
@@ -17,6 +19,12 @@ const GitLabAPI = new GL({
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
   canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
+});
+
+const darkTheme = createMuiTheme({
+  palette: {
+    type: 'dark',
+  }
 });
 
 // GitLabAPI.createAssignment(
@@ -62,6 +70,8 @@ const CoursePage = (obj: { match: any; location: any }) => {
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
+  const [theme, setTheme] = React.useState('dark');
+
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
     CanvasAPI.getClasses()
@@ -73,7 +83,8 @@ export const App = () => {
   }, [CanvasAPI]);
 
   return (
-    <main>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
       <BackButton />
       <SettingsButton />
       <Switch>
@@ -88,18 +99,18 @@ export const App = () => {
               <p>No Courses loaded yet</p>}
             </>
           }
-        />
+          />
         <Route
           exact
           path='/settings'
           key='settings'
           render={() => <SetUp />}
-        />
+          />
         <Route 
           exact 
           path='/course/:courseId' 
           component={CoursePage} 
-        />
+          />
         <Route
           key='error'
           render={() => (
@@ -107,8 +118,8 @@ export const App = () => {
               <p>Route not found!</p>
             </Link>
           )}
-        />
+          />
       </Switch>
-    </main>
+    </ThemeProvider>
   );
 };
