@@ -27,7 +27,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
 	}, [courseId]);
 
 	let classIndex = 0;
-	
+  
 	for (const i of courses) {
 	 if(i.id == courseId)
 	 {
@@ -57,7 +57,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
 							<tbody>
 								<tr>
 									<th key={s.sis_user_id}>{s.sis_user_id}</th>
-								</tr>
+                </tr>
 							</tbody>
 						</table>
 					</div>
