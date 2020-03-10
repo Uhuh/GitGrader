@@ -4,14 +4,19 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
+interface IProps {
+  left: boolean;
+}
+
+const Floating = styled.div<IProps>`
+  position: fixed;
+  ${p => p.left ? 'left' : 'right'}: 10px;
+  top: 10px;
+`;
+
 const BackButton = () => {
-  const Floating = styled.div`
-    position: fixed;
-    left: 10px;
-    top: 10px;
-  `;
   return(
-    <Floating>
+    <Floating left>
       <Link to='/'>
         <ArrowBackIcon fontSize='large'/>
       </Link>
@@ -20,13 +25,8 @@ const BackButton = () => {
 };
 
 const SettingsButton = () => {
-  const Floating = styled.div`
-    position: fixed;
-    right: 10px;
-    top: 10px;
-  `;
   return(
-    <Floating>
+    <Floating left={false}>
       <Link to='/settings'>
         <SettingsIcon fontSize='large'/>
       </Link>
