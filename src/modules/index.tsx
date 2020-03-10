@@ -1,4 +1,4 @@
-import { Paper } from '@material-ui/core';
+import { CssBaseline, Paper } from '@material-ui/core';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
@@ -24,7 +24,7 @@ const CanvasAPI = new Canvas({
 const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',
-  },
+  }
 });
 
 // GitLabAPI.createAssignment(
@@ -84,43 +84,42 @@ export const App = () => {
 
   return (
     <ThemeProvider theme={darkTheme}>
-      <Paper>
-        <BackButton />
-        <SettingsButton />
-        <Switch>
-          <Route
-            exact
-            path='/'
-            key='courses'
-            render={() => 
-              <>
-                {courses ? 
-                <CourseList courses={courses}/> :
-                <p>No Courses loaded yet</p>}
-              </>
-            }
-            />
-          <Route
-            exact
-            path='/settings'
-            key='settings'
-            render={() => <SetUp />}
-            />
-          <Route 
-            exact 
-            path='/course/:courseId' 
-            component={CoursePage} 
-            />
-          <Route
-            key='error'
-            render={() => (
-              <Link to='/'>
-                <p>Route not found!</p>
-              </Link>
-            )}
-            />
-        </Switch>
-      </Paper>
+      <CssBaseline />
+      <BackButton />
+      <SettingsButton />
+      <Switch>
+        <Route
+          exact
+          path='/'
+          key='courses'
+          render={() => 
+            <>
+              {courses ? 
+              <CourseList courses={courses}/> :
+              <p>No Courses loaded yet</p>}
+            </>
+          }
+          />
+        <Route
+          exact
+          path='/settings'
+          key='settings'
+          render={() => <SetUp />}
+          />
+        <Route 
+          exact 
+          path='/course/:courseId' 
+          component={CoursePage} 
+          />
+        <Route
+          key='error'
+          render={() => (
+            <Link to='/'>
+              <p>Route not found!</p>
+            </Link>
+          )}
+          />
+      </Switch>
     </ThemeProvider>
   );
 };

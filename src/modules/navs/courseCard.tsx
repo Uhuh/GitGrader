@@ -13,8 +13,8 @@ import { ICanvasClass } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 345,
-    maxHeight: 380
+    width: 345,
+    height: 280
   },
   media: {
     height: 140
@@ -35,10 +35,15 @@ const colors = [
   { l: '#ff758c', r: '#ff7eb3' }
 ];
 
+interface IProps {
+  colors: {
+    l: string;
+    r: string;
+  };
+}
 
-
-const ImagePlaceholder = styled.div`
-  background-image: linear-gradient(-70deg, ${props => (props.color ? props.color : '#D38312, #A83279')});
+const ImagePlaceholder = styled.div<IProps>`
+  background-image: linear-gradient(-70deg, ${p => p.colors.l}, ${p => p.colors.r});
   width: 100%;
   height: 140px;
 `;
@@ -46,13 +51,12 @@ const ImagePlaceholder = styled.div`
 export const CourseCard = (props: {course: ICanvasClass}) => {
   const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
-  const colorStr = `${color.l}, ${color.r}`
 
   return (
     <Paper elevation={3}>
       <Card className={classes.root}>
         <CardActionArea>
-          <ImagePlaceholder color={colorStr} />
+          <ImagePlaceholder colors={color} />
           <CardContent>
             <Typography variant='h6'>{props.course.name}</Typography>
             <Typography color='textSecondary'>
