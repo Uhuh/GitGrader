@@ -33,7 +33,6 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
     }
     classIndex++;
   } 
-
   return (
     <Box>
       <div>
