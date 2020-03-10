@@ -38,15 +38,7 @@ export const SetUp = () => {
     setAlertOpen(false);
   };
 
-  const inputEmpty = () => {
-    if(canvasHost.length === 0 || gitlabHost.length == 0 ||
-       canvasToken.length === 0 || gitlabToken.length === 0) {
-      return true;
-    } else {
-      return false;
-    }
-  };
- 
+  
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log('Canvas Host:', canvasHost, 'GitLab Host:', gitlabHost);
@@ -56,7 +48,8 @@ export const SetUp = () => {
     localStorage.setItem('CTdata', JSON.stringify(canvasToken));
     localStorage.setItem('GTdata', JSON.stringify(gitlabToken));
   };
-
+  
+  //Clearing, then changing pages and coming back retains old defaultValue, not sure why
   const clearForm = () => { 
     const settingsForm = document.getElementById('settings') as HTMLFormElement;
     CanvasHost='';
@@ -73,6 +66,19 @@ export const SetUp = () => {
     handleAlertClose();
   };
   
+  //Need to find way to allow changes if only one field is changed
+  const inputEmpty = () => {
+    if(!CanvasHost || !GitlabHost || !CanvasToken || !GitlabToken) {  
+      if(canvasHost.length === 0 || gitlabHost.length == 0 ||
+        canvasToken.length === 0 || gitlabToken.length === 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return false;
+  };
+      
   let CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
   let GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
   let CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
