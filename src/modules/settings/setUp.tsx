@@ -1,4 +1,5 @@
-import { Button, FormControl, Grid, InputLabel, OutlinedInput, Typography } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, 
+         FormControl, Grid, InputLabel, OutlinedInput, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -7,11 +8,12 @@ const SpacePadding = styled.div`
 `;
 
 export const SetUp = () => {
-  const [canvasHost, setCanvasHost] = React.useState(' ');
-  const [gitlabHost, setGitlabHost] = React.useState(' ');
-  const [canvasKey, setCanvasKey] = React.useState(' ');
-  const [gitlabKey, setGitlabKey] = React.useState(' ');
-
+  const [canvasHost, setCanvasHost] = React.useState('');
+  const [gitlabHost, setGitlabHost] = React.useState('');
+  const [canvasToken, setCanvasToken] = React.useState('');
+  const [gitlabToken, setGitlabToken] = React.useState('');
+  const [alertOpen, setAlertOpen] = React.useState(false);
+  
   const handleChangeCH = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCanvasHost(event.target.value);
   };
@@ -21,77 +23,138 @@ export const SetUp = () => {
   };
 
   const handleChangeCK = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCanvasKey(event.target.value);
+    setCanvasToken(event.target.value);
   };
 
   const handleChangeGK = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setGitlabKey(event.target.value);
+    setGitlabToken(event.target.value);
   };
 
+  const handleAlertOpen = () => {
+    setAlertOpen(true);
+  };
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
+
+  const inputEmpty = () => {
+    if(canvasHost.length === 0 || gitlabHost.length == 0 ||
+       canvasToken.length === 0 || gitlabToken.length === 0) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+ 
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log('Canvas Host:', canvasHost, 'GitLab Host:', gitlabHost);
-    console.log('Canvas Key:', canvasKey, 'GitLab Key:', gitlabKey);
+    console.log('Canvas Token:', canvasToken, 'GitLab Token:', gitlabToken);
     localStorage.setItem('CHdata', JSON.stringify(canvasHost));
     localStorage.setItem('GHdata', JSON.stringify(gitlabHost));
-    localStorage.setItem('CKdata', JSON.stringify(canvasKey));
-    localStorage.setItem('GKdata', JSON.stringify(gitlabKey));
+    localStorage.setItem('CTdata', JSON.stringify(canvasToken));
+    localStorage.setItem('GTdata', JSON.stringify(gitlabToken));
   };
 
-  const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
-  const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
-  const CanvasKey = JSON.parse(localStorage.getItem('CKdata') || 'null');
-  const GitlabKey = JSON.parse(localStorage.getItem('GKdata') || 'null');
+  const clearForm = () => { 
+    const settingsForm = document.getElementById('settings') as HTMLFormElement;
+    CanvasHost='';
+    GitlabHost='';
+    CanvasToken='';
+    GitlabToken='';
+    setCanvasHost('');
+    setGitlabHost('');
+    setGitlabToken('');
+    setCanvasToken('');
+    settingsForm.reset();
+    console.log('Canvas Host:', CanvasHost, 'GitLab Host:', GitlabHost);
+    console.log('Canvas Token:', CanvasToken, 'GitLab Token:', GitlabToken);
+    handleAlertClose();
+  };
+  
+  let CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
+  let GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
+  let CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
+  let GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null');  
 
   return ( 
     <Grid 
      container
      direction='column'
      alignItems='center' 
-     justify='center'
-    >
-      <form onSubmit={handleSubmit} noValidate autoComplete='off'>
+     justify='center'>
+      <form id='settings' onSubmit={handleSubmit} autoComplete='off'>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='canvasHost'>Canvas Host</InputLabel>
+          <InputLabel htmlFor='canvasHost'>Canvas Host URL</InputLabel>
           <OutlinedInput 
            id='canvasHost' 
+           placeholder='Please enter the host URL'
            defaultValue={CanvasHost}
            onChange={handleChangeCH} 
-           label='canvasHost' />
+           label='Canvas Host URL' />
         </FormControl>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='gitlabHost'>GitLab Host</InputLabel>
+          <InputLabel htmlFor='gitlabHost'>GitLab Host URL</InputLabel>
           <OutlinedInput 
            id='gitlabHost'
+           placeholder='Please enter the host URL'
            defaultValue={GitlabHost}
            onChange={handleChangeGH} 
-           label='gitlabHost' />
+           label='GitLab Host URL' />
         </FormControl>
         <SpacePadding></SpacePadding>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='canvasKey'>Canvas Key</InputLabel>
+          <InputLabel htmlFor='canvasToken'>Canvas Access Token</InputLabel>
           <OutlinedInput 
-           id='canvasKey' 
-           defaultValue={CanvasKey}
+           id='canvasToken' 
+           placeholder='Please enter your token'
+           defaultValue={CanvasToken}
            onChange={handleChangeCK} 
-           label='canvasKey' />
+           label='Canvas Access Token' />
         </FormControl>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='gitlabKey'>GitLab Key</InputLabel>
+          <InputLabel htmlFor='gitlabToken'>GitLab Access Token</InputLabel>
           <OutlinedInput 
-           id='gitlabKey' 
-           defaultValue={GitlabKey}
+           id='gitlabToken' 
+           placeholder='Please enter your token'
+           defaultValue={GitlabToken}
            onChange={handleChangeGK} 
-           label='gitlabKey' />
+           label='GitLab Access Token' />
         </FormControl>
         <SpacePadding></SpacePadding>
         <Grid 
          container
          direction='column'
          alignItems='center' 
-         justify='center'
-        >   
-          <Button variant='outlined' type='submit'>Save</Button>
+         justify='center'>   
+          <Button 
+           disabled={inputEmpty()} 
+           variant='outlined' 
+           type='submit'>
+            Save
+          </Button>
+          <Button variant='outlined' onClick={handleAlertOpen}>
+             Clear
+          </Button>
+          <Dialog open={alertOpen} onClose={handleAlertClose}>
+            <DialogTitle>{'Are you sure you want to clear all fields?'}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Clearing all fields will reset all values. You will need to enter
+                and save new host URLs and access tokens in order to ensure that 
+                GitGrader functions properly.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button variant='outlined' onClick={clearForm}>
+                Yes
+              </Button>
+              <Button variant='outlined' onClick={handleAlertClose}>
+                No
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </form>
     </Grid>
