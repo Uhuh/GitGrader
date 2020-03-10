@@ -51,8 +51,8 @@ export interface ICanvasUser {
  */
 interface ICanvasTeacher {
   id: string;
-  name: string;
-  avatar_url: string;
+  display_name: string;
+  avatar_image_url: string;
 }
 
 /**

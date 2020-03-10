@@ -33,8 +33,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
     }
     classIndex++;
   } 
-  console.log(courses[classIndex].teachers[0]);
-  console.log(courses[classIndex].teachers[0].name);
+
   return (
     <Box>
       <div>
@@ -45,7 +44,8 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
           Total Student: {courses[classIndex].total_students}
         </p>
         <p>
-          {courses[classIndex].teachers.map(teacher => <li>{teacher.id}</li>)}
+          Course Instructor(s): 
+          {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}
         </p>
         {students && students.map(s => {
           return (
@@ -61,6 +61,6 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
           );
         })}
       </div>
-  	</Box>
+    </Box>
   );
 };
