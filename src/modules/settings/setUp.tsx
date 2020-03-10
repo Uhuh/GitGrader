@@ -38,10 +38,10 @@ export const SetUp = () => {
     localStorage.setItem('GKdata', JSON.stringify(gitlabKey));
   };
 
-  const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || '{}');
-  const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || '{}');
-  const CanvasKey = JSON.parse(localStorage.getItem('CKdata') || '{}');
-  const GitlabKey = JSON.parse(localStorage.getItem('GKdata') || '{}');
+  const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
+  const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
+  const CanvasKey = JSON.parse(localStorage.getItem('CKdata') || 'null');
+  const GitlabKey = JSON.parse(localStorage.getItem('GKdata') || 'null');
 
   return ( 
     <Grid 
