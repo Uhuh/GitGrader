@@ -15,55 +15,52 @@ const CanvasAPI = new Canvas({
  * @param props courseId - Canvas course id
  */
 export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }) => {
-	const { courseId, courses} = props;
-	const [students, setStudents] = React.useState<ICanvasUser[]>();
+  const { courseId, courses} = props;
+  const [students, setStudents] = React.useState<ICanvasUser[]>();  
+  React.useEffect(() => {
+    CanvasAPI.getStudents(courseId)
+      .then(s => {
+  	    setStudents(s);
+      })
+    .catch(console.error);
+  }, [courseId]); 
+  let classIndex = 0;
 
-	React.useEffect(() => {
-		CanvasAPI.getStudents(courseId)
-			.then(s => {
-				setStudents(s);
-			})
-			.catch(console.error);
-	}, [courseId]);
-
-	let classIndex = 0;
-  
-	for (const i of courses) {
-	 if(i.id == courseId)
-	 {
-		 break;
-	 }
-	 classIndex++;
-	}
-
-	console.log(courses[classIndex].teachers[0]);
-	console.log(courses[classIndex].teachers[0].name);
-	return (
-		<Box>
-			<div>
-			<p>
-				Class Name: {courses[classIndex].name}
-			</p>
-			<p>
-				Total Student: {courses[classIndex].total_students}
-			</p>
-			<p>
-      	{courses[classIndex].teachers.map(teacher => <li>{teacher.id}</li>)}
-    	</p>
-			{students && students.map(s => {
-				return (
-					<div>
-						<table>
-							<tbody>
-								<tr>
-									<th key={s.sis_user_id}>{s.sis_user_id}</th>
-                </tr>
-							</tbody>
-						</table>
-					</div>
-				);
-			})}
-			</div>
-		</Box>
-	);
+  for (const i of courses) {
+    if(i.id == courseId)
+    {
+      break;
+    }
+    classIndex++;
+  } 
+  console.log(courses[classIndex].teachers[0]);
+  console.log(courses[classIndex].teachers[0].name);
+  return (
+    <Box>
+      <div>
+        <p>
+          Class Name: {courses[classIndex].name}
+        </p> 
+        <p>
+          Total Student: {courses[classIndex].total_students}
+        </p>
+        <p>
+          {courses[classIndex].teachers.map(teacher => <li>{teacher.id}</li>)}
+        </p>
+        {students && students.map(s => {
+          return (
+            <div>
+              <table>
+                <tbody>
+                  <tr>
+                    <th key={s.sis_user_id}>{s.sis_user_id}</th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
+      </div>
+  	</Box>
+  );
 };
