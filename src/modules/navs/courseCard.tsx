@@ -1,9 +1,7 @@
 import {
   Card,
   CardActionArea,
-  CardActions,
   CardContent,
-  CardMedia,
   makeStyles,
   Paper,
   Typography
@@ -37,21 +35,24 @@ const colors = [
   { l: '#ff758c', r: '#ff7eb3' }
 ];
 
+
+
+const ImagePlaceholder = styled.div`
+  background-image: linear-gradient(-70deg, ${props => (props.color ? props.color : '#D38312, #A83279')});
+  width: 100%;
+  height: 140px;
+`;
+
 export const CourseCard = (props: {course: ICanvasClass}) => {
   const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
-
-  const ImagePlaceholder = styled.div`
-    background-image: linear-gradient(-70deg, ${color.l}, ${color.r});
-    width: 100%;
-    height: 140px;
-  `;
+  const colorStr = `${color.l}, ${color.r}`
 
   return (
     <Paper elevation={3}>
       <Card className={classes.root}>
         <CardActionArea>
-          <ImagePlaceholder />
+          <ImagePlaceholder color={colorStr} />
           <CardContent>
             <Typography variant='h6'>{props.course.name}</Typography>
             <Typography color='textSecondary'>
