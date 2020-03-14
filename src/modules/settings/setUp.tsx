@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, 
-         FormControl, Grid, InputLabel, OutlinedInput, Typography } from '@material-ui/core';
+         FormControl, Grid, InputLabel, OutlinedInput, Popover, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -24,12 +24,17 @@ export const SetUp = () => {
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [helpOpen, setHelpOpen] = React.useState(false);
+  const [anchorCT, setAnchorCT] = React.useState<HTMLButtonElement | null>(null);
+  const [anchorGT, setAnchorGT] = React.useState<HTMLButtonElement | null>(null);
+
+  const showCT = Boolean(anchorCT);
+  const showGT = Boolean(anchorGT);
+  const settingsForm = document.getElementById('settings') as HTMLFormElement;
 
   let CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
   let GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
   let CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
   let GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null');  
-  const settingsForm = document.getElementById('settings') as HTMLFormElement;
 
   const handleAlertOpen = () => {
     setAlertOpen(true);
@@ -142,7 +147,8 @@ export const SetUp = () => {
          alignItems='center' 
          justify='center'>
           <Button 
-           disabled={inputEmpty()} 
+           disabled={inputEmpty()}
+           color='primary' 
            variant='outlined'
            type='submit'
            onClick={handleConfirmOpen}>
@@ -160,10 +166,92 @@ export const SetUp = () => {
      direction='column'
      alignItems='flex-start' 
      justify='center'>
-      <Typography align='left' variant='h6'>Canvas Host URL: {CanvasHost}</Typography>
-      <Typography align='left' variant='h6'>GitLab Host URL: {GitlabHost}</Typography>
-      <Typography align='left' variant='h6'>Canvas Access Token: {CanvasToken}</Typography>
-      <Typography align='left' variant='h6'>GitLab Access Token: {GitlabToken}</Typography>
+      <div style={{display:'flex'}}>
+        <Typography 
+         color='primary' 
+         align='left' 
+         variant='h6'>
+          Canvas Host URL:&nbsp;
+        </Typography>
+        <Typography  
+         align='left' 
+         variant='h6'>
+          {CanvasHost}
+        </Typography>
+      </div>
+      <div style={{display:'flex'}}>
+        <Typography 
+         color='primary' 
+         align='left' 
+         variant='h6'>
+          GitLab Host URL:&nbsp;
+        </Typography>
+        <Typography  
+         align='left' 
+         variant='h6'>
+          {GitlabHost}
+        </Typography>
+      </div>
+      <div style={{display:'flex'}}>
+        <Typography 
+         color='primary' 
+         align='left' 
+         variant='h6'>
+          Canvas Access Token:&nbsp;
+        </Typography>
+        <Button 
+         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorCT(e.currentTarget)}}>
+           Show
+        </Button>
+        <Popover
+         open={showCT}
+         anchorEl={anchorCT}
+         onClose={() => {setAnchorCT(null)}}
+         anchorOrigin={{
+           vertical: 'center',
+           horizontal: 'left',
+         }}
+         transformOrigin={{
+           vertical: 'center',
+           horizontal: 'left',
+         }}>
+          <Typography
+           align='left'
+           variant='h6'>
+             {CanvasToken}
+           </Typography>
+        </Popover>
+      </div>
+      <div style={{display:'flex'}}>
+        <Typography 
+         color='primary' 
+         align='left' 
+         variant='h6'>
+          GitLab Access Token:&nbsp;
+        </Typography>
+        <Button 
+         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorGT(e.currentTarget)}}>
+           Show
+        </Button>
+        <Popover
+         open={showGT}
+         anchorEl={anchorGT}
+         onClose={() => {setAnchorGT(null)}}
+         anchorOrigin={{
+           vertical: 'center',
+           horizontal: 'left',
+         }}
+         transformOrigin={{
+           vertical: 'center',
+           horizontal: 'left',
+         }}>
+          <Typography
+           align='left'
+           variant='h6'>
+             {GitlabToken}
+           </Typography>
+        </Popover>
+      </div>
       <Grid 
        container
        direction='column'
@@ -172,6 +260,7 @@ export const SetUp = () => {
         <SpacePadding></SpacePadding>   
         <Button 
          disabled={clearEmpty()}
+         color='primary'
          variant='outlined' 
          onClick={handleAlertOpen}>
             Clear
@@ -195,13 +284,16 @@ export const SetUp = () => {
           </DialogActions>
         </Dialog>
         <SpacePadding></SpacePadding>
-        <Button variant='outlined' onClick={() => {setHelpOpen(true)}}>
+        <Button
+         variant='outlined' 
+         color='secondary' 
+         onClick={() => {setHelpOpen(true)}}>
           Help
         </Button>
         <Dialog 
-        open={helpOpen} 
-        scroll='paper'
-        onClose={() => {setHelpOpen(false)}}>
+         open={helpOpen} 
+         scroll='paper'
+         onClose={() => {setHelpOpen(false)}}>
           <DialogTitle>{'How to Get Host URLs and Access Tokens'}</DialogTitle>
           <DialogContent>
             <DialogContentText>
