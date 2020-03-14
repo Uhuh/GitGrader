@@ -1,7 +1,7 @@
 import { Box } from '@material-ui/core';
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { ICanvasClass , ICanvasUser } from '../../api/interfaces';
+import { ICanvasClass , ICanvasUser, IGitNamespace } from '../../api/interfaces';
 import { CourseList } from '../navs';
 
 const CanvasAPI = new Canvas({
@@ -14,8 +14,9 @@ const CanvasAPI = new Canvas({
  * @todo this takes quite some time to load. Need to find a way to make it vrooom
  * @param props courseId - Canvas course id
  */
-export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }) => {
-  const { courseId, courses} = props;
+export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; namespace: IGitNamespace[]; }) => {
+  const { courseId, courses, namespace} = props;
+
   const [students, setStudents] = React.useState<ICanvasUser[]>();  
   React.useEffect(() => {
     CanvasAPI.getStudents(courseId)
@@ -24,6 +25,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
       })
     .catch(console.error);
   }, [courseId]); 
+
   let classIndex = 0;
 
   for (const i of courses) {
@@ -49,8 +51,8 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
         <div>
           <label>Namespace</label>
           <select className='namespace'>
-            {courses[classIndex].teachers.map(teacher => 
-              <option value={teacher.display_name}>{teacher.display_name}</option>
+            {namespace.map(namespace => 
+              <option key={namespace.id} value={namespace.name}>{namespace.name}</option>
             )}
           </select>
         </div>

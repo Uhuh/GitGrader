@@ -16,6 +16,15 @@ export interface ICanvas {
 }
 
 /**
+ * Basics for gitlab namespace
+ */
+export interface IGitNamespace {
+  id: string;
+  name: string;
+  web_url: string;
+}
+
+/**
  * Basics for a gitlab user
  */
 export interface IGitUser {

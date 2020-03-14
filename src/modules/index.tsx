@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { ICanvasClass } from '../api/interfaces';
+import { ICanvasClass, IGitNamespace } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
@@ -76,6 +76,14 @@ export const App = () => {
       // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
+  React.useEffect(() => {
+    GitLabAPI.getNamespaces()
+      .then(s => {
+  	    setNameSpace(s);
+      })
+    .catch(console.error);
+  }); 
+
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
@@ -118,7 +126,7 @@ export const App = () => {
           path='/course/:courseId' 
           render={({ match }) => (
             // Match will be the course id.
-            <CanvasPage { ...match.params } courses={courses}/>
+            <CanvasPage { ...match.params } courses={courses} namespace={namespace}/>
           )} 
         />
         <Route
