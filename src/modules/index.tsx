@@ -19,12 +19,15 @@ const GitLabAPI = new GL({
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
   canvas_token: '2006~tssi5f9tRWBUAMCIhPCpxNAcYhDp055fBsZ4nZq9KMY7Cyf5wYL6HpffZavnitJM'
+<<<<<<< HEAD
 });
 
 const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',
   }
+=======
+>>>>>>> d56b1e30b92175de9daeca31541bdd2ec276f904
 });
 
 // GitLabAPI.createAssignment(
