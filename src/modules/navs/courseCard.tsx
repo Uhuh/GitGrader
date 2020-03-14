@@ -13,8 +13,8 @@ import { ICanvasClass } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
-    width: 345,
-    height: 280
+    maxWidth: 300,
+    maxHeight: 320
   },
   media: {
     height: 140
@@ -53,20 +53,16 @@ export const CourseCard = (props: {course: ICanvasClass}) => {
   const color = colors[Number(props.course.id) % 11];
 
   return (
-    <Paper elevation={3}>
-      <Card className={classes.root}>
-        <CardActionArea>
-          <ImagePlaceholder colors={color} />
-          <CardContent>
-            <Typography variant='h6'>{props.course.name}</Typography>
-            <Typography color='textSecondary'>
-              {props.course.teachers[0].name}
-            </Typography>
-            <PersonIcon></PersonIcon>
-            {props.course.total_students}
-          </CardContent>
-        </CardActionArea>
-      </Card>
-    </Paper>
+    <Card className={classes.root}>
+      <ImagePlaceholder colors={color} />
+      <CardContent>
+        <Typography variant='h6'>{props.course.name}</Typography>
+        <Typography color='textSecondary'>
+          {props.course.teachers[0].name}
+        </Typography>
+        <PersonIcon></PersonIcon>
+        {props.course.total_students}
+      </CardContent>
+    </Card>
   );
 };
