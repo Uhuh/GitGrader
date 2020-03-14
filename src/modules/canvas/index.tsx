@@ -15,9 +15,12 @@ const CanvasAPI = new Canvas({
  * @param props courseId - Canvas course id
  */
 export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; namespace: IGitNamespace[]; }) => {
-  const { courseId, courses, namespace} = props;
+  const { courseId, courses, namespace } = props;
+  
+  let classIndex = 0;
+  const [assignmentName, setAssignmentName] = React.useState('');
+  const [students, setStudents] = React.useState<ICanvasUser[]>();
 
-  const [students, setStudents] = React.useState<ICanvasUser[]>();  
   React.useEffect(() => {
     CanvasAPI.getStudents(courseId)
       .then(s => {
@@ -25,9 +28,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
       })
     .catch(console.error);
   }, [courseId]); 
-
-  let classIndex = 0;
-
+  
   for (const i of courses) {
     if(i.id == courseId)
     {
@@ -56,19 +57,13 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
             )}
           </select>
         </div>
-        {students && students.map(s => {
-          return (
-            <div>
-              <table>
-                <tbody>
-                  <tr>
-                    <th key={s.sis_user_id}>{s.sis_user_id}</th>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          );
-        })}
+        <div>
+            <label>
+              Assignment Name:
+              <input type='text' onChange={e => setAssignmentName(e.target.value)}/>
+            </label>      
+          <button onClick={handleSubmit}>hello</button>
+        </div>
       </div>
     </Box>
   );
