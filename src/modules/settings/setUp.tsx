@@ -1,4 +1,4 @@
-import { Button, FormControl, Grid, InputLabel, OutlinedInput, Typography, Switch } from '@material-ui/core';
+import { Button, FormControl, Grid, InputLabel, OutlinedInput, Switch, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
 
@@ -6,7 +6,7 @@ const SpacePadding = styled.div`
   margin-bottom: 20px;
 `;
 
-export const SetUp = (toggleTheme: any) => {
+export const SetUp = (toggleTheme: any, theme: any) => {
   const [canvasHost, setCanvasHost] = React.useState(' ');
   const [gitlabHost, setGitlabHost] = React.useState(' ');
   const [canvasKey, setCanvasKey] = React.useState(' ');
@@ -84,7 +84,11 @@ export const SetUp = (toggleTheme: any) => {
            onChange={handleChangeGK} 
            label='gitlabKey' />
         </FormControl>
-        <Switch onChange={toggleTheme}/>
+        
+        <Switch
+          checked={toggleTheme.theme === 'dark'}
+          onClick={toggleTheme.toggleTheme}/>
+        />
         <SpacePadding></SpacePadding>
         <Grid 
          container
