@@ -1,5 +1,6 @@
+import grey from '@material-ui/core/colors/grey';
 import { CssBaseline, Paper } from '@material-ui/core';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme, ThemeProvider, withTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
@@ -24,12 +25,14 @@ const CanvasAPI = new Canvas({
 const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',
+    primary: grey,
   }
 });
 
 const lightTheme = createMuiTheme({
   palette: {
     type: 'light',
+    primary: grey,
   }
 });
 
@@ -81,7 +84,7 @@ export const App = () => {
   const toggleTheme = () => {
     console.log('beep boop');
     setTheme(theme == 'dark' ? 'light' : 'dark');
-  }
+  };
 
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
@@ -115,7 +118,7 @@ export const App = () => {
           exact
           path='/settings'
           key='settings'
-          render={() => <SetUp toggleTheme={toggleTheme}/>}
+          render={() => <SetUp toggleTheme={toggleTheme} theme={theme}/>}
           />
         <Route 
           exact 
