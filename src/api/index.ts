@@ -24,6 +24,23 @@ export class GitlabBackend {
    */
   build_name = (sem: string, sec: string, n: string, user: string): string =>
     `${sem}-${sec}-${n}-${user}`
+
+  /**
+   * Get list of namespaces for user.
+   */
+  getNamespaces = async (): Promise<any> => {
+    const namespaces = await this.request('GET', '/namespaces', {});
+
+    return new Promise(res => {
+      if(!namespaces) {
+        res({});
+      }
+
+      const groups = namespaces.filter((n: any) => n.kind === 'group');
+
+      res(groups);
+    });
+  }
   /**
    * Creates an assignment within a specific namespace.
    * @returns The git links to clone with.
