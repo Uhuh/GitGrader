@@ -36,41 +36,6 @@ const lightTheme = createMuiTheme({
   }
 });
 
-// GitLabAPI.createAssignment(
-//   'hw1',
-//   '2453',
-//   '001',
-//   '2020-SP',
-//   'mrmk8'
-// )
-// .then(assignment => {
-//   GitLabAPI.getUserId('mrmk8')
-//     .then(user => {
-//       GitLabAPI.assignAssignment(assignment.id, user.id)
-//         .then(console.log)
-//         .catch(console.error);
-//     })
-//     .catch(console.error);
-// })
-// .catch(console.error);
-
-// CanvasAPI.getStudents('42771')
-//   .then(console.log)
-//   .catch(console.error);
-
-// CanvasAPI.getStudents('42771')
-//   .then(console.log)
-//   .catch(console.error);
-
-/* GitLabAPI.lockAssignment('', '')
-  .then(console.log)
-  .catch(console.error); */
-
-/* canvas.getStudents('')
-  .then(console.log)
-  .catch(console.error);
- */
-
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
   return <p>{obj.match.params.courseId}</p>;
@@ -82,7 +47,6 @@ export const App = () => {
   const [theme, setTheme] = React.useState('dark');
 
   const toggleTheme = () => {
-    console.log('beep boop');
     setTheme(theme == 'dark' ? 'light' : 'dark');
   };
 
