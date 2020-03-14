@@ -6,7 +6,7 @@ const SpacePadding = styled.div`
   margin-bottom: 20px;
 `;
 
-export const SetUp = (toggleTheme: any, theme: any) => {
+export const SetUp = (theme: any) => {
   const [canvasHost, setCanvasHost] = React.useState(' ');
   const [gitlabHost, setGitlabHost] = React.useState(' ');
   const [canvasKey, setCanvasKey] = React.useState(' ');
@@ -86,8 +86,8 @@ export const SetUp = (toggleTheme: any, theme: any) => {
         </FormControl>
         
         <Switch
-          checked={toggleTheme.theme === 'dark'}
-          onClick={toggleTheme.toggleTheme}/>
+          checked={theme.theme === 'dark'}
+          onClick={theme.toggleTheme}
         />
         <SpacePadding></SpacePadding>
         <Grid 
