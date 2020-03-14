@@ -19,51 +19,13 @@ const GitLabAPI = new GL({
 const CanvasAPI = new Canvas({
   canvas_url: 'https://mst.instructure.com',
   canvas_token: '2006~tssi5f9tRWBUAMCIhPCpxNAcYhDp055fBsZ4nZq9KMY7Cyf5wYL6HpffZavnitJM'
-<<<<<<< HEAD
 });
 
 const darkTheme = createMuiTheme({
   palette: {
     type: 'dark',
   }
-=======
->>>>>>> d56b1e30b92175de9daeca31541bdd2ec276f904
 });
-
-// GitLabAPI.createAssignment(
-//   'hw1',
-//   '2453',
-//   '001',
-//   '2020-SP',
-//   'mrmk8'
-// )
-// .then(assignment => {
-//   GitLabAPI.getUserId('mrmk8')
-//     .then(user => {
-//       GitLabAPI.assignAssignment(assignment.id, user.id)
-//         .then(console.log)
-//         .catch(console.error);
-//     })
-//     .catch(console.error);
-// })
-// .catch(console.error);
-
-// CanvasAPI.getStudents('42771')
-//   .then(console.log)
-//   .catch(console.error);
-
-// CanvasAPI.getStudents('42771')
-//   .then(console.log)
-//   .catch(console.error);
-
-/* GitLabAPI.lockAssignment('', '')
-  .then(console.log)
-  .catch(console.error); */
-
-/* canvas.getStudents('')
-  .then(console.log)
-  .catch(console.error);
- */
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {

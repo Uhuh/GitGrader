@@ -7,6 +7,15 @@ const SpacePadding = styled.div`
   margin-bottom: 20px;
 `;
 
+const Centered = styled.div`
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+`;
+
 export const SetUp = () => {
   const [canvasHost, setCanvasHost] = React.useState('');
   const [gitlabHost, setGitlabHost] = React.useState('');
@@ -14,6 +23,7 @@ export const SetUp = () => {
   const [gitlabToken, setGitlabToken] = React.useState('');
   const [alertOpen, setAlertOpen] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [helpOpen, setHelpOpen] = React.useState(false);
 
   let CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
   let GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
@@ -85,7 +95,7 @@ export const SetUp = () => {
   }; 
 
   return (
-    <>
+    <Centered>
     <Grid 
      container
      direction='column'
@@ -140,11 +150,6 @@ export const SetUp = () => {
           </Button>
           <Dialog open={confirmOpen} onClose={handleConfirmClose}>
             <DialogTitle>{'Settings Updated'}</DialogTitle>
-            <DialogActions>
-              <Button variant='outlined' onClick={handleConfirmClose}>
-                OK
-              </Button>
-            </DialogActions>
           </Dialog>
         </Grid>
       </form>
@@ -153,12 +158,12 @@ export const SetUp = () => {
     <Grid 
      container
      direction='column'
-     alignItems='center' 
+     alignItems='flex-start' 
      justify='center'>
-      <Typography variant='h6'>Canvas Host URL: {CanvasHost}</Typography>
-      <Typography variant='h6'>GitLab Host URL: {GitlabHost}</Typography>
-      <Typography variant='h6'>Canvas Access Token: {CanvasToken}</Typography>
-      <Typography variant='h6'>GitLab Access Token: {GitlabToken}</Typography>
+      <Typography align='left' variant='h6'>Canvas Host URL: {CanvasHost}</Typography>
+      <Typography align='left' variant='h6'>GitLab Host URL: {GitlabHost}</Typography>
+      <Typography align='left' variant='h6'>Canvas Access Token: {CanvasToken}</Typography>
+      <Typography align='left' variant='h6'>GitLab Access Token: {GitlabToken}</Typography>
       <Grid 
        container
        direction='column'
@@ -189,8 +194,23 @@ export const SetUp = () => {
             </Button>
           </DialogActions>
         </Dialog>
+        <SpacePadding></SpacePadding>
+        <Button variant='outlined' onClick={() => {setHelpOpen(true)}}>
+          Help
+        </Button>
+        <Dialog 
+        open={helpOpen} 
+        scroll='paper'
+        onClose={() => {setHelpOpen(false)}}>
+          <DialogTitle>{'How to Get Host URLs and Access Tokens'}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              PLACEHOLDER
+            </DialogContentText>
+          </DialogContent>
+        </Dialog>
       </Grid>
     </Grid>
-    </>
+    </Centered>
   );
 };
