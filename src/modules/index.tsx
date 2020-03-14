@@ -27,6 +27,12 @@ const darkTheme = createMuiTheme({
   }
 });
 
+const lightTheme = createMuiTheme({
+  palette: {
+    type: 'light',
+  }
+});
+
 // GitLabAPI.createAssignment(
 //   'hw1',
 //   '2453',
@@ -72,6 +78,11 @@ export const App = () => {
 
   const [theme, setTheme] = React.useState('dark');
 
+  const toggleTheme = () => {
+    console.log('beep boop');
+    setTheme(theme == 'dark' ? 'light' : 'dark');
+  }
+
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
     CanvasAPI.getClasses()
@@ -83,7 +94,7 @@ export const App = () => {
   }, [CanvasAPI]);
 
   return (
-    <ThemeProvider theme={darkTheme}>
+    <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
       <BackButton />
       <SettingsButton />
@@ -104,7 +115,7 @@ export const App = () => {
           exact
           path='/settings'
           key='settings'
-          render={() => <SetUp />}
+          render={() => <SetUp toggleTheme={toggleTheme}/>}
           />
         <Route 
           exact 
