@@ -46,6 +46,14 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]  }
           Course Instructor(s): 
           {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}
         </p>
+        <div>
+          <label>Namespace</label>
+          <select className='namespace'>
+            {courses[classIndex].teachers.map(teacher => 
+              <option value={teacher.display_name}>{teacher.display_name}</option>
+            )}
+          </select>
+        </div>
         {students && students.map(s => {
           return (
             <div>
