@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { ICanvasClass, IGitNamespace } from '../api/interfaces';
+import { ICanvasClass, IGitNamespace, IGitRepo } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
@@ -48,6 +48,19 @@ const lightTheme = createMuiTheme({
     primary: grey,
   }
 });
+
+ GitLabAPI.createBaseRepo('hw100', '2453')
+  .then(base_repo => {
+    GitLabAPI.createAssignment(
+      base_repo,
+      '101',
+      '2020-SP',
+      'duwtgb'
+    )
+      .then(console.log)
+      .catch(console.error);
+  })
+  .catch(console.error);
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {

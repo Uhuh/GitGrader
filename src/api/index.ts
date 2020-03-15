@@ -2,13 +2,13 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {
   GitAccess,
   GitVisibility,
+  IBaseRepo,
   ICanvas,
   ICanvasClass,
   ICanvasUser,
   IGitlab,
   IGitRepo,
-  IGitUser,
-  IBaseRepo
+  IGitUser
 } from './interfaces';
 
 /**
