@@ -1,10 +1,11 @@
-import grey from '@material-ui/core/colors/grey';
 import { CssBaseline, Paper } from '@material-ui/core';
+import grey from '@material-ui/core/colors/grey';
 import { createMuiTheme, ThemeProvider, withTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
+import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton } from './navs';
 import { SetUp } from './settings';
 
@@ -78,6 +79,12 @@ export const App = () => {
             </>
           }
           />
+        <Route
+          exact
+          path='/add'
+          key='add'
+          component={CreateCourse}
+        />
         <Route
           exact
           path='/settings'
