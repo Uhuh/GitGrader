@@ -84,7 +84,7 @@ export const SetUp = () => {
   
   const inputEmpty = () => {
     if(canvasHost.length === 0 || gitlabHost.length == 0 ||
-      canvasToken.length === 0 || gitlabToken.length === 0) {
+       canvasToken.length === 0 || gitlabToken.length === 0) {
       return true;
     } else {
       return false;
@@ -143,7 +143,7 @@ export const SetUp = () => {
         <SpacePadding></SpacePadding>
         <Grid 
          container
-         direction='column'
+         direction='row'
          alignItems='center' 
          justify='center'>
           <Button 
@@ -157,6 +157,32 @@ export const SetUp = () => {
           <Dialog open={confirmOpen} onClose={handleConfirmClose}>
             <DialogTitle>{'Settings Updated'}</DialogTitle>
           </Dialog>
+         <SpacePadding></SpacePadding>   
+         <Button 
+          disabled={clearEmpty()}
+          color='primary'
+          variant='outlined' 
+          onClick={handleAlertOpen}>
+             Clear
+         </Button>
+         <Dialog open={alertOpen} onClose={handleAlertClose}>
+           <DialogTitle>{'Are you sure you want to clear all fields?'}</DialogTitle>
+           <DialogContent>
+             <DialogContentText>
+               Clearing all fields will reset all values. You will need to enter
+               and save new host URLs and access tokens in order to ensure that 
+               GitGrader functions properly.
+             </DialogContentText>
+           </DialogContent>
+           <DialogActions>
+             <Button variant='outlined' onClick={clearForm}>
+               Yes
+             </Button>
+             <Button variant='outlined' onClick={handleAlertClose}>
+               No
+             </Button>
+           </DialogActions>
+         </Dialog>
         </Grid>
       </form>
     </Grid>
@@ -218,7 +244,7 @@ export const SetUp = () => {
           <Typography
            align='left'
            variant='h6'>
-             {CanvasToken}
+            {CanvasToken}
            </Typography>
         </Popover>
       </div>
@@ -248,7 +274,7 @@ export const SetUp = () => {
           <Typography
            align='left'
            variant='h6'>
-             {GitlabToken}
+            {GitlabToken}
            </Typography>
         </Popover>
       </div>
@@ -257,32 +283,6 @@ export const SetUp = () => {
        direction='column'
        alignItems='center' 
        justify='center'>
-        <SpacePadding></SpacePadding>   
-        <Button 
-         disabled={clearEmpty()}
-         color='primary'
-         variant='outlined' 
-         onClick={handleAlertOpen}>
-            Clear
-        </Button>
-        <Dialog open={alertOpen} onClose={handleAlertClose}>
-          <DialogTitle>{'Are you sure you want to clear all fields?'}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Clearing all fields will reset all values. You will need to enter
-              and save new host URLs and access tokens in order to ensure that 
-              GitGrader functions properly.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button variant='outlined' onClick={clearForm}>
-              Yes
-            </Button>
-            <Button variant='outlined' onClick={handleAlertClose}>
-              No
-            </Button>
-          </DialogActions>
-        </Dialog>
         <SpacePadding></SpacePadding>
         <Button
          variant='outlined' 
@@ -296,9 +296,29 @@ export const SetUp = () => {
          onClose={() => {setHelpOpen(false)}}>
           <DialogTitle>{'How to Get Host URLs and Access Tokens'}</DialogTitle>
           <DialogContent>
-            <DialogContentText>
-              PLACEHOLDER
-            </DialogContentText>
+            <h3>Canvas Information</h3>
+            <ul>
+              <li>
+                Canvas host URLs are typically of the form &nbsp;
+                <code>???.instructure.com</code> &nbsp; where &nbsp; 
+                <code>???</code> &nbsp; is replaced with your institution's name.
+              </li>
+              <li>
+                Canvas API access tokens must be generated and can be found at &nbsp;
+                <code>???.instructure.com/profile/setings</code>
+              </li>
+            </ul>
+            <h3>GitLab Information</h3>
+            <ul>
+              <li>
+                The default GitLab URL is &nbsp; <code>gitlab.com</code>, however
+                your institution's GitLab server will differ.
+              </li>
+              <li>
+                GitLab API access tokens must be generated and can be found at &nbsp;
+                <code>git-classes.???.edu/profile/personal_access_tokens</code>
+              </li>
+            </ul>
           </DialogContent>
         </Dialog>
       </Grid>
