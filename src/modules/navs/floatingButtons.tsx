@@ -1,7 +1,8 @@
+import { Link } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SettingsIcon from '@material-ui/icons/Settings';
 import * as React from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 interface IProps {
@@ -17,7 +18,7 @@ const Floating = styled.div<IProps>`
 const BackButton = () => {
   return(
     <Floating left>
-      <Link to='/'>
+      <Link component={RouterLink} to='/'>
         <ArrowBackIcon fontSize='large'/>
       </Link>
     </Floating>
@@ -27,7 +28,7 @@ const BackButton = () => {
 const SettingsButton = () => {
   return(
     <Floating left={false}>
-      <Link to='/settings'>
+      <Link component={RouterLink} to='/settings'>
         <SettingsIcon fontSize='large'/>
       </Link>
     </Floating>
