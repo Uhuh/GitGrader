@@ -1,9 +1,11 @@
 import { Box } from '@material-ui/core';
-import { Button, Card, CardActions, CardContent , CardHeader, makeStyles, Typography} from '@material-ui/core/';
+import { Button, Card, CardActions, CardContent , CardHeader, Dialog , DialogActions, DialogContent, DialogContentText
+  , DialogTitle ,makeStyles, TextField, Typography } from '@material-ui/core/';
 import  AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { ICanvasClass , ICanvasUser, IGitNamespace } from '../../api/interfaces';
+import { ICanvasClass , ICanvasUser, IGitNamespace, GitAccess } from '../../api/interfaces';
+import { GitLabAPI } from '..';
 
 const CanvasAPI = new Canvas();
 CanvasAPI.setUrl('https://mst.instructure.com');
@@ -44,8 +46,10 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
   const classes = useStyles();
   
   let classIndex = 0;
+
   const [assignmentName, setAssignmentName] = React.useState('');
   const [students, setStudents] = React.useState<ICanvasUser[]>();
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     CanvasAPI.getStudents(courseId)
@@ -94,16 +98,28 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
             )}
         </div>
         <div>
-          <Card className={classes.root}>
+          <Card className={classes.root} onClick={handleClickOpen}>
             <br />
             <AddIcon className={classes.addIcon}></AddIcon>
             <br />
           </Card>
-              <label>
-                Assignment Name:
+          <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+            <DialogTitle id='form-dialog-title'>Add Assignment</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please enter the name of the assignment you are assigning
+              </DialogContentText>
                 <input type='text' onChange={e => setAssignmentName(e.target.value)}/>
-              </label>      
-            <button onClick={handleSubmit}>hello</button>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color='primary'>
+                Cancel
+              </Button>
+              <Button onClick={createAssignment} color='primary'>
+                Submit
+              </Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </div>
     </Box>
