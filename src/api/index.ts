@@ -3,10 +3,8 @@ import {
   GitAccess,
   GitVisibility,
   IBaseRepo,
-  ICanvas,
   ICanvasClass,
   ICanvasUser,
-  IGitlab,
   IGitRepo,
   IGitUser
 } from './interfaces';
@@ -18,7 +16,14 @@ import {
  * @constructor Requires a users private token, (institute) url, and namespace.
  */
 export class GitlabBackend {
-  constructor (private info: IGitlab) {}
+  private gitlab_host = 'https://www.gitlab.com';
+  private gitlab_token = '';
+  constructor () {}
+  setToken (token: string) { this.gitlab_token = token; }
+  setHost (host: string) { this.gitlab_host = host; }
+  ready () {
+    return (this.gitlab_host !== '' && this.gitlab_token !== '') ? true : false;
+  }
   /**
    * To format assignment names.
    * @returns A formatted string
@@ -104,7 +109,7 @@ export class GitlabBackend {
       name: this.build_name(semester, section, base_repo.name, username),
       namespace: base_repo.namespace.name,
       namespace_id: base_repo.namespace.id,
-      namespace_path: `${this.info.gitlab_host}/${base_repo.namespace.name}`,
+      namespace_path: `${this.gitlab_host}/${base_repo.namespace.name}`,
       path: this.build_name(semester, section, base_repo.name, username)
     };
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
@@ -240,12 +245,12 @@ export class GitlabBackend {
     path: string,
     params: {}
   ): Promise<any> => {
-    const url = `${this.info.gitlab_host}/api/v4/${path}`;
+    const url = `${this.gitlab_host}/api/v4/${path}`;
     return (
       await axios({
         method,
         url,
-        headers: { 'Private-Token': this.info.gitlab_token },
+        headers: { 'Private-Token': this.gitlab_token },
         params
       })
     ).data;
@@ -259,7 +264,14 @@ export class GitlabBackend {
  * @constructor Requires a users acces token, (institute) url.
  */
 export class CanvasBackend {
-  constructor (private info: ICanvas) {}
+  private canvas_url = '';
+  private canvas_token = '';
+  constructor () {}
+  setToken (token: string) { this.canvas_token = token; }
+  setUrl (url: string) { this.canvas_url = url; }
+  ready () {
+   return (this.canvas_url !== '' && this.canvas_token !== '') ? true : false;
+  }
   /**
    * Uses the users canvas_token to gain access to their courses.
    *
@@ -318,8 +330,8 @@ export class CanvasBackend {
     path: string,
     params: { [k: string]: string | string[] }
   ): Promise<any> => {
-    const url = `${this.info.canvas_url}/api/v1/${path}`;
-    params.access_token = this.info.canvas_token;
+    const url = `${this.canvas_url}/api/v1/${path}`;
+    params.access_token = this.canvas_token;
     return (
       await axios({
         method,
@@ -340,7 +352,7 @@ export class CanvasBackend {
     method: AxiosRequestConfig['method'],
     course_id: string
   ): Promise<any> => {
-    const url = `${this.info.canvas_url}/api/v1/courses/${course_id}/enrollments`;
+    const url = `${this.canvas_url}/api/v1/courses/${course_id}/enrollments`;
 
     if (method !== 'GET') {
       return Promise.reject('Didn\'t use GET method');
@@ -351,7 +363,7 @@ export class CanvasBackend {
       await axios({
         method,
         url,
-        params: { access_token: this.info.canvas_token, per_page: 1000 }
+        params: { access_token: this.canvas_token, per_page: 1000 }
       })
     ).data;
   }

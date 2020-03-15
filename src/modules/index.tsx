@@ -14,16 +14,15 @@ import { MissingSettings, SetUp } from './settings';
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
  */
-const GitLabAPI = new GL({
-  gitlab_host: JSON.parse(localStorage.getItem('GHdata') || 'null'),
-  gitlab_token: JSON.parse(localStorage.getItem('GTdata') || 'null'),
-  namespace: '2020-senior-test'
-});
+const GitLabAPI = new GL();
+export { GitLabAPI };
+// GitLabAPI.setToken('Cax44W7ysyF-gv39SeyP');
+// GitLabAPI.setHost('https://git-classes.mst.edu');
 
-const CanvasAPI = new Canvas({
-  canvas_url: JSON.parse(localStorage.getItem('CHdata') || 'null'),
-  canvas_token: JSON.parse(localStorage.getItem('CTdata') || 'null')
-});
+const CanvasAPI = new Canvas();
+export { CanvasAPI };
+// CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
+// CanvasAPI.setUrl('https://mst.instructure.com');
 
 const Centered = styled.div`
   margin: 0;
@@ -49,7 +48,7 @@ const lightTheme = createMuiTheme({
   }
 });
 
- GitLabAPI.createBaseRepo('hw100', '2453')
+/*  GitLabAPI.createBaseRepo('hw100', '2453')
   .then(base_repo => {
     GitLabAPI.createAssignment(
       base_repo,
@@ -60,7 +59,7 @@ const lightTheme = createMuiTheme({
       .then(console.log)
       .catch(console.error);
   })
-  .catch(console.error);
+  .catch(console.error); */
 
 // TODO : This needs to be an actual page/component
 const CoursePage = (obj: { match: any; location: any }) => {
@@ -81,21 +80,25 @@ export const App = () => {
 
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
-    CanvasAPI.getClasses()
-      .then(classes => {
-        setCourses(classes);
-      })
-      .catch(console.error);
-      // The CanvasAPI won't change so this prevents re-rendering.
+    if (CanvasAPI.ready()) {
+      CanvasAPI.getClasses()
+        .then(classes => {
+          setCourses(classes);
+        })
+        .catch(console.error);
+    }
+    // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
-
+  
   React.useEffect(() => {
-    GitLabAPI.getNamespaces()
-      .then(s => {
-  	    setNameSpace(s);
-      })
-    .catch(console.error);
-  }); 
+    if (GitLabAPI.ready()) {
+      GitLabAPI.getNamespaces()
+        .then(s => {
+          setNameSpace(s);
+        })
+        .catch(console.error);
+    }
+  }, [GitLabAPI]);
 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>

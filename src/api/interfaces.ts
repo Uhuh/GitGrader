@@ -4,7 +4,6 @@
 export interface IGitlab {
   gitlab_token: string;
   gitlab_host: string;
-  namespace: string;
 }
 
 /**

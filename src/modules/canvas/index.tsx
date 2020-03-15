@@ -5,10 +5,9 @@ import * as React from 'react';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
 import { ICanvasClass , ICanvasUser, IGitNamespace } from '../../api/interfaces';
 
-const CanvasAPI = new Canvas({
-  canvas_url: 'https://mst.instructure.com',
-  canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
-});
+const CanvasAPI = new Canvas();
+CanvasAPI.setUrl('https://mst.instructure.com');
+CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
 
 const useStyles = makeStyles({
   root: {
