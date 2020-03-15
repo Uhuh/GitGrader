@@ -7,7 +7,8 @@ import {
   ICanvasUser,
   IGitlab,
   IGitRepo,
-  IGitUser
+  IGitUser,
+  IBaseRepo
 } from './interfaces';
 
 /**
@@ -42,28 +43,72 @@ export class GitlabBackend {
     });
   }
   /**
-   * Creates an assignment within a specific namespace.
-   * @returns The git links to clone with.
+   * Create student repos for list of users.
    */
-  createAssignment = async (
+  createBaseRepo = async (
     name: string,
-    namespace_id: string,
-    section: string,
-    semester: string,
-    username: string
-  ): Promise<IGitRepo> => {
+    namespace_id: string
+  ): Promise<IBaseRepo> => {
+    // Initialize with readme so we can create student repos
+    // without needing any commits.
     const params = {
-      name: this.build_name(semester, section, name, username),
+      name: name,
       namespace_id: namespace_id,
       issues_enabled: false,
       merge_requests_enabled: false,
       builds_enabled: false,
       wiki_enabled: false,
       snippets_enabled: true,
-      visibility_level: GitVisibility.private
+      visibility_level: GitVisibility.private,
+      initialize_with_readme: true
+    };
+
+    const base_repo = await this.request('POST', '/projects', params);
+
+    return new Promise((res, rej) => {
+      if(!base_repo || base_repo === null) {
+        /**
+         * It might be an username or namespace issue.
+         */
+        rej({
+          status: 'failed',
+          namespace_id,
+          name
+        });
+      }
+
+      res({
+        id: base_repo.id,
+        name: base_repo.name,
+        namespace: {
+          name: base_repo.namespace.name,
+          id: base_repo.namespace.id,
+        },
+        ssh_url: base_repo.ssh_url_to_repo
+      });
+    });
+  }
+  /**
+   * @todo Try to get around using fork.
+   * Creates an assignment within a specific namespace. Forks currently.
+   * When creating more than one at a time, make sure to await it so there are no id conflicts
+   * @returns The git links to clone with.
+   */
+  createAssignment = async (
+    base_repo: IBaseRepo,
+    section: string,
+    semester: string,
+    username: string
+  ): Promise<IGitRepo> => {
+    const params = {
+      name: this.build_name(semester, section, base_repo.name, username),
+      namespace: base_repo.namespace.name,
+      namespace_id: base_repo.namespace.id,
+      namespace_path: `${this.info.gitlab_host}/${base_repo.namespace.name}`,
+      path: this.build_name(semester, section, base_repo.name, username)
     };
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
-    const repo = await this.request('POST', '/projects', params);
+    const repo = await this.request('POST', `/projects/${base_repo.id}/fork`, params);
 
     return new Promise((res, rej) => {
       if(!repo || repo === null) {
@@ -72,7 +117,7 @@ export class GitlabBackend {
          */
         rej({
           status: 'failed',
-          namespace_id,
+          base_repo,
           name,
           username
         });
@@ -82,7 +127,8 @@ export class GitlabBackend {
         username,
         id: repo.id,
         name: repo.name,
-        namespace: repo.namespace.name
+        namespace: repo.namespace.name,
+        ssh_url: repo.ssh_url_to_repo
       });
     });
   }

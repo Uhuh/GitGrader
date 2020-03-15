@@ -43,6 +43,20 @@ export interface IGitRepo {
   name: string;
   username: string;
   namespace: string;
+  ssh_url: string;
+}
+
+/**
+ * Base repo information
+ */
+export interface IBaseRepo {
+  id: string;
+  name: string;
+  namespace: {
+    id: string;
+    name: string;
+  };
+  ssh_url: string;
 }
 
 /**
