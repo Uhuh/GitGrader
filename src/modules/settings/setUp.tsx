@@ -136,11 +136,6 @@ export const SetUp = () => {
            onChange={(e) => {setGitlabToken(e.target.value)}} 
            label='GitLab Access Token' />
         </FormControl>
-        
-        <Switch
-          checked={theme.theme === 'dark'}
-          onClick={theme.toggleTheme}
-        />
         <SpacePadding></SpacePadding>
         <Grid 
          container

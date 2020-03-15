@@ -89,7 +89,7 @@ export const App = () => {
           exact
           path='/settings'
           key='settings'
-          render={() => <SetUp toggleTheme={toggleTheme} theme={theme}/>}
+          render={() => <SetUp />}
           />
         <Route 
           exact 
