@@ -11,14 +11,14 @@ import { SetUp } from './settings';
  * Make sure to use your token for testing. Might want to use an .env file for this
  */
 const GitLabAPI = new GL({
-  gitlab_host: 'https://git-classes.mst.edu',
-  gitlab_token: '',
+  gitlab_host: JSON.parse(localStorage.getItem('GHdata') || 'null'),
+  gitlab_token: JSON.parse(localStorage.getItem('GTdata') || 'null'),
   namespace: '2020-senior-test'
 });
 
 const CanvasAPI = new Canvas({
-  canvas_url: 'https://mst.instructure.com',
-  canvas_token: '2006~tssi5f9tRWBUAMCIhPCpxNAcYhDp055fBsZ4nZq9KMY7Cyf5wYL6HpffZavnitJM'
+  canvas_url: JSON.parse(localStorage.getItem('CHdata') || 'null'),
+  canvas_token: JSON.parse(localStorage.getItem('CTdata') || 'null')
 });
 
 const darkTheme = createMuiTheme({

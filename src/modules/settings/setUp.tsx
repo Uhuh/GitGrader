@@ -62,8 +62,6 @@ export const SetUp = () => {
     setGitlabHost('');
     setCanvasToken('');
     setGitlabToken('');
-    console.log('Canvas Host:', canvasHost, 'GitLab Host:', gitlabHost);
-    console.log('Canvas Token:', canvasToken, 'GitLab Token:', gitlabToken);
     settingsForm.reset();
   };
   
@@ -76,8 +74,6 @@ export const SetUp = () => {
     setGitlabHost('');
     setCanvasToken('');
     setGitlabToken('');
-    console.log('Canvas Host:', canvasHost, 'GitLab Host:', gitlabHost);
-    console.log('Canvas Token:', canvasToken, 'GitLab Token:', gitlabToken);
     settingsForm.reset();
     handleAlertClose();
   };
