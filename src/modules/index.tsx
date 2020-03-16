@@ -62,7 +62,7 @@ export const App = () => {
   };
 
   //Used for debugging local storage/rerouting
-  localStorage.clear();
+  //localStorage.clear();
 
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
