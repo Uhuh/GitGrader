@@ -1,7 +1,12 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, 
-         FormControl, Grid, InputLabel, OutlinedInput, Popover, Typography } from '@material-ui/core';
+         FormControl, Grid, InputLabel, Popover, TextField, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
+
+/*
+THINGS TO DO:
+-
+*/
 
 const SpacePadding = styled.div`
   margin-bottom: 20px;
@@ -63,7 +68,9 @@ export const SetUp = () => {
   const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
   const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
   const CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
-  const GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null');  
+  const GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null'); 
+  
+  const hostRegex = new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/);
 
   const handleAlertOpen = () => {
     setAlertOpen(true);
@@ -83,10 +90,14 @@ export const SetUp = () => {
 
   const handleSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
-    localStorage.setItem('CHdata', JSON.stringify(canvasHost));
-    localStorage.setItem('GHdata', JSON.stringify(gitlabHost));
-    localStorage.setItem('CTdata', JSON.stringify(canvasToken));
-    localStorage.setItem('GTdata', JSON.stringify(gitlabToken));
+    if(canvasHost.length != 0){
+      localStorage.setItem('CHdata', JSON.stringify(canvasHost));}
+    if(gitlabHost.length != 0){
+      localStorage.setItem('GHdata', JSON.stringify(gitlabHost));}
+    if(canvasToken.length != 0){
+      localStorage.setItem('CTdata', JSON.stringify(canvasToken));}
+    if(gitlabToken.length != 0){
+      localStorage.setItem('GTdata', JSON.stringify(gitlabToken));}
     setCanvasHost('');
     setGitlabHost('');
     setCanvasToken('');
@@ -95,10 +106,10 @@ export const SetUp = () => {
   };
   
   const clearForm = () => { 
-    localStorage.setItem('CHdata', JSON.stringify(''));
-    localStorage.setItem('GHdata', JSON.stringify(''));
-    localStorage.setItem('CTdata', JSON.stringify(''));
-    localStorage.setItem('GTdata', JSON.stringify(''));
+    localStorage.setItem('CHdata', '');
+    localStorage.setItem('GHdata', '');
+    localStorage.setItem('CTdata', '');
+    localStorage.setItem('GTdata', '');
     setCanvasHost('');
     setGitlabHost('');
     setCanvasToken('');
@@ -108,9 +119,22 @@ export const SetUp = () => {
   };
   
   const inputEmpty = () => {
-    if(canvasHost.length === 0 || gitlabHost.length == 0 ||
-       canvasToken.length === 0 || gitlabToken.length === 0) {
+    if((!CanvasHost && !GitlabHost && !CanvasToken && !GitlabToken) ||
+        (CanvasHost === '' && GitlabHost === '' &&
+         CanvasToken === '' && GitlabToken === '')){
+      if(canvasHost.length === 0 || gitlabHost.length == 0 ||
+        canvasToken.length === 0 || gitlabToken.length === 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    if(!(hostRegex.test(canvasHost)) || !(hostRegex.test(gitlabHost))){
       return true;
+    }
+    if(canvasHost.length === 0 && gitlabHost.length == 0 &&
+       canvasToken.length === 0 && gitlabToken.length === 0) {
+      return true;           
     } else {
       return false;
     }
@@ -133,37 +157,37 @@ export const SetUp = () => {
      justify='center'>
       <form id='settings' onSubmit={handleSubmit} autoComplete='off'>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='canvasHost'>Canvas Host URL</InputLabel>
-          <OutlinedInput 
-           id='canvasHost' 
-           placeholder='Please enter the host URL'
+          <TextField
+           id='canvasHost'
+           variant='outlined' 
+           error={hostRegex.test(canvasHost) ? false : true}
+           helperText={hostRegex.test(canvasHost) ? '' :'Invalid URL (Did you use "https://"?)'}
            onChange={(e) => {setCanvasHost(e.target.value);}} 
            label='Canvas Host URL' />
         </FormControl>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='gitlabHost'>GitLab Host URL</InputLabel>
-          <OutlinedInput 
+          <TextField 
            id='gitlabHost'
-           placeholder='Please enter the host URL'
+           variant='outlined'
+           error={hostRegex.test(gitlabHost) ? false : true}
+           helperText={hostRegex.test(gitlabHost) ? '' : 'Invalid URL (Did you use "https://"?)'}
            onChange={(e) => {setGitlabHost(e.target.value);}} 
            label='GitLab Host URL' />
         </FormControl>
         <SpacePadding></SpacePadding>
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='canvasToken'>Canvas Access Token</InputLabel>
-          <OutlinedInput 
+          <TextField 
            id='canvasToken' 
-           placeholder='Please enter your token'
+           variant='outlined'
            onChange={(e) => {setCanvasToken(e.target.value);}} 
            label='Canvas Access Token' />
         </FormControl>
         &nbsp;&nbsp;&nbsp;&nbsp;
         <FormControl variant='outlined'>
-          <InputLabel htmlFor='gitlabToken'>GitLab Access Token</InputLabel>
-          <OutlinedInput 
+          <TextField 
            id='gitlabToken' 
-           placeholder='Please enter your token'
+           variant='outlined'
            onChange={(e) => {setGitlabToken(e.target.value);}} 
            label='GitLab Access Token' />
         </FormControl>
@@ -329,25 +353,26 @@ export const SetUp = () => {
             <ul>
               <li>
                 Canvas host URLs are typically of the form &nbsp;
-                <code>???.instructure.com</code> &nbsp; where &nbsp; 
+                <code>https://???.instructure.com</code> &nbsp; where &nbsp; 
                 <code>???</code> &nbsp; is replaced with your institution's name.
               </li>
               <li>
                 Canvas API access tokens must be generated and can be found at &nbsp;
-                <code>???.instructure.com/profile/setings</code>
+                <code>https://???.instructure.com/profile/settings</code>
               </li>
             </ul>
             <h3>GitLab Information</h3>
             <ul>
               <li>
-                The default GitLab URL is &nbsp; <code>gitlab.com</code>, however
-                your institution's GitLab server will differ.
+                The default GitLab URL is &nbsp; <code>https://gitlab.com</code>, however
+                your institution's GitLab server may differ.
               </li>
               <li>
-                GitLab API access tokens must be generated and can be found at &nbsp;
-                <code>git-classes.???.edu/profile/personal_access_tokens</code>
+                GitLab API access tokens must be generated and can be found at in
+                User Settings > Access Tokens.
               </li>
             </ul>
+            <h4>NOTE: Host URLs MUST be preceeded with <code>https://</code></h4>
           </DialogContent>
         </Dialog>
       </Grid>
