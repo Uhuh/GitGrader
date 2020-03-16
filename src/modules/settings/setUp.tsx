@@ -129,9 +129,6 @@ export const SetUp = () => {
         return false;
       }
     }
-    if(!(hostRegex.test(canvasHost)) || !(hostRegex.test(gitlabHost))){
-      return true;
-    }
     if(canvasHost.length === 0 && gitlabHost.length == 0 &&
        canvasToken.length === 0 && gitlabToken.length === 0) {
       return true;           
@@ -160,8 +157,8 @@ export const SetUp = () => {
           <TextField
            id='canvasHost'
            variant='outlined' 
-           error={hostRegex.test(canvasHost) ? false : true}
-           helperText={hostRegex.test(canvasHost) ? '' :'Invalid URL (Did you use "https://"?)'}
+           error={(hostRegex.test(canvasHost) || canvasHost.length === 0) ? false : true}
+           helperText={(hostRegex.test(canvasHost) || canvasHost.length === 0) ? '' :'Invalid URL (Did you use "https://"?)'}
            onChange={(e) => {setCanvasHost(e.target.value);}} 
            label='Canvas Host URL' />
         </FormControl>
@@ -170,8 +167,8 @@ export const SetUp = () => {
           <TextField 
            id='gitlabHost'
            variant='outlined'
-           error={hostRegex.test(gitlabHost) ? false : true}
-           helperText={hostRegex.test(gitlabHost) ? '' : 'Invalid URL (Did you use "https://"?)'}
+           error={(hostRegex.test(gitlabHost) || gitlabHost.length === 0) ? false : true}
+           helperText={(hostRegex.test(gitlabHost) || gitlabHost.length === 0) ? '' : 'Invalid URL (Did you use "https://"?)'}
            onChange={(e) => {setGitlabHost(e.target.value);}} 
            label='GitLab Host URL' />
         </FormControl>
