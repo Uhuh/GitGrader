@@ -8,7 +8,9 @@ import { CourseCard } from './courseCard';
 
 export const CourseList = (props: {courses: ICanvasClass[]}) => {
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
-                      localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null) 
+                      localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
+                      localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
+                      localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
                       ? true : false;
 
   return (

@@ -1,4 +1,4 @@
-import { CssBaseline, Paper } from '@material-ui/core';
+import { Button, CssBaseline, Paper } from '@material-ui/core';
 import grey from '@material-ui/core/colors/grey';
 import { createMuiTheme, ThemeProvider, withTheme } from '@material-ui/core/styles';
 import * as React from 'react';
@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
 import { CreateCourse } from './create/createCourse';
-import { BackButton, CourseList, SettingsButton } from './navs';
+import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
 import { MissingSettings, SetUp } from './settings';
 
 /**
@@ -55,7 +55,7 @@ const CoursePage = (obj: { match: any; location: any }) => {
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
-  const [theme, setTheme] = React.useState('dark');
+  const [theme, setTheme] = React.useState('light');
 
   const toggleTheme = () => {
     setTheme(theme == 'dark' ? 'light' : 'dark');
@@ -79,16 +79,24 @@ export const App = () => {
       <CssBaseline />
       <BackButton />
       <SettingsButton />
+      <Button onClick={toggleTheme}><ThemeButton/></Button>
       <Switch>
         <Route
           exact
           path='/'
           key='courses'
+          refresh={true}
           render={() => 
             <>
               {courses ? 
               <CourseList courses={courses}/> :
-              <Centered><h3>Loading Courses...</h3><MissingSettings/></Centered>}
+              <Centered>
+                <h3>Loading Courses...</h3>
+                <Link to={'/settings'}>
+                  Courses not loading?
+                </Link>
+                <MissingSettings/>
+              </Centered>}
             </>
           }
           />
