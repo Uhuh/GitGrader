@@ -16,6 +16,35 @@ const Centered = styled.div`
   transform: translate(-50%, -50%);
 `;
 
+export const MissingSettings = () => {
+  const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
+                      localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
+                      localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
+                      localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
+                      ? true : false;
+
+  return (
+    <Dialog open={noSettings}>
+      <DialogTitle>{'Missing Settings'}</DialogTitle>
+      <DialogContent dividers>
+        <DialogContentText>
+          One or more host URLs and access tokens are missing or have yet
+          to be setup. Please input the missing host URLs or access tokens in
+          the settings page.
+        </DialogContentText>
+        <DialogActions>
+          <Button 
+           variant='outlined' 
+           color='primary'
+           href='#/settings'>
+            Settings
+          </Button>
+        </DialogActions>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export const SetUp = () => {
   const [canvasHost, setCanvasHost] = React.useState('');
   const [gitlabHost, setGitlabHost] = React.useState('');
@@ -31,10 +60,10 @@ export const SetUp = () => {
   const showGT = Boolean(anchorGT);
   const settingsForm = document.getElementById('settings') as HTMLFormElement;
 
-  let CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
-  let GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
-  let CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
-  let GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null');  
+  const CanvasHost = JSON.parse(localStorage.getItem('CHdata') || 'null');
+  const GitlabHost = JSON.parse(localStorage.getItem('GHdata') || 'null');
+  const CanvasToken = JSON.parse(localStorage.getItem('CTdata') || 'null');
+  const GitlabToken = JSON.parse(localStorage.getItem('GTdata') || 'null');  
 
   const handleAlertOpen = () => {
     setAlertOpen(true);
@@ -108,15 +137,16 @@ export const SetUp = () => {
           <OutlinedInput 
            id='canvasHost' 
            placeholder='Please enter the host URL'
-           onChange={(e) => {setCanvasHost(e.target.value)}} 
+           onChange={(e) => {setCanvasHost(e.target.value);}} 
            label='Canvas Host URL' />
         </FormControl>
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <FormControl variant='outlined'>
           <InputLabel htmlFor='gitlabHost'>GitLab Host URL</InputLabel>
           <OutlinedInput 
            id='gitlabHost'
            placeholder='Please enter the host URL'
-           onChange={(e) => {setGitlabHost(e.target.value)}} 
+           onChange={(e) => {setGitlabHost(e.target.value);}} 
            label='GitLab Host URL' />
         </FormControl>
         <SpacePadding></SpacePadding>
@@ -125,15 +155,16 @@ export const SetUp = () => {
           <OutlinedInput 
            id='canvasToken' 
            placeholder='Please enter your token'
-           onChange={(e) => {setCanvasToken(e.target.value)}} 
+           onChange={(e) => {setCanvasToken(e.target.value);}} 
            label='Canvas Access Token' />
         </FormControl>
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <FormControl variant='outlined'>
           <InputLabel htmlFor='gitlabToken'>GitLab Access Token</InputLabel>
           <OutlinedInput 
            id='gitlabToken' 
            placeholder='Please enter your token'
-           onChange={(e) => {setGitlabToken(e.target.value)}} 
+           onChange={(e) => {setGitlabToken(e.target.value);}} 
            label='GitLab Access Token' />
         </FormControl>
         <SpacePadding></SpacePadding>
@@ -146,6 +177,7 @@ export const SetUp = () => {
            disabled={inputEmpty()}
            color='primary' 
            variant='outlined'
+           style={{maxWidth: '100px', maxHeight: '40px', minWidth: '100px', minHeight: '40px'}}
            type='submit'
            onClick={handleConfirmOpen}>
             Update
@@ -153,32 +185,33 @@ export const SetUp = () => {
           <Dialog open={confirmOpen} onClose={handleConfirmClose}>
             <DialogTitle>{'Settings Updated'}</DialogTitle>
           </Dialog>
-         <SpacePadding></SpacePadding>   
-         <Button 
-          disabled={clearEmpty()}
-          color='primary'
-          variant='outlined' 
-          onClick={handleAlertOpen}>
-             Clear
-         </Button>
-         <Dialog open={alertOpen} onClose={handleAlertClose}>
-           <DialogTitle>{'Are you sure you want to clear all fields?'}</DialogTitle>
-           <DialogContent>
-             <DialogContentText>
-               Clearing all fields will reset all values. You will need to enter
-               and save new host URLs and access tokens in order to ensure that 
-               GitGrader functions properly.
-             </DialogContentText>
-           </DialogContent>
-           <DialogActions>
-             <Button variant='outlined' onClick={clearForm}>
-               Yes
-             </Button>
-             <Button variant='outlined' onClick={handleAlertClose}>
-               No
-             </Button>
-           </DialogActions>
-         </Dialog>
+          &nbsp;&nbsp;&nbsp;
+          <Button 
+            disabled={clearEmpty()}
+            color='primary'
+            variant='outlined' 
+            style={{maxWidth: '100px', maxHeight: '40px', minWidth: '100px', minHeight: '40px'}}
+            onClick={handleAlertOpen}>
+              Clear
+          </Button>
+          <Dialog open={alertOpen} onClose={handleAlertClose}>
+            <DialogTitle>{'Are you sure you want to clear all fields?'}</DialogTitle>
+            <DialogContent dividers>
+              <DialogContentText>
+                Clearing all fields will reset all values. You will need to enter
+                and save new host URLs and access tokens in order to ensure that 
+                GitGrader functions properly.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button variant='outlined' onClick={clearForm}>
+                Yes
+              </Button>
+              <Button variant='outlined' onClick={handleAlertClose}>
+                No
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </form>
     </Grid>
@@ -222,13 +255,13 @@ export const SetUp = () => {
           Canvas Access Token:&nbsp;
         </Typography>
         <Button 
-         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorCT(e.currentTarget)}}>
+         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorCT(e.currentTarget);}}>
            Show
         </Button>
         <Popover
          open={showCT}
          anchorEl={anchorCT}
-         onClose={() => {setAnchorCT(null)}}
+         onClose={() => {setAnchorCT(null);}}
          anchorOrigin={{
            vertical: 'center',
            horizontal: 'left',
@@ -252,13 +285,13 @@ export const SetUp = () => {
           GitLab Access Token:&nbsp;
         </Typography>
         <Button 
-         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorGT(e.currentTarget)}}>
+         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {setAnchorGT(e.currentTarget);}}>
            Show
         </Button>
         <Popover
          open={showGT}
          anchorEl={anchorGT}
-         onClose={() => {setAnchorGT(null)}}
+         onClose={() => {setAnchorGT(null);}}
          anchorOrigin={{
            vertical: 'center',
            horizontal: 'left',
@@ -283,15 +316,15 @@ export const SetUp = () => {
         <Button
          variant='outlined' 
          color='secondary' 
-         onClick={() => {setHelpOpen(true)}}>
+         onClick={() => {setHelpOpen(true);}}>
           Help
         </Button>
         <Dialog 
          open={helpOpen} 
          scroll='paper'
-         onClose={() => {setHelpOpen(false)}}>
+         onClose={() => {setHelpOpen(false);}}>
           <DialogTitle>{'How to Get Host URLs and Access Tokens'}</DialogTitle>
-          <DialogContent>
+          <DialogContent dividers>
             <h3>Canvas Information</h3>
             <ul>
               <li>
