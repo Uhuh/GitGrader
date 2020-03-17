@@ -81,15 +81,15 @@ export class GitlabBackend {
         res([]);
       }
 
-      res(base_projects.map((b: any) => {
-        id: b.id;
-        name: b.name;
+      res(base_projects.map((b: any) => ({
+        id: b.id,
+        name: b.name,
         namespace: {
-          id: b.namespace_id;
-          name: b.namespace.name;
-        }
-        ssh_url: b.ssh_url_to_repo;
-      }));
+          id: b.namespace_id,
+          name: b.namespace.name,
+        },
+        ssh_url: b.ssh_url_to_repo
+      })));
     });
   }
   /**
