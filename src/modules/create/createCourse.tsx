@@ -1,8 +1,18 @@
 import * as React from 'react';
-import { Typography } from '@material-ui/core';
+import { Typography, Dialog, DialogTitle } from '@material-ui/core';
 
 export const CreateCourse = () => {
-  return(
-    <Typography>Add Course</Typography>
+  const [open, setOpen] = React.useState(false);
+
+  const handleChange = (event: React.ChangeEvent<{ canvasID: string, gitlabID: string }>) => {
+    const temp = JSON.parse(localStorage.getItem('courses') || '{}');
+    temp[`${event.target.canvasID}`] = event.target.gitlabID;
+    localStorage.setItem('courses', JSON.stringify(temp))
+  };
+
+  return (
+    <Dialog open={open} onClose={() => setOpen(false)}>
+      <DialogTitle>Add Course</DialogTitle>
+    </Dialog>
   );
 };
