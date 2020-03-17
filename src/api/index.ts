@@ -48,6 +48,51 @@ export class GitlabBackend {
     });
   }
   /**
+   * Filter out use projects for "base" repos.
+   * @param namespace_id ID that belongs to a course.
+   * @param section The course section id.
+   */
+  getBaseRepos = async (namespace_id: string, section: string): Promise<IBaseRepo[]> => {
+    /**
+     * For now the hacky method. Assume no base repo will have the course section
+     * in the name.
+     */
+    let projects: any = [];
+    
+    // We're limited by how many repos we can grab so we gotta do by page. :(
+    for(let i = 1; i <= 10; i++) {
+      const P = await this.request('GET', '/projects', { page: i, per_page: 100 })
+        .catch(console.error);
+      // Clearly no more repos.
+      if(!P || P.length === 0) {
+        break;
+      }
+      projects = [...projects, ...P];
+    }
+
+    const namespace_projects = await projects
+      .filter((p: any) => p.namespace.id == namespace_id);
+
+    const base_projects = await namespace_projects
+      .filter((n: any) => !n.name.includes(section));
+
+    return new Promise((res, rej) => {
+      if (!base_projects || base_projects.length === 0) {  
+        res([]);
+      }
+
+      res(base_projects.map((b: any) => {
+        id: b.id;
+        name: b.name;
+        namespace: {
+          id: namespace_id;
+          name: b.namespace.name;
+        }
+        ssh_url: b.ssh_url_to_repo;
+      }));
+    });
+  }
+  /**
    * Create student repos for list of users.
    */
   createBaseRepo = async (
