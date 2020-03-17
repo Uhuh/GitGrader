@@ -16,13 +16,13 @@ import { MissingSettings, SetUp } from './settings';
  */
 const GitLabAPI = new GL();
 export { GitLabAPI };
-// GitLabAPI.setToken('Cax44W7ysyF-gv39SeyP');
-// GitLabAPI.setHost('https://git-classes.mst.edu');
+GitLabAPI.setToken('Cax44W7ysyF-gv39SeyP');
+GitLabAPI.setHost('https://git-classes.mst.edu');
 
 const CanvasAPI = new Canvas();
 export { CanvasAPI };
-// CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
-// CanvasAPI.setUrl('https://mst.instructure.com');
+CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
+CanvasAPI.setUrl('https://mst.instructure.com');
 
 const Centered = styled.div`
   margin: 0;

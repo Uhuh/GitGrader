@@ -1,11 +1,11 @@
-import { Box } from '@material-ui/core';
-import { Button, Card, CardActions, CardContent , CardHeader, Dialog , DialogActions, DialogContent, DialogContentText
-  , DialogTitle ,makeStyles, TextField, Typography } from '@material-ui/core/';
+import { Box, Button, Card, CardActions, CardContent , CardHeader, Dialog , DialogActions, DialogContent, 
+  DialogContentText, DialogTitle ,Grid ,makeStyles, TextField, Typography } from '@material-ui/core/';
 import  AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
-import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { ICanvasClass , ICanvasUser, IGitNamespace, GitAccess } from '../../api/interfaces';
 import { GitLabAPI } from '..';
+import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
+import { GitAccess , IBaseRepo, ICanvasClass, ICanvasUser, IGitNamespace } from '../../api/interfaces';
+import { RepoCard } from './repoCards';
 
 const CanvasAPI = new Canvas();
 CanvasAPI.setUrl('https://mst.instructure.com');
@@ -48,6 +48,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
   let classIndex = 0;
 
   const [assignmentName, setAssignmentName] = React.useState('');
+  const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>();
   const [students, setStudents] = React.useState<ICanvasUser[]>();
   const [open, setOpen] = React.useState(false);
 
@@ -55,6 +56,14 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
     CanvasAPI.getStudents(courseId)
       .then(s => {
   	    setStudents(s);
+      })
+    .catch(console.error);
+  }, [courseId]); 
+
+  React.useEffect(() => {
+    GitLabAPI.getBaseRepos('2453','101')
+      .then(b => {
+  	    setBaseRepo(b);
       })
     .catch(console.error);
   }, [courseId]); 
@@ -79,25 +88,19 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
           Course Instructor(s): 
           {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}
         </p>
-        <br />
-        <div className='namespace'>
-            {namespace.map(namespace => 
-            <div>
-              <Card className={classes.root}>
-                <CardContent>
-                    <Typography className={classes.title} color='textSecondary' gutterBottom>
-                      {namespace.name}
-                    </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size='small'>Learn More</Button>
-                </CardActions>
-              </Card>
-              <br />
-            </div>
-            )}
-        </div>
-        <div>
+        <Grid
+          container
+          justify='center'
+          alignItems='center'
+          spacing={3}
+          style={{ minHeight: '100vh' }}
+        >
+          {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
+            <Grid item xs={3} key={baseRepo.id}>
+              <RepoCard baseRepo={baseRepo}/>
+            </Grid>
+          )):[]}
+          <div>
           <Card className={classes.root} onClick={handleClickOpen}>
             <br />
             <AddIcon className={classes.addIcon}></AddIcon>
@@ -121,6 +124,7 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
             </DialogActions>
           </Dialog>
         </div>
+        </Grid>
       </div>
     </Box>
   );
