@@ -72,11 +72,7 @@ export const App = () => {
           path='/'
           key='courses'
           render={() => 
-            <>
-              {courses ? 
-              <CourseList courses={courses}/> :
-              <p>No Courses loaded yet</p>}
-            </>
+            <CourseList courses={courses}/>
           }
           />
         <Route

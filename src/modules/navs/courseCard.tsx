@@ -48,7 +48,7 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-export const CourseCard = (props: {course: ICanvasClass}) => {
+export const CourseCard = (props: { course: ICanvasClass }) => {
   const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
 
