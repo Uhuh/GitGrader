@@ -48,16 +48,19 @@ export class GitlabBackend {
     });
   }
   /**
-   * Filter out use projects for "base" repos.
+   * Separate "Base" repos from student repos.
    * @param namespace_id ID that belongs to a course.
    * @param section The course section id.
    */
-  getBaseRepos = async (namespace_id: string, section: string): Promise<IBaseRepo[]> => {
+  getRepos = async (namespace_id: string, section: string): 
+    Promise<{ base_repos: IBaseRepo[], student_repos: Map<string, string>}> => {
     /**
      * For now the hacky method. Assume no base repo will have the course section
      * in the name.
      */
     let projects: any = [];
+    let base_projects: any = [];
+    const student_repos = new Map<string, string>();
     
     // We're limited by how many repos we can grab so we gotta do by page. :(
     for(let i = 1; i <= 10; i++) {
@@ -73,23 +76,36 @@ export class GitlabBackend {
     const namespace_projects = await projects
       .filter((p: any) => p.namespace.id == namespace_id);
 
-    const base_projects = await namespace_projects
-      .filter((n: any) => !n.name.includes(section));
+    for(const n of namespace_projects) {
+      if (n.name.includes(section)) {
+        student_repos.set(n.name, n.id);
+      } else {
+        base_projects = [...base_projects, n];
+      }
+    }
 
     return new Promise((res, rej) => {
       if (!base_projects || base_projects.length === 0) {  
-        res([]);
+        res({
+          base_repos: [],
+          student_repos
+        });
       }
 
-      res(base_projects.map((b: any) => ({
-        id: b.id,
-        name: b.name,
-        namespace: {
-          id: b.namespace_id,
-          name: b.namespace.name,
-        },
-        ssh_url: b.ssh_url_to_repo
-      })));
+      res(
+        {
+          base_repos: base_projects.map((b: any) => ({
+            id: b.id,
+            name: b.name,
+            namespace: {
+              id: b.namespace_id,
+              name: b.namespace.name,
+            },
+            ssh_url: b.ssh_url_to_repo
+          })),
+          student_repos
+        }
+      );
     });
   }
   /**
