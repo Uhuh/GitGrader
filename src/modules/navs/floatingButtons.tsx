@@ -25,7 +25,10 @@ const FloatingBottom = styled.div<IProps>`
 const BackButton = () => {
   return(
     <FloatingTop left>
-      <Link component={RouterLink} to='/'>
+      <Link 
+       component={RouterLink} 
+       onClick={() => {window.location.href = '#/'; window.location.reload();}} 
+       to='/'>
         <HomeIcon fontSize='large'/>
       </Link>
     </FloatingTop>
