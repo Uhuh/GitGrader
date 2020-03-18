@@ -54,3 +54,4 @@ export const CourseList = (props: {courses: ICanvasClass[]}) => {
     </>
   );
 };
+ 
