@@ -1,4 +1,4 @@
-import { Button, createStyles, FormControl, Grid, InputLabel, makeStyles, Paper, Select, Theme } from '@material-ui/core';
+import { Button, createStyles, FormControl, Grid, InputLabel, makeStyles, Paper, Select, Theme, TextField } from '@material-ui/core';
 import LinkIcon from '@material-ui/icons/Link';
 import * as React from 'react';
 import { ICanvasClass, IGitNamespace } from '../../api/interfaces';
@@ -10,6 +10,7 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
 
   const [selectedNamespace, setSelectedNamespace] = React.useState('');
   const [selectedCourse, setSelectedCourse] = React.useState('');
+  const [section, setSection] = React.useState('');
 
   const handleChangeNamespace = (event: React.ChangeEvent<{ value: unknown }>) => {
     if(typeof event.target.value === 'string'){
@@ -25,9 +26,14 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
 
   const handleSubmit = () => {
     const temp = JSON.parse(localStorage.getItem('relations') || '{}');
-    temp[selectedCourse] = {canvasID: selectedCourse, gitlabID: selectedNamespace};
+    temp[selectedCourse] = {
+      canvasID: selectedCourse, 
+      section: section, 
+      gitlabID: selectedNamespace
+    };
     localStorage.setItem('relations', JSON.stringify(temp));
-  }
+    console.log(temp);
+  };
   
   React.useEffect(() => {
     CanvasAPI.getClasses()
@@ -108,6 +114,13 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
                 })}
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item>
+            <TextField
+              type='text'
+              label='Class Section'
+              onChange={e => setSection(e.target.value)}
+            />
           </Grid>
           <Grid item>
             <FormControl>

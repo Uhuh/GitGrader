@@ -45,9 +45,12 @@ const SettingsButton = () => {
   );
 };
 
-const ThemeButton = () => {
+const ThemeButton = (props: { changeTheme: () => void }) => {
   return(
-    <FloatingBottom left>
+    <FloatingBottom 
+      onClick={props.changeTheme}
+      left
+    >
       <ThemeIcon fontSize='large'/>
     </FloatingBottom>
   )

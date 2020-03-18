@@ -50,12 +50,12 @@ export const AddCard = () => {
 
   return (
     <Grid item>
-        <Card className={classes.root}>
-          <ImagePlaceholder colors={color} />
-          <div className={classes.cardContent}>
-            <AddIcon className={classes.cardContent} />
-          </div>
-        </Card>
+      <Card className={classes.root}>
+        <ImagePlaceholder colors={color} />
+        <div className={classes.cardContent}>
+          <AddIcon className={classes.cardContent} />
+        </div>
+      </Card>
     </Grid>
   );
 };

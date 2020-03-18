@@ -9,7 +9,7 @@ import {
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import styled from 'styled-components';
-import { ICanvasClass } from '../../api/interfaces';
+import { ICanvasNamespace } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
@@ -48,13 +48,13 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-export const CourseCard = (props: { course: ICanvasClass }) => {
+export const CourseCard = (props: { course: ICanvasNamespace }) => {
   const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
 
   return (
     <Paper elevation={3}>
-      <Card className={classes.root}>
+      <Card>
         <CardActionArea>
           <ImagePlaceholder colors={color}/>
           <CardContent>
@@ -62,7 +62,7 @@ export const CourseCard = (props: { course: ICanvasClass }) => {
             <Typography color='textSecondary'>
               {props.course.teachers[0].display_name}
             </Typography>
-            <PersonIcon></PersonIcon>
+            <PersonIcon/>
             {props.course.total_students}
           </CardContent>
         </CardActionArea>

@@ -1,13 +1,46 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, 
-         DialogTitle, Grid, Link } from '@material-ui/core';
+import { 
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle, 
+  Grid, 
+  Link, 
+  makeStyles
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { ICanvasClass } from '../../api/interfaces';
+import { ICanvasNamespace } from '../../api/interfaces';
 import { CourseCard } from './courseCard';
-import { AddCard } from './addCard';
 
-export const CourseList = (props: {courses: ICanvasClass[]}) => {
+const useStyles = makeStyles({
+  card: {
+    padding: '30px',
+    maxWidth: '21%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  body: {
+    width: '100%',
+    paddingLeft: '5vw',
+    paddingRight: '5vw',
+    display: 'flex',
+    flexWrap: 'wrap'
+  },
+  addIcon: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  centerItem: {
+    width: '100%',
+    textAlign: 'center'
+  }
+});
+
+export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
+  const classes = useStyles();
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
                       localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
                       localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
@@ -18,22 +51,23 @@ export const CourseList = (props: {courses: ICanvasClass[]}) => {
     <>
     <Grid
       container
+      className={classes.body}
       justify='center'
       alignItems='center'
-      spacing={3}
-      style={{ minHeight: '100vh' }}
     >
-      {props.courses ?
-        props.courses.map((course: ICanvasClass) => (
-          <Grid item xs={3} key={course.id}>
-            <Link component={RouterLink} to={`/course/${course.id}`}>
-              <CourseCard course={course} />
-            </Link>
-          </Grid>
-      )) : <></>}
-      <Grid item>
+      <div className={classes.centerItem}>
+        <h1>Courses you grade for</h1>
+      </div>
+      {props.courses.map((course: ICanvasNamespace) => (
+        <Grid item xs={3} key={course.id} className={classes.card}>
+          <Link component={RouterLink} to={`/course/${course.id}`}>
+            <CourseCard course={course} />
+          </Link>
+        </Grid>
+      ))}
+      <Grid item xs={3} className={classes.addIcon}>
         <Link component={RouterLink} to={`/add`}>
-          <AddCard />
+          <AddIcon />
         </Link>
       </Grid>
     </Grid>
