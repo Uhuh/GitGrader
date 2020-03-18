@@ -2,10 +2,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {
   GitAccess,
   GitVisibility,
-  ICanvas,
+  IBaseRepo,
   ICanvasClass,
   ICanvasUser,
-  IGitlab,
   IGitRepo,
   IGitUser
 } from './interfaces';
@@ -17,36 +16,166 @@ import {
  * @constructor Requires a users private token, (institute) url, and namespace.
  */
 export class GitlabBackend {
-  constructor (private info: IGitlab) {}
+  private gitlab_host = 'https://www.gitlab.com';
+  private gitlab_token = '';
+  constructor () {}
+  setToken (token: string) { this.gitlab_token = token; }
+  setHost (host: string) { this.gitlab_host = host; }
+  ready () {
+    return (this.gitlab_host !== '' && this.gitlab_token !== '') ? true : false;
+  }
   /**
    * To format assignment names.
    * @returns A formatted string
    */
   build_name = (sem: string, sec: string, n: string, user: string): string =>
     `${sem}-${sec}-${n}-${user}`
+
   /**
-   * Creates an assignment within a specific namespace.
-   * @returns The git links to clone with.
+   * Get list of namespaces for user.
    */
-  createAssignment = async (
+  getNamespaces = async (): Promise<any> => {
+    const namespaces = await this.request('GET', '/namespaces', {});
+
+    return new Promise(res => {
+      if(!namespaces) {
+        res({});
+      }
+
+      const groups = namespaces.filter((n: any) => n.kind === 'group');
+
+      res(groups);
+    });
+  }
+  /**
+   * Separate "Base" repos from student repos.
+   * @param namespace_id ID that belongs to a course.
+   * @param section The course section id. EG: 101 for "CS 1570 (101)"
+   */
+  getRepos = async (namespace_id: string, section: string): 
+    Promise<{ base_repos: IBaseRepo[], student_repos: Map<string, string>}> => {
+    /**
+     * For now the hacky method. Assume no base repo will have the course section
+     * in the name.
+     */
+    let projects: any = [];
+    let base_projects: any = [];
+    const student_repos = new Map<string, string>();
+    
+    // We're limited by how many repos we can grab so we gotta do by page. :(
+    for(let i = 1; i <= 10; i++) {
+      // Grab all repos from the namespace.
+      const P = await this.request('GET', `/groups/${namespace_id}/projects`, { page: i, per_page: 100 })
+        .catch(console.error);
+      // Clearly no more repos.
+      if(!P || P.length === 0) {
+        break;
+      }
+      projects = [...projects, ...P];
+    }
+
+    const namespace_projects = await projects
+      .filter((p: any) => p.namespace.id == namespace_id);
+
+    for(const n of namespace_projects) {
+      if (n.name.includes(section)) {
+        student_repos.set(n.name, n.id);
+      } else {
+        base_projects = [...base_projects, n];
+      }
+    }
+
+    return new Promise((res, rej) => {
+      if (!base_projects || base_projects.length === 0) {  
+        res({
+          base_repos: [],
+          student_repos
+        });
+      }
+
+      res(
+        {
+          base_repos: base_projects.map((b: any) => ({
+            id: b.id,
+            name: b.name,
+            namespace: {
+              id: b.namespace.id,
+              name: b.namespace.name,
+            },
+            ssh_url: b.ssh_url_to_repo
+          })),
+          student_repos
+        }
+      );
+    });
+  }
+  /**
+   * Create student repos for list of users.
+   */
+  createBaseRepo = async (
     name: string,
-    namespace_id: string,
-    section: string,
-    semester: string,
-    username: string
-  ): Promise<IGitRepo> => {
+    namespace_id: string
+  ): Promise<IBaseRepo> => {
+    // Initialize with readme so we can create student repos
+    // without needing any commits.
     const params = {
-      name: this.build_name(semester, section, name, username),
+      name: name,
       namespace_id: namespace_id,
       issues_enabled: false,
       merge_requests_enabled: false,
       builds_enabled: false,
       wiki_enabled: false,
       snippets_enabled: true,
-      visibility_level: GitVisibility.private
+      visibility_level: GitVisibility.private,
+      initialize_with_readme: true
+    };
+
+    const base_repo = await this.request('POST', '/projects', params);
+
+    return new Promise((res, rej) => {
+      if(!base_repo || base_repo === null) {
+        /**
+         * It might be an username or namespace issue.
+         */
+        rej({
+          status: 'failed',
+          namespace_id,
+          name
+        });
+      }
+
+      res({
+        id: base_repo.id,
+        name: base_repo.name,
+        namespace: {
+          name: base_repo.namespace.name,
+          id: base_repo.namespace.id,
+        },
+        ssh_url: base_repo.ssh_url_to_repo
+      });
+    });
+  }
+  /**
+   * @todo Try to get around using fork.
+   * Creates an assignment within a specific namespace. Forks currently.
+   * When creating more than one at a time, make sure to await it so there are no id conflicts
+   * @returns The git links to clone with.
+   */
+  createAssignment = async (
+    base_repo: IBaseRepo,
+    section: string,
+    semester: string,
+    username: string
+  ): Promise<IGitRepo> => {
+    const params = {
+      name: this.build_name(semester, section, base_repo.name, username),
+      namespace: base_repo.namespace.name,
+      namespace_id: base_repo.namespace.id,
+      namespace_path: `${this.gitlab_host}/${base_repo.namespace.name}`,
+      path: this.build_name(semester, section, base_repo.name, username)
     };
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
-    const repo = await this.request('POST', '/projects', params);
+    const repo = await this.request('POST', `/projects/${base_repo.id}/fork`, params);
 
     return new Promise((res, rej) => {
       if(!repo || repo === null) {
@@ -55,7 +184,7 @@ export class GitlabBackend {
          */
         rej({
           status: 'failed',
-          namespace_id,
+          base_repo,
           name,
           username
         });
@@ -65,7 +194,8 @@ export class GitlabBackend {
         username,
         id: repo.id,
         name: repo.name,
-        namespace: repo.namespace.name
+        namespace: repo.namespace.name,
+        ssh_url: repo.ssh_url_to_repo
       });
     });
   }
@@ -147,20 +277,37 @@ export class GitlabBackend {
    * @returns user_id for whoever
    * @throws if user is not found.
    */
-  getUserId = async (username: string): Promise<IGitUser> => {
-    const user = await this.request('GET', '/users', { 'search': username });
+  getUser = async (student: ICanvasUser | ICanvasUser[]): Promise<IGitUser | IGitUser[]> => {
+
+    let users: any = null;
+    
+    if (Array.isArray(student) && student.length) {
+      for (const s of student) {
+        const user =  await this.request(
+            'GET', 
+            '/users', 
+            { 'search': s.sis_user_id }
+        );
+        users = [...users, user];
+      }
+    }
 
     return new Promise((res, rej) => {
-      if(!user || !user.length) {
-        rej(`Could not find GitLab account with username: ${username}`);
+      if(!users || !users.length) {
+        rej(`Could not find GitLab accounts`);
       }
 
-      res({
-        id: user[0].id,
-        name: user[0].name,
-        username,
-        avatar_url: user[0].avatar_url
-      });
+      res(
+        Array.isArray(users) ?
+        users.map(u => (
+          {
+            id: u.id,
+            name: u.name,
+            u: u.username,
+            avatar_url: u.avatar_url
+          }
+        )) : users
+      );
     });
   }
   /**
@@ -177,12 +324,12 @@ export class GitlabBackend {
     path: string,
     params: {}
   ): Promise<any> => {
-    const url = `${this.info.gitlab_host}/api/v4/${path}`;
+    const url = `${this.gitlab_host}/api/v4/${path}`;
     return (
       await axios({
         method,
         url,
-        headers: { 'Private-Token': this.info.gitlab_token },
+        headers: { 'Private-Token': this.gitlab_token },
         params
       })
     ).data;
@@ -196,7 +343,14 @@ export class GitlabBackend {
  * @constructor Requires a users acces token, (institute) url.
  */
 export class CanvasBackend {
-  constructor (private info: ICanvas) {}
+  private canvas_url = '';
+  private canvas_token = '';
+  constructor () {}
+  setToken (token: string) { this.canvas_token = token; }
+  setUrl (url: string) { this.canvas_url = url; }
+  ready () {
+   return (this.canvas_url !== '' && this.canvas_token !== '') ? true : false;
+  }
   /**
    * Uses the users canvas_token to gain access to their courses.
    *
@@ -216,7 +370,6 @@ export class CanvasBackend {
       id: c.id,
       name: c.name,
       teachers: c.teachers,
-      created_at: c.created_at,
       total_students: c.total_students
     }))));
   }
@@ -255,8 +408,8 @@ export class CanvasBackend {
     path: string,
     params: { [k: string]: string | string[] }
   ): Promise<any> => {
-    const url = `${this.info.canvas_url}/api/v1/${path}`;
-    params.access_token = this.info.canvas_token;
+    const url = `${this.canvas_url}/api/v1/${path}`;
+    params.access_token = this.canvas_token;
     return (
       await axios({
         method,
@@ -277,7 +430,7 @@ export class CanvasBackend {
     method: AxiosRequestConfig['method'],
     course_id: string
   ): Promise<any> => {
-    const url = `${this.info.canvas_url}/api/v1/courses/${course_id}/enrollments`;
+    const url = `${this.canvas_url}/api/v1/courses/${course_id}/enrollments`;
 
     if (method !== 'GET') {
       return Promise.reject('Didn\'t use GET method');
@@ -288,7 +441,7 @@ export class CanvasBackend {
       await axios({
         method,
         url,
-        params: { access_token: this.info.canvas_token, per_page: 1000 }
+        params: { access_token: this.canvas_token, per_page: 1000 }
       })
     ).data;
   }

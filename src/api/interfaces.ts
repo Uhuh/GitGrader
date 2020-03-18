@@ -4,7 +4,6 @@
 export interface IGitlab {
   gitlab_token: string;
   gitlab_host: string;
-  namespace: string;
 }
 
 /**
@@ -13,6 +12,15 @@ export interface IGitlab {
 export interface ICanvas {
   canvas_token: string;
   canvas_url: string;
+}
+
+/**
+ * Basics for gitlab namespace
+ */
+export interface IGitNamespace {
+  id: string;
+  name: string;
+  web_url: string;
 }
 
 /**
@@ -34,6 +42,20 @@ export interface IGitRepo {
   name: string;
   username: string;
   namespace: string;
+  ssh_url: string;
+}
+
+/**
+ * Base repo information
+ */
+export interface IBaseRepo {
+  id: string;
+  name: string;
+  namespace: {
+    id: string;
+    name: string;
+  };
+  ssh_url: string;
 }
 
 /**
@@ -47,12 +69,22 @@ export interface ICanvasUser {
 }
 
 /**
+ * To create an association with canvas classes and namespaces.
+ */
+export interface ICanvasNamespace extends ICanvasClass {
+  namespace: {
+    id: string;
+    name: string;
+  }
+}
+
+/**
  * Small details about canvas teacher.
  */
 interface ICanvasTeacher {
   id: string;
-  name: string;
-  avatar_url: string;
+  display_name: string;
+  avatar_image_url: string;
 }
 
 /**
@@ -61,7 +93,7 @@ interface ICanvasTeacher {
 export interface ICanvasClass {
   id: string;
   name: string;
-  created_at: string;
+  section: string;
   total_students: string;
   teachers: ICanvasTeacher[];
 }

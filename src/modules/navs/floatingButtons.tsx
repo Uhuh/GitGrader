@@ -1,5 +1,6 @@
 import { Link } from '@material-ui/core';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import ThemeIcon from '@material-ui/icons/Brightness4';
+import HomeIcon from '@material-ui/icons/Home';
 import SettingsIcon from '@material-ui/icons/Settings';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
@@ -9,30 +10,46 @@ interface IProps {
   left: boolean;
 }
 
-const Floating = styled.div<IProps>`
+const FloatingTop = styled.div<IProps>`
   position: fixed;
   ${p => p.left ? 'left' : 'right'}: 10px;
   top: 10px;
 `;
 
+const FloatingBottom = styled.div<IProps>`
+  position: fixed;
+  ${p => p.left ? 'left' : 'right'}: 10px;
+  bottom: 10px;
+`;
+
 const BackButton = () => {
   return(
-    <Floating left>
-      <Link component={RouterLink} to='/'>
-        <ArrowBackIcon fontSize='large'/>
+    <FloatingTop left>
+      <Link 
+       component={RouterLink} 
+       onClick={() => {window.location.href = '#/'; window.location.reload();}} 
+       to='/'>
+        <HomeIcon fontSize='large'/>
       </Link>
-    </Floating>
+    </FloatingTop>
   );
 };
 
 const SettingsButton = () => {
   return(
-    <Floating left={false}>
+    <FloatingTop left={false}>
       <Link component={RouterLink} to='/settings'>
         <SettingsIcon fontSize='large'/>
       </Link>
-    </Floating>
+    </FloatingTop>
   );
 };
 
-export { BackButton, SettingsButton };
+const ThemeButton = () => {
+  return(
+    <FloatingBottom left>
+      <ThemeIcon fontSize='large'/>
+    </FloatingBottom>
+  )
+}
+export { BackButton, SettingsButton, ThemeButton };

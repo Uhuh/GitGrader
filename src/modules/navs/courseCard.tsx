@@ -53,16 +53,20 @@ export const CourseCard = (props: { course: ICanvasClass }) => {
   const color = colors[Number(props.course.id) % 11];
 
   return (
-    <Card className={classes.root}>
-      <ImagePlaceholder colors={color} />
-      <CardContent>
-        <Typography variant='h6'>{props.course.name}</Typography>
-        <Typography color='textSecondary'>
-          {props.course.teachers[0].name}
-        </Typography>
-        <PersonIcon></PersonIcon>
-        {props.course.total_students}
-      </CardContent>
-    </Card>
+    <Paper elevation={3}>
+      <Card className={classes.root}>
+        <CardActionArea>
+          <ImagePlaceholder colors={color}/>
+          <CardContent>
+            <Typography variant='h6'>{props.course.name}</Typography>
+            <Typography color='textSecondary'>
+              {props.course.teachers[0].display_name}
+            </Typography>
+            <PersonIcon></PersonIcon>
+            {props.course.total_students}
+          </CardContent>
+        </CardActionArea>
+      </Card>
+    </Paper>
   );
 };
