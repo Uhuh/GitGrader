@@ -50,7 +50,7 @@ export class GitlabBackend {
   /**
    * Separate "Base" repos from student repos.
    * @param namespace_id ID that belongs to a course.
-   * @param section The course section id.
+   * @param section The course section id. EG: 101 for "CS 1570 (101)"
    */
   getRepos = async (namespace_id: string, section: string): 
     Promise<{ base_repos: IBaseRepo[], student_repos: Map<string, string>}> => {
@@ -64,7 +64,8 @@ export class GitlabBackend {
     
     // We're limited by how many repos we can grab so we gotta do by page. :(
     for(let i = 1; i <= 10; i++) {
-      const P = await this.request('GET', '/projects', { page: i, per_page: 100 })
+      // Grab all repos from the namespace.
+      const P = await this.request('GET', `/groups/${namespace_id}/projects`, { page: i, per_page: 100 })
         .catch(console.error);
       // Clearly no more repos.
       if(!P || P.length === 0) {
@@ -98,7 +99,7 @@ export class GitlabBackend {
             id: b.id,
             name: b.name,
             namespace: {
-              id: b.namespace_id,
+              id: b.namespace.id,
               name: b.namespace.name,
             },
             ssh_url: b.ssh_url_to_repo
@@ -276,20 +277,37 @@ export class GitlabBackend {
    * @returns user_id for whoever
    * @throws if user is not found.
    */
-  getUser = async (username: string): Promise<IGitUser> => {
-    const user = await this.request('GET', '/users', { 'search': username });
+  getUser = async (student: ICanvasUser | ICanvasUser[]): Promise<IGitUser | IGitUser[]> => {
+
+    let users: any = null;
+    
+    if (Array.isArray(student) && student.length) {
+      for (const s of student) {
+        const user =  await this.request(
+            'GET', 
+            '/users', 
+            { 'search': s.sis_user_id }
+        );
+        users = [...users, user];
+      }
+    }
 
     return new Promise((res, rej) => {
-      if(!user || !user.length) {
-        rej(`Could not find GitLab account with username: ${username}`);
+      if(!users || !users.length) {
+        rej(`Could not find GitLab accounts`);
       }
 
-      res({
-        id: user[0].id,
-        name: user[0].name,
-        username,
-        avatar_url: user[0].avatar_url
-      });
+      res(
+        Array.isArray(users) ?
+        users.map(u => (
+          {
+            id: u.id,
+            name: u.name,
+            u: u.username,
+            avatar_url: u.avatar_url
+          }
+        )) : users
+      );
     });
   }
   /**
@@ -352,7 +370,6 @@ export class CanvasBackend {
       id: c.id,
       name: c.name,
       teachers: c.teachers,
-      created_at: c.created_at,
       total_students: c.total_students
     }))));
   }

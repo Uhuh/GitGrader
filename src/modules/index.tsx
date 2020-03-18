@@ -5,7 +5,7 @@ import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { ICanvasClass, IGitNamespace, IGitRepo } from '../api/interfaces';
+import { ICanvasNamespace, IGitNamespace,  } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
@@ -67,7 +67,7 @@ const CoursePage = (obj: { match: any; location: any }) => {
 };
 
 export const App = () => {
-  const [courses, setCourses] = React.useState<ICanvasClass[]>();
+  const [courses, setCourses] = React.useState<ICanvasNamespace[]>();
 
   const [theme, setTheme] = React.useState('light');
 
@@ -79,11 +79,32 @@ export const App = () => {
   //localStorage.clear();
 
   // We need the data from canas so on initial render let's try.
-  React.useEffect(() => {
+   // We need the data from canas so on initial render let's try.
+   React.useEffect(() => {
     if (CanvasAPI.ready()) {
       CanvasAPI.getClasses()
         .then(classes => {
-          setCourses(classes);
+          setCourses(
+            [
+              {
+                id: '123',
+                name: 'Senior Design',
+                section: '234',
+                total_students: '69',
+                teachers: [
+                  {
+                    id: '123',
+                    display_name: 'Mike Gosnell',
+                    avatar_image_url: 'Xd'
+                  }
+                ],
+                namespace: {
+                  id: '2453',
+                  name: 'senior-test'
+                }
+              }
+           ]
+          );
         })
         .catch(console.error);
     }
@@ -140,10 +161,17 @@ export const App = () => {
         <Route 
           exact 
           path='/course/:courseId' 
-          render={({ match }) => (
+          render={({ match }) => {
             // Match will be the course id.
-            <CanvasPage { ...match.params } courses={courses} namespace={namespace}/>
-          )} 
+            if (!courses || courses.length === 0) {
+              return (<div>How did you get here? Wacky.</div>);
+            }
+            
+            const course = courses.find(c => c.id === match.params.courseId);
+            return (
+              <CanvasPage { ...match.params } course={course} />
+            );
+          }} 
         />
         <Route
           key='error'

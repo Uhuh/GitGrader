@@ -1,10 +1,10 @@
-import { Box, Button, Card, CardActions, CardContent , CardHeader, Dialog , DialogActions, DialogContent, 
-  DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography } from '@material-ui/core/';
+import { Box, Button, Card, Dialog , DialogActions, DialogContent, 
+  DialogContentText, DialogTitle ,Grid , makeStyles, TextField } from '@material-ui/core/';
 import  AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 import { GitLabAPI } from '..';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
-import { GitAccess , IBaseRepo, ICanvasClass, ICanvasUser, IGitNamespace } from '../../api/interfaces';
+import { IBaseRepo, ICanvasNamespace, ICanvasUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 
 const CanvasAPI = new Canvas();
@@ -41,53 +41,70 @@ const useStyles = makeStyles({
  * @todo this takes quite some time to load. Need to find a way to make it vrooom
  * @param props courseId - Canvas course id
  */
-export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; namespace: IGitNamespace[]; }) => {
-  const { courseId, courses, namespace } = props;
+export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; }) => {
+  const { courseId, course } = props;
   const classes = useStyles();
   
-  let classIndex = 0;
-
   const [assignmentName, setAssignmentName] = React.useState('');
-  const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>();
-  const [students, setStudents] = React.useState<ICanvasUser[]>();
+  const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>([]);
+  const [students, setStudents] = React.useState<ICanvasUser[]>([]);
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     CanvasAPI.getStudents(courseId)
       .then(s => {
-  	    setStudents(s);
+  	    setStudents([
+          ...s,
+          {
+            id: '123',
+            user_id: '456',
+            sis_user_id: 'mrmk8',
+            course_id: '789'
+          }
+        ]);
       })
     .catch(console.error);
+    setStudents([
+      {
+        id: '123',
+        user_id: '456',
+        sis_user_id: 'mrmk8',
+        course_id: '789'
+      }
+    ]);
   }, [courseId]); 
 
   React.useEffect(() => {
-    GitLabAPI.getRepos('2453','666')
+    GitLabAPI.getRepos('2453','234')
       .then(b => {
         console.log(b);
   	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
-  }); 
-  
-  for (const i of courses) {
-    if(i.id == courseId)
-    {
-      break;
-    }
-    classIndex++;
-  } 
+  }, []);
+
+  const createAssignment = () => {
+    GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
+      .then(repo => {
+        console.log(repo);
+        setBaseRepo([...baseRepos, repo]);
+      })
+      .catch(console.error);
+    setOpen(false);
+  };
+
   return (
     <Box>
       <div>
         <h1 className={classes.centerItem}>
-          <strong>Class Name: {courses[classIndex].name}</strong>
+          <strong>Class Name: {course.name}</strong>
         </h1> 
         <h2 className={classes.centerItem}>
-          <strong>Total Student: {courses[classIndex].total_students}</strong>
+          <strong>Total Student: {course.total_students}</strong>
         </h2>
         <h2 className={classes.centerItem}> 
         <strong>Course Instructor(s): 
-          {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}</strong>
+          {course.teachers.map(teacher => <li key={teacher.id}>{teacher.display_name}</li>)}</strong>
         </h2>
         <Grid
           container
@@ -98,24 +115,30 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
         >
           {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
             <Grid item xs={3} key={baseRepo.id} spacing={10}>
-              <RepoCard baseRepo={baseRepo} />
+              <RepoCard baseRepo={baseRepo} students={students} course={course} />
             </Grid>
           )):[]}
           <div>
-          <Card className={classes.root} onClick={handleClickOpen}>
+          <Card className={classes.root} onClick={() => setOpen(true)}>
             <AddIcon className={classes.addIcon}></AddIcon>
           </Card>
-          <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
-            <DialogTitle id='form-dialog-title'>Add Assignment</DialogTitle>
+          <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
+            <DialogTitle id='form-dialog-title'>
+              Add Assignment
+            </DialogTitle>
             <DialogContent>
               <DialogContentText>
                 Please enter the name of the assignment you are assigning
               </DialogContentText>
-                <TextField id='outlined-basic' label='Assignment Name' 
-                  type='text' onChange={e => setAssignmentName(e.target.value)} />
+                <TextField 
+                  id='outlined-basic' 
+                  label='Assignment Name' 
+                  type='text' 
+                  onChange={e => setAssignmentName(e.target.value)} 
+                />
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose} color='primary'>
+              <Button onClick={() => setOpen(false)} color='primary'>
                 Cancel
               </Button>
               <Button onClick={createAssignment} color='primary'>

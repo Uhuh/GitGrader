@@ -69,6 +69,16 @@ export interface ICanvasUser {
 }
 
 /**
+ * To create an association with canvas classes and namespaces.
+ */
+export interface ICanvasNamespace extends ICanvasClass {
+  namespace: {
+    id: string;
+    name: string;
+  }
+}
+
+/**
  * Small details about canvas teacher.
  */
 interface ICanvasTeacher {
@@ -83,7 +93,7 @@ interface ICanvasTeacher {
 export interface ICanvasClass {
   id: string;
   name: string;
-  created_at: string;
+  section: string;
   total_students: string;
   teachers: ICanvasTeacher[];
 }
