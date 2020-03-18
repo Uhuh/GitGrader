@@ -99,6 +99,7 @@ export class GitlabBackend {
           base_repos: base_projects.map((b: any) => ({
             id: b.id,
             name: b.name,
+            created_at: new Date(b.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
             namespace: {
               id: b.namespace.id,
               name: b.namespace.name,
@@ -148,6 +149,7 @@ export class GitlabBackend {
       res({
         id: base_repo.id,
         name: base_repo.name,
+        created_at: new Date(base_repo.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
         namespace: {
           name: base_repo.namespace.name,
           id: base_repo.namespace.id,
