@@ -18,13 +18,6 @@ import { GitLabAPI } from '..';
 import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/interfaces';
 
 const useStyles = makeStyles({
-  root: {
-    width: 345,
-    height: 280
-  },
-  media: {
-    height: 140
-  },
   actionButton: {
     color: 'white'
   }
@@ -117,7 +110,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, students: ICanvasUser[], c
 
   return (
     <Paper elevation={3}>
-      <Card className={classes.root} onClick={() => setOpen(true)}>
+      <Card onClick={() => setOpen(true)}>
         <CardActionArea>
           <ImagePlaceholder colors={color} />
           <CardContent>
@@ -129,26 +122,27 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, students: ICanvasUser[], c
         </CardActionArea>
       </Card>
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
-        <DialogTitle id='form-dialog-title'>Menu</DialogTitle>
+        <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Select an action to act on {baseRepo.name}
-          </DialogContentText>
-          <Button className={classes.actionButton} onClick={assign} color='primary'>
-            Assign
+          <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Assign</Typography>
           </Button>
-          <Button className={classes.actionButton} onClick={unlock} color='primary'>
-            Unlock
+          <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Unlock</Typography>
           </Button>
-          <Button className={classes.actionButton} onClick={lock} color='primary'>
-            Lock
+          <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Lock</Typography>
           </Button>
-          <Button className={classes.actionButton} onClick={archive} color='primary'>
-            Archive
+          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Archive</Typography>
           </Button>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)} color='primary'>
+          <Button 
+            onClick={() => setOpen(false)}
+            variant='outlined' 
+            color='secondary'
+          >
             Cancel
           </Button>
         </DialogActions>

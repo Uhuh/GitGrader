@@ -1,6 +1,7 @@
-import { Box, Button, Card, Dialog , DialogActions, DialogContent, 
-  DialogContentText, DialogTitle ,Grid , makeStyles, TextField } from '@material-ui/core/';
-import  AddIcon from '@material-ui/icons/Add';
+import { Button, Dialog , DialogActions, DialogContent, 
+  DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography } from '@material-ui/core';
+import AddIcon from '@material-ui/icons/Add';
+import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
@@ -12,9 +13,18 @@ CanvasAPI.setUrl('https://mst.instructure.com');
 CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
 
 const useStyles = makeStyles({
-  root: {
-    width: 345,
-    height: 280,
+  card: {
+    padding: '30px',
+    maxWidth: '21%',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  body: {
+    width: '100%',
+    paddingLeft: '5vw',
+    paddingRight: '5vw',
+    display: 'flex',
+    flexWrap: 'wrap'
   },
   title: {
     fontSize: 14,
@@ -25,14 +35,11 @@ const useStyles = makeStyles({
   addIcon: {
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    width: '100%',
-    height: '100%',
+    alignItems: 'center'
   },
   centerItem: {
-    textAlign: 'center',
+    width: '100%',
+    textAlign: 'center'
   }
 });
 
@@ -86,7 +93,6 @@ export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; 
   const createAssignment = () => {
     GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
       .then(repo => {
-        console.log(repo);
         setBaseRepo([...baseRepos, repo]);
       })
       .catch(console.error);
@@ -94,61 +100,68 @@ export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; 
   };
 
   return (
-    <Box>
-      <div>
-        <h1 className={classes.centerItem}>
-          <strong>Class Name: {course.name}</strong>
-        </h1> 
-        <h2 className={classes.centerItem}>
-          <strong>Total Student: {course.total_students}</strong>
-        </h2>
-        <h2 className={classes.centerItem}> 
-        <strong>Course Instructor(s): 
-          {course.teachers.map(teacher => <li key={teacher.id}>{teacher.display_name}</li>)}</strong>
-        </h2>
-        <Grid
-          container
-          justify='center'
-          alignItems='center'
-          spacing={3}
-          style={{ minHeight: '100vh' }}
-        >
-          {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
-            <Grid item xs={3} key={baseRepo.id} spacing={10}>
-              <RepoCard baseRepo={baseRepo} students={students} course={course} />
-            </Grid>
-          )):[]}
-          <div>
-          <Card className={classes.root} onClick={() => setOpen(true)}>
-            <AddIcon className={classes.addIcon}></AddIcon>
-          </Card>
-          <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
-            <DialogTitle id='form-dialog-title'>
-              Add Assignment
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Please enter the name of the assignment you are assigning
-              </DialogContentText>
-                <TextField 
-                  id='outlined-basic' 
-                  label='Assignment Name' 
-                  type='text' 
-                  onChange={e => setAssignmentName(e.target.value)} 
-                />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpen(false)} color='primary'>
-                Cancel
-              </Button>
-              <Button onClick={createAssignment} color='primary'>
-                Submit
-              </Button>
-            </DialogActions>
-          </Dialog>
+    <>
+      <Grid
+        container
+        className={classes.body}
+        justify='center'
+        alignItems='center'
+      >
+        <div className={classes.centerItem}>
+          <h1> {course.name} </h1>
+          <h2> <PersonIcon fontSize={'large'}/> {course.total_students} </h2>
+          <h2> 
+            {course.teachers.map(teacher => <p key={teacher.id}>{teacher.display_name}</p>)}
+          </h2>
         </div>
+
+        {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
+          <Grid item xs={3} key={baseRepo.id} className={classes.card}>
+            <RepoCard baseRepo={baseRepo} students={students} course={course} />
+          </Grid>
+        ))
+          :
+          <Grid item className={classes.card}>
+            <Typography color={'textSecondary'}>No base repos! Go make one.</Typography>
+          </Grid>
+        }
+        <Grid item className={classes.addIcon} onClick={() => setOpen(true)}>
+          <AddIcon/>
         </Grid>
-      </div>
-    </Box>
+      </Grid>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
+        <DialogTitle id='form-dialog-title'>
+          Create Assignment
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please enter the name of the assignment you are assigning
+          </DialogContentText>
+          <TextField 
+            id='outlined-basic' 
+            label='Assignment Name' 
+            type='text'
+            autoFocus={true}
+            onChange={e => setAssignmentName(e.target.value)} 
+          />
+        </DialogContent>
+        <DialogActions>
+        <Button 
+            onClick={() => setOpen(false)}
+            variant='outlined' 
+            color='secondary'
+          >
+            Cancel
+          </Button>
+          <Button
+           onClick={createAssignment} 
+           variant='outlined'
+           color='primary'
+          >
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };

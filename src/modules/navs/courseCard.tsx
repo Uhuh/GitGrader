@@ -54,7 +54,7 @@ export const CourseCard = (props: { course: ICanvasClass }) => {
 
   return (
     <Paper elevation={3}>
-      <Card className={classes.root}>
+      <Card>
         <CardActionArea>
           <ImagePlaceholder colors={color}/>
           <CardContent>
@@ -62,7 +62,7 @@ export const CourseCard = (props: { course: ICanvasClass }) => {
             <Typography color='textSecondary'>
               {props.course.teachers[0].display_name}
             </Typography>
-            <PersonIcon></PersonIcon>
+            <PersonIcon/>
             {props.course.total_students}
           </CardContent>
         </CardActionArea>

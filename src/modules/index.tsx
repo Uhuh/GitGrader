@@ -1,11 +1,11 @@
-import { Button, CssBaseline, Paper } from '@material-ui/core';
+import { CssBaseline } from '@material-ui/core';
 import grey from '@material-ui/core/colors/grey';
-import { createMuiTheme, ThemeProvider, withTheme } from '@material-ui/core/styles';
+import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { ICanvasNamespace, IGitNamespace,  } from '../api/interfaces';
+import { ICanvasNamespace } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
@@ -116,7 +116,7 @@ export const App = () => {
       <CssBaseline />
       <BackButton />
       <SettingsButton />
-      <Button onClick={toggleTheme}><ThemeButton/></Button>
+      <ThemeButton changeTheme={toggleTheme}/>
       <Switch>
         <Route
           exact
