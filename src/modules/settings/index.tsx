@@ -1,3 +1,3 @@
-import { SetUp } from './setUp';
+import { MissingSettings, SetUp } from './setUp';
 
-export { SetUp };
+export { MissingSettings, SetUp };

@@ -1,13 +1,14 @@
-import { CssBaseline, Paper } from '@material-ui/core';
+import { Button, CssBaseline, Paper } from '@material-ui/core';
 import grey from '@material-ui/core/colors/grey';
 import { createMuiTheme, ThemeProvider, withTheme } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
+import styled from 'styled-components';
 import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
 import { ICanvasClass } from '../api/interfaces';
 import { CreateCourse } from './create/createCourse';
-import { BackButton, CourseList, SettingsButton } from './navs';
-import { SetUp } from './settings';
+import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
+import { MissingSettings, SetUp } from './settings';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -22,6 +23,15 @@ const CanvasAPI = new Canvas({
   canvas_url: JSON.parse(localStorage.getItem('CHdata') || 'null'),
   canvas_token: JSON.parse(localStorage.getItem('CTdata') || 'null')
 });
+
+const Centered = styled.div`
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+`;
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -45,11 +55,14 @@ const CoursePage = (obj: { match: any; location: any }) => {
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
 
-  const [theme, setTheme] = React.useState('dark');
+  const [theme, setTheme] = React.useState('light');
 
   const toggleTheme = () => {
     setTheme(theme == 'dark' ? 'light' : 'dark');
   };
+
+  //Used for debugging local storage/rerouting
+  //localStorage.clear();
 
   // We need the data from canas so on initial render let's try.
   React.useEffect(() => {
@@ -66,16 +79,24 @@ export const App = () => {
       <CssBaseline />
       <BackButton />
       <SettingsButton />
+      <Button onClick={toggleTheme}><ThemeButton/></Button>
       <Switch>
         <Route
           exact
           path='/'
           key='courses'
+          refresh={true}
           render={() => 
             <>
               {courses ? 
               <CourseList courses={courses}/> :
-              <p>No Courses loaded yet</p>}
+              <Centered>
+                <h3>Loading Courses...</h3>
+                <Link to={'/settings'}>
+                  Courses not loading?
+                </Link>
+                <MissingSettings/>
+              </Centered>}
             </>
           }
           />
