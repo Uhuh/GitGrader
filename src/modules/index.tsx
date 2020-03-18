@@ -31,6 +31,7 @@ const Centered = styled.div`
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
+  text-align: center;
 `;
 
 const darkTheme = createMuiTheme({
@@ -85,7 +86,6 @@ export const App = () => {
           exact
           path='/'
           key='courses'
-          refresh={true}
           render={() => 
             <>
               {courses ? 
@@ -93,7 +93,7 @@ export const App = () => {
               <Centered>
                 <h3>Loading Courses...</h3>
                 <Link to={'/settings'}>
-                  Courses not loading?
+                  Courses not loading? Check your settings.
                 </Link>
                 <MissingSettings/>
               </Centered>}
