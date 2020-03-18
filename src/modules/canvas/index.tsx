@@ -48,8 +48,8 @@ const useStyles = makeStyles({
  * @todo this takes quite some time to load. Need to find a way to make it vrooom
  * @param props courseId - Canvas course id
  */
-export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; }) => {
-  const { courseId, course } = props;
+export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
+  const { course } = props;
   const classes = useStyles();
   
   const [assignmentName, setAssignmentName] = React.useState('');
@@ -58,7 +58,7 @@ export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; 
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
-    CanvasAPI.getStudents(courseId)
+    CanvasAPI.getStudents(course.id)
       .then(s => {
   	    setStudents([
           ...s,
@@ -79,7 +79,7 @@ export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; 
         course_id: '789'
       }
     ]);
-  }, [courseId]); 
+  }, [course.id]); 
 
   React.useEffect(() => {
     GitLabAPI.getRepos('2453','234')
@@ -108,8 +108,8 @@ export const CanvasPage = (props: { courseId: string; course: ICanvasNamespace; 
         alignItems='center'
       >
         <div className={classes.centerItem}>
-          <h1> {course.name} </h1>
-          <h2> <PersonIcon fontSize={'large'}/> {course.total_students} </h2>
+          <h2 style={{float: 'left'}}> {course.name} <PersonIcon fontSize={'large'}/> {course.total_students} </h2>
+          <h2 style={{float: 'right'}}> {course.namespace.name} </h2>
           <h2> 
             {course.teachers.map(teacher => <p key={teacher.id}>{teacher.display_name}</p>)}
           </h2>

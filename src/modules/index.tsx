@@ -68,10 +68,13 @@ const CoursePage = (obj: { match: any; location: any }) => {
 
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasNamespace[]>();
+  const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'dark');
+  const relations = JSON.parse(localStorage.getItem('relations') || 'null');
 
-  const [theme, setTheme] = React.useState('light');
+  console.log(relations);
 
   const toggleTheme = () => {
+    localStorage.setItem('theme', theme == 'dark' ? 'light' : 'dark');
     setTheme(theme == 'dark' ? 'light' : 'dark');
   };
 
@@ -81,33 +84,36 @@ export const App = () => {
   // We need the data from canas so on initial render let's try.
    // We need the data from canas so on initial render let's try.
    React.useEffect(() => {
-    if (CanvasAPI.ready()) {
-      CanvasAPI.getClasses()
-        .then(classes => {
-          setCourses(
-            [
-              {
-                id: '123',
-                name: 'Senior Design',
-                section: '234',
-                total_students: '69',
-                teachers: [
+    GitLabAPI.getNamespaces()
+      .then(namespaces => {
+        CanvasAPI.getClasses()
+          .then(classes => {
+            let connections: ICanvasNamespace[] = [];
+            for(const c of classes) {
+              if(relations[c.id]) {
+                const info = relations[c.id];
+                console.log(info);
+                console.log(c);
+                const n = namespaces.find(n => n.id == info.gitlabID);
+                connections = [
+                  ...connections,
                   {
-                    id: '123',
-                    display_name: 'Mike Gosnell',
-                    avatar_image_url: 'Xd'
+                    ...c,
+                    section: info.section,
+                    namespace: {
+                      id: n!.id,
+                      name: n!.name
+                    }
                   }
-                ],
-                namespace: {
-                  id: '2453',
-                  name: 'senior-test'
-                }
+                ];
               }
-           ]
-          );
-        })
-        .catch(console.error);
-    }
+            }
+            setCourses(connections);
+          })
+          .catch(console.error);
+      })
+      .catch(console.error);
+      
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
@@ -124,15 +130,7 @@ export const App = () => {
           key='courses'
           render={() => 
             <>
-              {courses ? 
-              <CourseList courses={courses}/> :
-              <Centered>
-                <h3>Loading Courses...</h3>
-                <Link to={'/settings'}>
-                  Courses not loading? Check your settings.
-                </Link>
-                <MissingSettings/>
-              </Centered>}
+              <CourseList courses={courses || []}/>
             </>
           }
         />
@@ -157,7 +155,7 @@ export const App = () => {
               return (<div>How did you get here? Wacky.</div>);
             }
             
-            const course = courses.find(c => c.id === match.params.courseId);
+            const course = courses.find(c => c.id == match.params.courseId);
             return (
               <CanvasPage { ...match.params } course={course} />
             );

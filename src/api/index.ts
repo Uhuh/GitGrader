@@ -5,6 +5,7 @@ import {
   IBaseRepo,
   ICanvasClass,
   ICanvasUser,
+  IGitNamespace,
   IGitRepo,
   IGitUser
 } from './interfaces';
@@ -34,12 +35,12 @@ export class GitlabBackend {
   /**
    * Get list of namespaces for user.
    */
-  getNamespaces = async (): Promise<any> => {
+  getNamespaces = async (): Promise<IGitNamespace[]> => {
     const namespaces = await this.request('GET', '/namespaces', {});
 
     return new Promise(res => {
       if(!namespaces) {
-        res({});
+        res();
       }
 
       const groups = namespaces.filter((n: any) => n.kind === 'group');

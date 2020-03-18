@@ -1,11 +1,19 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, 
-         DialogTitle, Grid, Link, makeStyles } from '@material-ui/core';
+import { 
+  Button, 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle, 
+  Grid, 
+  Link, 
+  makeStyles
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { ICanvasClass } from '../../api/interfaces';
+import { ICanvasNamespace } from '../../api/interfaces';
 import { CourseCard } from './courseCard';
-import { AddCard } from './addCard';
 
 const useStyles = makeStyles({
   card: {
@@ -21,13 +29,17 @@ const useStyles = makeStyles({
     display: 'flex',
     flexWrap: 'wrap'
   },
+  addIcon: {
+    display: 'flex',
+    alignItems: 'center',
+  },
   centerItem: {
     width: '100%',
     textAlign: 'center'
   }
 });
 
-export const CourseList = (props: {courses: ICanvasClass[]}) => {
+export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
   const classes = useStyles();
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
                       localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
@@ -46,16 +58,16 @@ export const CourseList = (props: {courses: ICanvasClass[]}) => {
       <div className={classes.centerItem}>
         <h1>Courses you grade for</h1>
       </div>
-      {props.courses.map((course: ICanvasClass) => (
+      {props.courses.map((course: ICanvasNamespace) => (
         <Grid item xs={3} key={course.id} className={classes.card}>
           <Link component={RouterLink} to={`/course/${course.id}`}>
             <CourseCard course={course} />
           </Link>
         </Grid>
       ))}
-      <Grid item>
+      <Grid item xs={3} className={classes.addIcon}>
         <Link component={RouterLink} to={`/add`}>
-          <AddCard />
+          <AddIcon />
         </Link>
       </Grid>
     </Grid>
