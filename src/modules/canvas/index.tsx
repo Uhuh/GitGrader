@@ -61,10 +61,10 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
   }, [courseId]); 
 
   React.useEffect(() => {
-    GitLabAPI.getBaseRepos('2453','666')
+    GitLabAPI.getRepos('2453','666')
       .then(b => {
         console.log(b);
-  	    setBaseRepo(b);
+  	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
   }); 

@@ -276,7 +276,7 @@ export class GitlabBackend {
    * @returns user_id for whoever
    * @throws if user is not found.
    */
-  getUserId = async (username: string): Promise<IGitUser> => {
+  getUser = async (username: string): Promise<IGitUser> => {
     const user = await this.request('GET', '/users', { 'search': username });
 
     return new Promise((res, rej) => {
