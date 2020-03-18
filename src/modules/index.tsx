@@ -74,7 +74,7 @@ export const App = () => {
           render={() => 
             <CourseList courses={courses}/>
           }
-          />
+        />
         <Route
           exact
           path='/add'
@@ -86,12 +86,12 @@ export const App = () => {
           path='/settings'
           key='settings'
           render={() => <SetUp />}
-          />
+        />
         <Route 
           exact 
           path='/course/:courseId' 
           component={CoursePage} 
-          />
+        />
         <Route
           key='error'
           render={() => (
@@ -99,7 +99,7 @@ export const App = () => {
               <p>Route not found!</p>
             </Link>
           )}
-          />
+        />
       </Switch>
     </ThemeProvider>
   );

@@ -13,8 +13,8 @@ import { ICanvasClass } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 300,
-    maxHeight: 320
+    width: 300,
+    height: 320
   },
   media: {
     height: 140

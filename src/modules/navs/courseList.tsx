@@ -21,7 +21,7 @@ export const CourseList = (props: { courses?: ICanvasClass[] }) => {
               <CourseCard course={course} />
             </Link>
           </Grid>
-        )) : <></>}
+      )) : <></>}
       <Grid item>
         <Link component={RouterLink} to={`/add`}>
           <AddCard />
