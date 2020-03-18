@@ -16,13 +16,13 @@ import { MissingSettings, SetUp } from './settings';
  */
 const GitLabAPI = new GL();
 export { GitLabAPI };
-GitLabAPI.setToken('Cax44W7ysyF-gv39SeyP');
-GitLabAPI.setHost('https://git-classes.mst.edu');
+GitLabAPI.setToken(JSON.parse(localStorage.getItem('GTdata') || 'null') || '');
+GitLabAPI.setHost(JSON.parse(localStorage.getItem('GHdata') || 'null') || 'https://gitlab.com');
 
 const CanvasAPI = new Canvas();
 export { CanvasAPI };
-CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
-CanvasAPI.setUrl('https://mst.instructure.com');
+CanvasAPI.setToken(JSON.parse(localStorage.getItem('CTdata') || 'null') || '');
+CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || '');
 
 const Centered = styled.div`
   margin: 0;
@@ -47,24 +47,6 @@ const lightTheme = createMuiTheme({
     primary: grey,
   }
 });
-
-/*  GitLabAPI.createBaseRepo('hw100', '2453')
-  .then(base_repo => {
-    GitLabAPI.createAssignment(
-      base_repo,
-      '101',
-      '2020-SP',
-      'duwtgb'
-    )
-      .then(console.log)
-      .catch(console.error);
-  })
-  .catch(console.error); */
-
-// TODO : This needs to be an actual page/component
-const CoursePage = (obj: { match: any; location: any }) => {
-  return <p>{obj.match.params.courseId}</p>;
-};
 
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasNamespace[]>();

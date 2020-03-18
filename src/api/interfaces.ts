@@ -51,6 +51,7 @@ export interface IGitRepo {
 export interface IBaseRepo {
   id: string;
   name: string;
+  created_at: string;
   namespace: {
     id: string;
     name: string;

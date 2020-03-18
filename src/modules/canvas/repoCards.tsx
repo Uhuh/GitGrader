@@ -116,7 +116,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, students: ICanvasUser[], c
           <CardContent>
             <Typography variant='h6'>{props.baseRepo.name}</Typography>
             <Typography color='textSecondary'>
-              {props.baseRepo.id}
+              Created: {baseRepo.created_at}
             </Typography>
           </CardContent>
         </CardActionArea>

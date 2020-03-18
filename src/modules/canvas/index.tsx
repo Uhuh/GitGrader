@@ -4,13 +4,9 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
-import { CanvasBackend as Canvas, GitlabBackend as GL } from '../../api';
+import { CanvasAPI } from '..';
 import { IBaseRepo, ICanvasNamespace, ICanvasUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
-
-const CanvasAPI = new Canvas();
-CanvasAPI.setUrl('https://mst.instructure.com');
-CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq');
 
 const useStyles = makeStyles({
   card: {
@@ -60,31 +56,14 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   React.useEffect(() => {
     CanvasAPI.getStudents(course.id)
       .then(s => {
-  	    setStudents([
-          ...s,
-          {
-            id: '123',
-            user_id: '456',
-            sis_user_id: 'mrmk8',
-            course_id: '789'
-          }
-        ]);
+  	    setStudents(s);
       })
     .catch(console.error);
-    setStudents([
-      {
-        id: '123',
-        user_id: '456',
-        sis_user_id: 'mrmk8',
-        course_id: '789'
-      }
-    ]);
   }, [course.id]); 
 
   React.useEffect(() => {
-    GitLabAPI.getRepos('2453','234')
+    GitLabAPI.getRepos(course.namespace.id, course.section)
       .then(b => {
-        console.log(b);
   	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
