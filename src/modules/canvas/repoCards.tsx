@@ -14,7 +14,9 @@ import {
 } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
+import { GitLabAPI } from '..';
 import { IBaseRepo, ICanvasUser } from '../../api/interfaces';
+
 
 const useStyles = makeStyles({
   root: {
@@ -69,19 +71,24 @@ export const RepoCard = (props: {baseRepo: IBaseRepo}) => {
     setOpen(false);
   };
 
-  const assign = () => {
+  const assign = (id: string) => {
+    GitLabAPI.assignAssignment(id,'atwpb');
     console.log('assign');
+    
     handleClose();
   };
-  const unlock = () => {
+  const unlock = (id: string) => {
+    GitLabAPI.unlockAssignment(id,'mrmk8');
     console.log('unlock');
     handleClose();
   };
-  const lock = () => {
+  const lock = (id: string) => {
+    GitLabAPI.lockAssignment(id,'mrmk8');
     console.log('lock');
     handleClose();
   };
-  const archive = () => {
+  const archive = (id: string) => {
+    GitLabAPI.archiveAssignment(id);
     console.log('archive');
     handleClose();
   };
@@ -105,16 +112,16 @@ export const RepoCard = (props: {baseRepo: IBaseRepo}) => {
               <DialogContentText>
                 Select an action to act on {props.baseRepo.name}
               </DialogContentText>
-              <Button className={classes.actionButton} onClick={assign} color='primary'>
+              <Button className={classes.actionButton} onClick={() => assign(props.baseRepo.id)} color='primary'>
                 Assign
               </Button>
-              <Button className={classes.actionButton} onClick={unlock} color='primary'>
+              <Button className={classes.actionButton} onClick={() => unlock(props.baseRepo.id)} color='primary'>
                 Unlock
               </Button>
-              <Button className={classes.actionButton} onClick={lock} color='primary'>
+              <Button className={classes.actionButton} onClick={() => lock(props.baseRepo.id)} color='primary'>
                 Lock
               </Button>
-              <Button className={classes.actionButton} onClick={archive} color='primary'>
+              <Button className={classes.actionButton} onClick={() => archive(props.baseRepo.id)} color='primary'>
                 Archive
               </Button>
             </DialogContent>
