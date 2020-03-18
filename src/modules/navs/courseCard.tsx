@@ -56,7 +56,7 @@ export const CourseCard = (props: {course: ICanvasClass}) => {
     <Paper elevation={3}>
       <Card className={classes.root}>
         <CardActionArea>
-          <ImagePlaceholder />
+          <ImagePlaceholder colors={color}/>
           <CardContent>
             <Typography variant='h6'>{props.course.name}</Typography>
             <Typography color='textSecondary'>

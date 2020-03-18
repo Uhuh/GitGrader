@@ -110,16 +110,6 @@ export const App = () => {
     }
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
-  
-  React.useEffect(() => {
-    if (GitLabAPI.ready()) {
-      GitLabAPI.getNamespaces()
-        .then(s => {
-          setNameSpace(s);
-        })
-        .catch(console.error);
-    }
-  }, [GitLabAPI]);
 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
