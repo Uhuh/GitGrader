@@ -135,7 +135,7 @@ export const App = () => {
               </Centered>}
             </>
           }
-          />
+        />
         <Route
           exact
           path='/add'
@@ -147,7 +147,7 @@ export const App = () => {
           path='/settings'
           key='settings'
           render={() => <SetUp />}
-          />
+        />
         <Route 
           exact 
           path='/course/:courseId' 
@@ -170,7 +170,7 @@ export const App = () => {
               <p>Route not found!</p>
             </Link>
           )}
-          />
+        />
       </Switch>
     </ThemeProvider>
   );

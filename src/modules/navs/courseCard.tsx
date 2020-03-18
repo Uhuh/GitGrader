@@ -13,8 +13,8 @@ import { ICanvasClass } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 300,
-    maxHeight: 320
+    width: 300,
+    height: 320
   },
   media: {
     height: 140
@@ -48,7 +48,7 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-export const CourseCard = (props: {course: ICanvasClass}) => {
+export const CourseCard = (props: { course: ICanvasClass }) => {
   const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
 

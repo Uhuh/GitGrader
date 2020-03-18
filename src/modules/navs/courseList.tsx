@@ -5,6 +5,7 @@ import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { ICanvasClass } from '../../api/interfaces';
 import { CourseCard } from './courseCard';
+import { AddCard } from './addCard';
 
 export const CourseList = (props: {courses: ICanvasClass[]}) => {
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
@@ -22,16 +23,17 @@ export const CourseList = (props: {courses: ICanvasClass[]}) => {
       spacing={3}
       style={{ minHeight: '100vh' }}
     >
-      {props.courses.map((course: ICanvasClass) => (
-        <Grid item xs={3} key={course.id}>
-          <Link component={RouterLink} to={`/course/${course.id}`}>
-            <CourseCard course={course} />
-          </Link>
-        </Grid>
-      ))}
+      {props.courses ?
+        props.courses.map((course: ICanvasClass) => (
+          <Grid item xs={3} key={course.id}>
+            <Link component={RouterLink} to={`/course/${course.id}`}>
+              <CourseCard course={course} />
+            </Link>
+          </Grid>
+      )) : <></>}
       <Grid item>
         <Link component={RouterLink} to={`/add`}>
-          <AddIcon/>
+          <AddCard />
         </Link>
       </Grid>
     </Grid>
