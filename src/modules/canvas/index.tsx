@@ -1,5 +1,5 @@
 import { Box, Button, Card, CardActions, CardContent , CardHeader, Dialog , DialogActions, DialogContent, 
-  DialogContentText, DialogTitle ,Grid ,makeStyles, TextField, Typography } from '@material-ui/core/';
+  DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography } from '@material-ui/core/';
 import  AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
 import { GitLabAPI } from '..';
@@ -13,8 +13,8 @@ CanvasAPI.setToken('2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVr
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 275,
-    maxHeight: 200,
+    width: 345,
+    height: 280,
   },
   title: {
     fontSize: 14,
@@ -23,16 +23,16 @@ const useStyles = makeStyles({
     marginBottom: 12,
   },
   addIcon: {
-    display: 'block',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginLeft: 'auto',
     marginRight: 'auto',
-    width: 50,
-    height: 50,
+    width: '100%',
+    height: '100%',
   },
   centerItem: {
-    display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    textAlign: 'center',
   }
 });
 
@@ -61,12 +61,13 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
   }, [courseId]); 
 
   React.useEffect(() => {
-    GitLabAPI.getBaseRepos('2453','101')
+    GitLabAPI.getBaseRepos('2453','666')
       .then(b => {
+        console.log(b);
   	    setBaseRepo(b);
       })
     .catch(console.error);
-  }, [courseId]); 
+  }); 
   
   for (const i of courses) {
     if(i.id == courseId)
@@ -78,16 +79,16 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
   return (
     <Box>
       <div>
-        <p>
-          Class Name: {courses[classIndex].name}
-        </p> 
-        <p>
-          Total Student: {courses[classIndex].total_students}
-        </p>
-        <p>
-          Course Instructor(s): 
-          {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}
-        </p>
+        <h1 className={classes.centerItem}>
+          <strong>Class Name: {courses[classIndex].name}</strong>
+        </h1> 
+        <h2 className={classes.centerItem}>
+          <strong>Total Student: {courses[classIndex].total_students}</strong>
+        </h2>
+        <h2 className={classes.centerItem}> 
+        <strong>Course Instructor(s): 
+          {courses[classIndex].teachers.map(teacher => <li>{teacher.display_name}</li>)}</strong>
+        </h2>
         <Grid
           container
           justify='center'
@@ -96,15 +97,13 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
           style={{ minHeight: '100vh' }}
         >
           {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
-            <Grid item xs={3} key={baseRepo.id}>
-              <RepoCard baseRepo={baseRepo}/>
+            <Grid item xs={3} key={baseRepo.id} spacing={10}>
+              <RepoCard baseRepo={baseRepo} />
             </Grid>
           )):[]}
           <div>
           <Card className={classes.root} onClick={handleClickOpen}>
-            <br />
             <AddIcon className={classes.addIcon}></AddIcon>
-            <br />
           </Card>
           <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
             <DialogTitle id='form-dialog-title'>Add Assignment</DialogTitle>
@@ -112,7 +111,8 @@ export const CanvasPage = (props: { courseId: string; courses: ICanvasClass[]; n
               <DialogContentText>
                 Please enter the name of the assignment you are assigning
               </DialogContentText>
-                <input type='text' onChange={e => setAssignmentName(e.target.value)}/>
+                <TextField id='outlined-basic' label='Assignment Name' 
+                  type='text' onChange={e => setAssignmentName(e.target.value)} />
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose} color='primary'>

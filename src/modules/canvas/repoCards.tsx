@@ -1,14 +1,20 @@
 import {
+  Button,
   Card,
   CardActionArea,
   CardContent,
-  makeStyles,
-  Paper,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText, 
+  DialogTitle, 
+  makeStyles, 
+  Paper, 
   Typography
 } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
-import { IBaseRepo } from '../../api/interfaces';
+import { IBaseRepo, ICanvasUser } from '../../api/interfaces';
 
 const useStyles = makeStyles({
   root: {
@@ -17,6 +23,9 @@ const useStyles = makeStyles({
   },
   media: {
     height: 140
+  },
+  actionButton: {
+    color: 'white'
   }
 });
 
@@ -50,10 +59,36 @@ const ImagePlaceholder = styled.div<IProps>`
 export const RepoCard = (props: {baseRepo: IBaseRepo}) => {
   const classes = useStyles();
   const color = colors[Number(props.baseRepo.id) % 11];
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const assign = () => {
+    console.log('assign');
+    handleClose();
+  };
+  const unlock = () => {
+    console.log('unlock');
+    handleClose();
+  };
+  const lock = () => {
+    console.log('lock');
+    handleClose();
+  };
+  const archive = () => {
+    console.log('archive');
+    handleClose();
+  };
 
   return (
     <Paper elevation={3}>
-      <Card className={classes.root}>
+      <Card className={classes.root} onClick={handleClickOpen}>
         <CardActionArea>
           <ImagePlaceholder colors={color} />
           <CardContent>
@@ -64,6 +99,31 @@ export const RepoCard = (props: {baseRepo: IBaseRepo}) => {
           </CardContent>
         </CardActionArea>
       </Card>
+      <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+            <DialogTitle id='form-dialog-title'>Menu</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Select an action to act on {props.baseRepo.name}
+              </DialogContentText>
+              <Button className={classes.actionButton} onClick={assign} color='primary'>
+                Assign
+              </Button>
+              <Button className={classes.actionButton} onClick={unlock} color='primary'>
+                Unlock
+              </Button>
+              <Button className={classes.actionButton} onClick={lock} color='primary'>
+                Lock
+              </Button>
+              <Button className={classes.actionButton} onClick={archive} color='primary'>
+                Archive
+              </Button>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose} color='primary'>
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
     </Paper>
   );
 };
