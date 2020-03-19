@@ -50,31 +50,18 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-export const RepoCard = (props: {baseRepo: IBaseRepo, students: ICanvasUser[], course: ICanvasNamespace }) => {
+export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course: ICanvasNamespace }) => {
   const classes = useStyles();
-  const { baseRepo, students, course } = props;
+  const { baseRepo, users, course } = props;
   const color = colors[Number(props.baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
-  const [users, setUsers] = React.useState<IGitUser[]>([]);
   const year = new Date().getFullYear();
-
-  React.useEffect(() => {
-    // Need to get all the student's gitlab ids to set up assignments.
-    GitLabAPI.getUser(students)
-    .then(u => {
-      setUsers(
-        Array.isArray(u) ? u : [u]
-      );
-    })
-    // Need to log users that don't have gitlab accounts or tell the user a list somehow.
-    .catch(console.error);
-  }, []);
 
   const assign = () => {
     for (const user of users) {
-      GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, user.username)
+      GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, 'duwtgb')
         .then(repo => {
-          GitLabAPI.assignAssignment(repo.id, user.id)
+          GitLabAPI.assignAssignment(repo.id, '489')
             .then(() => {
               console.log(`Created repo ${repo.name} for ${user.username}`);
             })
@@ -82,7 +69,6 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, students: ICanvasUser[], c
         })
         .catch(console.error);
     }
-
     setOpen(false);
   };
   const unlock = () => {

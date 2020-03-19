@@ -9,7 +9,7 @@ import { ICanvasNamespace } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
-import { MissingSettings, SetUp } from './settings';
+import { SetUp } from './settings';
 
 /**
  * Make sure to use your token for testing. Might want to use an .env file for this
@@ -74,17 +74,19 @@ export const App = () => {
             for(const c of classes) {
               if(relations[c.id]) {
                 const info = relations[c.id];
-                console.log(info);
-                console.log(c);
                 const n = namespaces.find(n => n.id == info.gitlabID);
+                if (!n) {
+                  continue;
+                }
                 connections = [
                   ...connections,
                   {
                     ...c,
                     section: info.section,
                     namespace: {
-                      id: n!.id,
-                      name: n!.name
+                      id: n.id,
+                      name: n.name,
+                      path: n.path
                     }
                   }
                 ];
@@ -110,11 +112,7 @@ export const App = () => {
           exact
           path='/'
           key='courses'
-          render={() => 
-            <>
-              <CourseList courses={courses || []}/>
-            </>
-          }
+          render={() => <CourseList courses={courses || []}/>}
         />
         <Route
           exact

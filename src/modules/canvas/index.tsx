@@ -5,7 +5,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
 import { CanvasAPI } from '..';
-import { IBaseRepo, ICanvasNamespace, ICanvasUser } from '../../api/interfaces';
+import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 
 const useStyles = makeStyles({
@@ -50,13 +50,21 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   
   const [assignmentName, setAssignmentName] = React.useState('');
   const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>([]);
-  const [students, setStudents] = React.useState<ICanvasUser[]>([]);
+  const [users, setUsers] = React.useState<IGitUser[]>([]);
   const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     CanvasAPI.getStudents(course.id)
-      .then(s => {
-  	    setStudents(s);
+      .then(s => { // s is all students
+        // Need to get all the student's gitlab ids to set up assignments.
+        GitLabAPI.getUser(s)
+          .then(u => {
+            setUsers(
+              Array.isArray(u) ? u : [u]
+            );
+          })
+          // Need to log users that don't have gitlab accounts or tell the user a list somehow.
+          .catch(console.error);
       })
     .catch(console.error);
   }, [course.id]); 
@@ -64,6 +72,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   React.useEffect(() => {
     GitLabAPI.getRepos(course.namespace.id, course.section)
       .then(b => {
+        console.log(b)
   	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
@@ -96,7 +105,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
 
         {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
           <Grid item xs={3} key={baseRepo.id} className={classes.card}>
-            <RepoCard baseRepo={baseRepo} students={students} course={course} />
+            <RepoCard baseRepo={baseRepo} users={users} course={course} />
           </Grid>
         ))
           :
