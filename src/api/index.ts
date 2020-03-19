@@ -38,6 +38,8 @@ export class GitlabBackend {
   getNamespaces = async (): Promise<IGitNamespace[]> => {
     const namespaces = await this.request('GET', '/namespaces', {});
 
+    console.log(namespaces);
+
     return new Promise(res => {
       if(!namespaces) {
         res();
@@ -103,6 +105,7 @@ export class GitlabBackend {
             namespace: {
               id: b.namespace.id,
               name: b.namespace.name,
+              path: b.namespace.path
             },
             ssh_url: b.ssh_url_to_repo
           })),
@@ -153,6 +156,7 @@ export class GitlabBackend {
         namespace: {
           name: base_repo.namespace.name,
           id: base_repo.namespace.id,
+          path: base_repo.namespace.path
         },
         ssh_url: base_repo.ssh_url_to_repo
       });
@@ -169,10 +173,10 @@ export class GitlabBackend {
     section: string,
     semester: string,
     username: string
-  ): Promise<IGitRepo> => {
+  ): Promise<IGitRepo> => {    
     const params = {
       name: this.build_name(semester, section, base_repo.name, username),
-      namespace: base_repo.namespace.name,
+      namespace: base_repo.namespace.path,
       namespace_id: base_repo.namespace.id,
       namespace_path: `${this.gitlab_host}/${base_repo.namespace.name}`,
       path: this.build_name(semester, section, base_repo.name, username)
@@ -282,7 +286,7 @@ export class GitlabBackend {
    */
   getUser = async (student: ICanvasUser | ICanvasUser[]): Promise<IGitUser | IGitUser[]> => {
 
-    let users: any = null;
+    let users: any = [];
     
     if (Array.isArray(student) && student.length) {
       for (const s of student) {
@@ -291,7 +295,7 @@ export class GitlabBackend {
             '/users', 
             { 'search': s.sis_user_id }
         );
-        users = [...users, user];
+        users = [...users, ...user];
       }
     }
 
@@ -306,7 +310,7 @@ export class GitlabBackend {
           {
             id: u.id,
             name: u.name,
-            u: u.username,
+            username: u.username,
             avatar_url: u.avatar_url
           }
         )) : users
@@ -394,7 +398,7 @@ export class CanvasBackend {
         user_id: s.user_id,
         sis_user_id: s.sis_user_id,
         course_id: s.course_id
-      })))
+      })));
     });
   }
   /**
@@ -439,13 +443,24 @@ export class CanvasBackend {
       return Promise.reject('Didn\'t use GET method');
     }
 
+    const people = (await axios({
+      method,
+      url,
+      params: { access_token: this.canvas_token, per_page: 1000 }
+    })).data;
+
     // Currently it sends 10 per request, so limit is 1000 for now.
-    return (
-      await axios({
-        method,
-        url,
-        params: { access_token: this.canvas_token, per_page: 1000 }
-      })
-    ).data;
+    return new Promise((res, rej) => {
+      if(!people || people.length === 0) {
+        rej('No people in the canvas course');
+      }
+
+      // We don't want teachers
+      res(
+        people.filter((p: any) =>
+          p.role !== 'TaEnrollment' && p.role !== 'TeacherEnrollment'
+        )
+      );
+    });      
   }
 }

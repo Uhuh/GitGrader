@@ -20,6 +20,7 @@ export interface ICanvas {
 export interface IGitNamespace {
   id: string;
   name: string;
+  path: string;
   web_url: string;
 }
 
@@ -55,6 +56,7 @@ export interface IBaseRepo {
   namespace: {
     id: string;
     name: string;
+    path: string;
   };
   ssh_url: string;
 }
@@ -75,7 +77,8 @@ export interface ICanvasUser {
 export interface ICanvasNamespace extends ICanvasClass {
   namespace: {
     id: string;
-    name: string;
+    name: string; // Display name
+    path: string; // The UNIQUE name.
   }
 }
 
