@@ -57,9 +57,9 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
   const [open, setOpen] = React.useState(false);
   const year = new Date().getFullYear();
 
-  const assign = () => {
+  const assign = async () => {
     for (const user of users) {
-      GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, user.username)
+      await GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, user.username)
         .then(repo => {
           GitLabAPI.assignAssignment(repo.id, user.id)
             .then(() => {

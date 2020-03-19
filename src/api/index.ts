@@ -295,7 +295,7 @@ export class GitlabBackend {
             '/users', 
             { 'search': s.sis_user_id }
         );
-        users = [...users, user];
+        users = [...users, ...user];
       }
     }
 
@@ -398,7 +398,7 @@ export class CanvasBackend {
         user_id: s.user_id,
         sis_user_id: s.sis_user_id,
         course_id: s.course_id
-      })))
+      })));
     });
   }
   /**
