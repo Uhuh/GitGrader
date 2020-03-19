@@ -5,7 +5,7 @@ import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
 import { CanvasAPI } from '..';
-import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/interfaces';
+import { IBaseRepo, ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 
 const useStyles = makeStyles({

@@ -59,9 +59,9 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
 
   const assign = () => {
     for (const user of users) {
-      GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, 'duwtgb')
+      GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, user.username)
         .then(repo => {
-          GitLabAPI.assignAssignment(repo.id, '489')
+          GitLabAPI.assignAssignment(repo.id, user.id)
             .then(() => {
               console.log(`Created repo ${repo.name} for ${user.username}`);
             })
