@@ -248,6 +248,12 @@ export class GitlabBackend {
     return this.request('POST', `/projects/${assignment_id}/archive`, {});
   }
   /**
+   * Delete project, remove unnecessary repo
+   */
+  removeAssignment = (assignment_id: string): Promise<any> => {
+    return this.request('DELETE', `/projects/${assignment_id}`, {});
+  }
+  /**
    * Give a user reporter access to a project
    */
   lockAssignment = (assignment_id: string, user_id: string): Promise<any> => {

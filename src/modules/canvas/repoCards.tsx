@@ -93,6 +93,12 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
+  const remove = () => {
+    GitLabAPI.removeAssignment(baseRepo.id)
+      .then(() => console.log(`Removed ${baseRepo.name}`))
+      .catch(console.error);
+    setOpen(false);
+  };
 
   return (
     <Paper elevation={3}>
@@ -121,6 +127,9 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           </Button>
           <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Archive</Typography>
+          </Button>
+          <Button className={classes.actionButton} onClick={remove} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Delete</Typography>
           </Button>
         </DialogContent>
         <DialogActions>
