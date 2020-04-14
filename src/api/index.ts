@@ -286,7 +286,7 @@ export class GitlabBackend {
     const params = {
       file_path: file_name,
       branch: 'master',
-      encoding: 'base64',
+      //encoding: 'base64',
       content: file_content,
       commit_message: 'Initialization'
     };

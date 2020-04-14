@@ -110,19 +110,24 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
     const file_content = file.files;
     
     let file_name = file.value as string;
-    let base64content = 'VXBsb2FkIGVycm9y';
+    let content = 'Upload error.';
+    //let base64content = 'VXBsb2FkIGVycm9y';
     
     reader.onloadend = () => {
       file_name = file_name.replace('C:\\fakepath\\', '');
-      base64content = reader.result as string;
-      base64content = base64content.split(',')[1];
+      content = reader.result as string;
+      //base64content = reader.result as string;
       console.log(file_name);
-      console.log(base64content);
-      upload(file_name, base64content);
+      console.log(content);
+      //base64content = base64content.split(',')[1];
+      //console.log(base64content);
+      //upload(file_name, base64content);
+      upload(file_name, content);
     };
 
     if(file_content) {
-      reader.readAsDataURL(file_content[0]);
+      //reader.readAsDataURL(file_content[0]);
+      reader.readAsText(file_content[0]);
     }
   };
 
