@@ -17,6 +17,10 @@ import styled from 'styled-components';
 import { GitLabAPI } from '..';
 import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/interfaces';
 
+const SpacePadding = styled.div`
+  margin-bottom: 20px;
+`;
+
 const useStyles = makeStyles({
   actionButton: {
     color: 'white'
@@ -93,6 +97,34 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
+  const upload = (file_name: string, file_content: string) => {
+    GitLabAPI.uploadFile(baseRepo.id, file_name, file_content)
+      .then(() => console.log(`Uploaded file`))
+      .catch(console.error);
+    setOpen(false);
+  };
+
+  const convertBase64 = () => {
+    const reader = new FileReader();
+    const file = document.getElementById('file-upload') as HTMLInputElement;
+    const file_content = file.files;
+    
+    let file_name = file.value as string;
+    let base64content = 'VXBsb2FkIGVycm9y';
+    
+    reader.onloadend = () => {
+      file_name = file_name.replace('C:\\fakepath\\', '');
+      base64content = reader.result as string;
+      base64content = base64content.split(',')[1];
+      console.log(file_name);
+      console.log(base64content);
+      upload(file_name, base64content);
+    };
+
+    if(file_content) {
+      reader.readAsDataURL(file_content[0]);
+    }
+  };
 
   return (
     <Paper elevation={3}>
@@ -119,9 +151,18 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
-          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
+          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'> 
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
+
+          <SpacePadding></SpacePadding>
+          <form>
+            <input type='file' id='file-upload'/>
+          </form>
+          <Button className={classes.actionButton} onClick={convertBase64} variant='outlined' color='primary'> 
+            Upload
+          </Button>
+
         </DialogContent>
         <DialogActions>
           <Button 

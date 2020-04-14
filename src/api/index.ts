@@ -280,6 +280,24 @@ export class GitlabBackend {
     );
   }
   /**
+   * Uploads files to repo
+   */
+  uploadFile = (assignment_id: string, file_name: string, file_content: string): Promise<any> => {
+    const params = {
+      file_path: file_name,
+      branch: 'master',
+      encoding: 'base64',
+      content: file_content,
+      commit_message: 'Initialization'
+    };
+
+    return this.request(
+      'POST',
+      `/projects/${assignment_id}/repository/files/${params.file_path}`,
+      params
+    );
+  }
+  /**
    * Get user_id from username
    * @returns user_id for whoever
    * @throws if user is not found.
