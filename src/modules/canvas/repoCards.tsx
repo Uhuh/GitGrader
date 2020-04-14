@@ -55,6 +55,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
   const { baseRepo, users, course } = props;
   const color = colors[Number(props.baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
+  const [deleteCheck, setDeleteCheck] = React.useState(false);
   const year = new Date().getFullYear();
 
   const assign = async () => {
@@ -69,6 +70,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         })
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const unlock = () => {
@@ -77,6 +79,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         .then(() => console.log(`Unlocked ${baseRepo.name}`))
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const lock = () => {
@@ -85,24 +88,37 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         .then(() => console.log(`Locked ${baseRepo.name}`))
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const archive = () => {
     GitLabAPI.archiveAssignment(baseRepo.id)
       .then(() => console.log(`Archived ${baseRepo.name}`))
       .catch(console.error);
+    setDeleteCheck(false);
     setOpen(false);
   };
   const remove = () => {
     GitLabAPI.removeAssignment(baseRepo.id)
       .then(() => console.log(`Removed ${baseRepo.name}`))
       .catch(console.error);
+    setDeleteCheck(false);
     setOpen(false);
+  };
+
+  const handleClose = () => {
+    setDeleteCheck(false);
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setDeleteCheck(false);
+    setOpen(true);
   };
 
   return (
     <Paper elevation={3}>
-      <Card onClick={() => setOpen(true)}>
+      <Card onClick={handleOpen}>
         <CardActionArea>
           <ImagePlaceholder colors={color} />
           <CardContent>
@@ -113,7 +129,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           </CardContent>
         </CardActionArea>
       </Card>
-      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
+      <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
           <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
@@ -128,13 +144,30 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
-          <Button className={classes.actionButton} onClick={remove} variant='outlined' color='primary'>
+          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Delete</Typography>
+            <Dialog
+              open={deleteCheck}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Are you sure you want to delete this repo?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose} color='primary'>
+                  Cancel
+                </Button>
+                <Button onClick={remove} color='primary'>
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Button>
         </DialogContent>
         <DialogActions>
           <Button 
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             variant='outlined' 
             color='secondary'
           >
