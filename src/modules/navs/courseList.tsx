@@ -121,4 +121,3 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
     </>
   );
 };
- 
