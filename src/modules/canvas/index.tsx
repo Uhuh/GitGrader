@@ -54,7 +54,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState(false);
  
-  React.useEffect(() => {
+  React.useEffect(() => { 
     CanvasAPI.getStudents(course.id)
       .then(s => { // s is all students
         // Need to get all the student's gitlab ids to set up assignments.
@@ -62,7 +62,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
           .then(u => {
             setUsers(
               Array.isArray(u) ? u : [u]
-            );
+            ); 
           })
           // Need to log users that don't have gitlab accounts or tell the user a list somehow.
           .catch(console.error);
