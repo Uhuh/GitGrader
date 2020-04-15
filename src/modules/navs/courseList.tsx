@@ -7,7 +7,8 @@ import {
   DialogTitle, 
   Grid, 
   Link, 
-  makeStyles
+  makeStyles,
+  Typography
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
@@ -36,6 +37,9 @@ const useStyles = makeStyles({
   centerItem: {
     width: '100%',
     textAlign: 'center'
+  },
+  actionButton: {
+    color: 'white'
   }
 });
 
@@ -46,6 +50,13 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
                       localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
                       localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
                       ? true : false;
+  
+  const [deleteCheck, setDeleteCheck] = React.useState(false);
+
+  const deleteClass = (courseID:string) => {
+  localStorage.removeItem('relations');
+  window.location.reload(false);
+  };
 
   return (
     <>
@@ -63,6 +74,26 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
           <Link component={RouterLink} to={`/course/${course.id}`}>
             <CourseCard course={course} />
           </Link>
+          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Delete</Typography>
+            <Dialog
+              open={deleteCheck}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Are you sure you want to delete this class?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={()=> window.location.reload(false)} color='primary'>
+                  Cancel
+                </Button>
+                <Button onClick={() => deleteClass(course.id)} color='primary'>
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
+          </Button>   
         </Grid>
       ))}
       <Grid item xs={3} className={classes.addIcon}>
