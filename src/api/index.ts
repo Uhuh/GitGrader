@@ -284,18 +284,38 @@ export class GitlabBackend {
    */
   uploadFile = (assignment_id: string, file_name: string, file_content: string): Promise<any> => {
     const params = {
-      file_path: file_name,
       branch: 'master',
-      //encoding: 'base64',
-      content: file_content,
-      commit_message: 'Initialization'
+      commit_message: 'Testing Payloads',
+      actions: [
+        {
+          action: 'create',
+          file_path: file_name,
+          content: file_content,
+          encoding: 'base64'
+        }
+      ]
     };
 
-    return this.request(
+    return this.requestUpload(
       'POST',
-      `/projects/${assignment_id}/repository/files/${params.file_path}`,
+      `/projects/${assignment_id}/repository/commits`,
       params
     );
+  }
+  requestUpload = async (
+    method: AxiosRequestConfig['method'],
+    path: string,
+    params: {}
+  ): Promise<any> => {
+    const url = `${this.gitlab_host}/api/v4/${path}`;
+    return (
+      await axios({
+        method,
+        url,
+        headers: { 'Private-Token': this.gitlab_token },
+        data: params
+      })
+    ).data;
   }
   /**
    * Get user_id from username
