@@ -97,28 +97,25 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
+
+  //TO DO: ADD ABILITY TO UPLOAD MULTIPLE FILES AT ONCE
+  //TO DO: ADD DELETION, EDIT, FUNCTIONALITIES
   const upload = (file_name: string, file_content: string) => {
     GitLabAPI.uploadFile(baseRepo.id, file_name, file_content)
       .then(() => console.log(`Uploaded file`))
       .catch(console.error);
     setOpen(false);
   };
-
   const convertBase64 = () => {
     const reader = new FileReader();
     const file = document.getElementById('file-upload') as HTMLInputElement;
     const file_content = file.files;
     
     let file_name = file.value as string;
-    //let content = 'Upload error.';
     let base64content = 'VXBsb2FkIGVycm9y';
     
     reader.onloadend = () => {
       file_name = file_name.replace('C:\\fakepath\\', '');
-      //content = reader.result as string;
-      //console.log(file_name);
-      //console.log(content);
-      //upload(file_name, content);
       base64content = reader.result as string;
       base64content = base64content.split(',')[1];
       console.log(base64content);
@@ -126,10 +123,10 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
     };
 
     if(file_content) {
-      //reader.readAsText(file_content[0]);
       reader.readAsDataURL(file_content[0]);
     }
   };
+  //END TO DO//
 
   return (
     <Paper elevation={3}>

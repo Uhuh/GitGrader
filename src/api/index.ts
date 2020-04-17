@@ -279,6 +279,7 @@ export class GitlabBackend {
       params
     );
   }
+  
   /**
    * Uploads files to repo
    */
@@ -296,27 +297,19 @@ export class GitlabBackend {
       ]
     };
 
-    return this.requestUpload(
+    //TO DO: CHANGE TO ALLOW MULTIPLE UPLOADS AT ONCE
+
+    return this.requestPayload(
       'POST',
       `/projects/${assignment_id}/repository/commits`,
       params
     );
   }
-  requestUpload = async (
-    method: AxiosRequestConfig['method'],
-    path: string,
-    params: {}
-  ): Promise<any> => {
-    const url = `${this.gitlab_host}/api/v4/${path}`;
-    return (
-      await axios({
-        method,
-        url,
-        headers: { 'Private-Token': this.gitlab_token },
-        data: params
-      })
-    ).data;
-  }
+  
+  //TO DO: ADD FUNCTIONS FOR DELETION, EDIT, ETC.
+
+  //END TO DO
+
   /**
    * Get user_id from username
    * @returns user_id for whoever
@@ -376,6 +369,24 @@ export class GitlabBackend {
         url,
         headers: { 'Private-Token': this.gitlab_token },
         params
+      })
+    ).data;
+  }
+  /**
+   * Allows multiple repo actions for file manipulation
+   */
+  requestPayload = async (
+    method: AxiosRequestConfig['method'],
+    path: string,
+    params: {}
+  ): Promise<any> => {
+    const url = `${this.gitlab_host}/api/v4/${path}`;
+    return (
+      await axios({
+        method,
+        url,
+        headers: { 'Private-Token': this.gitlab_token },
+        data: params
       })
     ).data;
   }
