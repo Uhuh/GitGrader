@@ -21,6 +21,16 @@ const SpacePadding = styled.div`
   margin-bottom: 20px;
 `;
 
+const Centered = styled.div`
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+`;
+
+
 const useStyles = makeStyles({
   actionButton: {
     color: 'white'
@@ -54,11 +64,14 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
+let filesList = ' ';
+
 export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course: ICanvasNamespace }) => {
   const classes = useStyles();
   const { baseRepo, users, course } = props;
   const color = colors[Number(props.baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
+  const [files, setFiles] = React.useState(false);
   const year = new Date().getFullYear();
 
   const assign = async () => {
@@ -97,15 +110,13 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
-
-  //TO DO: ADD ABILITY TO UPLOAD MULTIPLE FILES AT ONCE
-  //TO DO: ADD DELETION, EDIT, FUNCTIONALITIES
   const upload = (file_name: string, file_content: string) => {
     GitLabAPI.uploadFile(baseRepo.id, file_name, file_content)
       .then(() => console.log(`Uploaded file`))
       .catch(console.error);
     setOpen(false);
   };
+
   const convertBase64 = () => {
     const reader = new FileReader();
     const file = document.getElementById('file-upload') as HTMLInputElement;
@@ -126,7 +137,31 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       reader.readAsDataURL(file_content[0]);
     }
   };
-  //END TO DO//
+
+  const listRepoFiles = () => {
+    setFiles(true);
+
+    GitLabAPI.listFiles(baseRepo.id)
+      .then(() => console.log(`Listing files`))
+      .catch(console.error);
+
+    const files = JSON.parse(localStorage.getItem('filesList') || 'null');
+    
+    for(let i = 0; i < files.length; i++){
+      console.log(files[i]);
+    }
+
+    filesList = files.toString();
+    console.log(filesList);
+  };
+  
+  /**
+   * TO DO:
+   * -- Allow multiple uploads, updates, deletions.
+   * -- Change how repo files are listed in dialog
+   * -- Plan A: Let user checklist for multiple actions
+   * -- Plan B: Make user text input filename for multiple actions
+   */
 
   return (
     <Paper elevation={3}>
@@ -147,24 +182,27 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Assign</Typography>
           </Button>
+          &nbsp;&nbsp;
           <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Unlock</Typography>
           </Button>
+          &nbsp;&nbsp;
           <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
+          &nbsp;&nbsp;
           <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'> 
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
-
-          <SpacePadding></SpacePadding>
-          <form>
-            <input type='file' id='file-upload'/>
-          </form>
-          <Button className={classes.actionButton} onClick={convertBase64} variant='outlined' color='primary'> 
-            Upload
+          &nbsp;&nbsp;
+          <Button 
+            className={classes.actionButton} 
+            onClick={listRepoFiles} 
+            variant='outlined' 
+            color='primary'
+          > 
+            <Typography color='textSecondary'>Files</Typography>
           </Button>
-
         </DialogContent>
         <DialogActions>
           <Button 
@@ -175,6 +213,27 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
             Cancel
           </Button>
         </DialogActions>
+      </Dialog>
+      <Dialog open={files} onClose={() => setFiles(false)} aria-labelledby='files-dialog-title'> 
+       <DialogTitle id='files-dialog-title'>{baseRepo.name} files</DialogTitle>
+       <DialogContent>
+        <Typography variant='subtitle2'>{filesList}</Typography>
+        <form>
+          <input type='file' id='file-upload'/>
+          <Button className={classes.actionButton} onClick={convertBase64} variant='outlined' color='primary'> 
+            Upload
+          </Button>
+        </form>
+       </DialogContent>
+       <DialogActions>
+        <Button 
+          onClick={() => setFiles(false)}
+          variant='outlined' 
+          color='secondary'
+        >
+          Cancel
+        </Button>
+       </DialogActions>
       </Dialog>
     </Paper>
   );
