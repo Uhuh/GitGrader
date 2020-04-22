@@ -2,12 +2,13 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {
   GitAccess,
   GitVisibility,
-  IBaseRepo,
   ICanvasClass,
   ICanvasUser,
   IGitNamespace,
   IGitRepo,
-  IGitUser
+  IGitUser,
+  IRepo,
+  IStudentRepo
 } from './interfaces';
 
 /**
@@ -38,8 +39,6 @@ export class GitlabBackend {
   getNamespaces = async (): Promise<IGitNamespace[]> => {
     const namespaces = await this.request('GET', '/namespaces', {});
 
-    console.log(namespaces);
-
     return new Promise(res => {
       if(!namespaces) {
         res();
@@ -55,15 +54,17 @@ export class GitlabBackend {
    * @param namespace_id ID that belongs to a course.
    * @param section The course section id. EG: 101 for "CS 1570 (101)"
    */
-  getRepos = async (namespace_id: string, section: string): 
-    Promise<{ base_repos: IBaseRepo[], student_repos: Map<string, string>}> => {
+  getRepos = async (namespace_id: string): 
+    Promise<{ base_repos: IRepo[], student_repos: IStudentRepo[] }> => {
     /**
      * For now the hacky method. Assume no base repo will have the course section
      * in the name.
      */
     let projects: any = [];
     let base_projects: any = [];
-    const student_repos = new Map<string, string>();
+    let student_repos: any = []
+    // Basically, `currentYear-semester-section-homework-username`
+    const S_Repo = new RegExp(`((${new Date().getFullYear()})-(SP|FS|SS)-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+)`);
     
     // We're limited by how many repos we can grab so we gotta do by page. :(
     for(let i = 1; i <= 10; i++) {
@@ -81,8 +82,8 @@ export class GitlabBackend {
       .filter((p: any) => p.namespace.id == namespace_id);
 
     for(const n of namespace_projects) {
-      if (n.name.includes(section)) {
-        student_repos.set(n.name, n.id);
+      if (S_Repo.test(n.name)) {
+        student_repos = [...student_repos, n];
       } else {
         base_projects = [...base_projects, n];
       }
@@ -102,14 +103,17 @@ export class GitlabBackend {
             id: b.id,
             name: b.name,
             created_at: new Date(b.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
-            namespace: {
-              id: b.namespace.id,
-              name: b.namespace.name,
-              path: b.namespace.path
-            },
+            namespace_id: b.namespace.id,
             ssh_url: b.ssh_url_to_repo
           })),
-          student_repos
+          student_repos: student_repos.map((s: any) => ({
+            id: s.id,
+            user_id: s.user_id,
+            name: s.name,
+            created_at: new Date(s.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
+            namespace_id: s.namespace.id,
+            ssh_url: s.ssh_url_to_repo
+          }))
         }
       );
     });
@@ -120,7 +124,7 @@ export class GitlabBackend {
   createBaseRepo = async (
     name: string,
     namespace_id: string
-  ): Promise<IBaseRepo> => {
+  ): Promise<IRepo> => {
     // Initialize with readme so we can create student repos
     // without needing any commits.
     const params = {
@@ -154,8 +158,8 @@ export class GitlabBackend {
         name: base_repo.name,
         created_at: new Date(base_repo.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
         namespace: {
-          name: base_repo.namespace.name,
           id: base_repo.namespace.id,
+          name: base_repo.namespace.name,
           path: base_repo.namespace.path
         },
         ssh_url: base_repo.ssh_url_to_repo
@@ -169,16 +173,17 @@ export class GitlabBackend {
    * @returns The git links to clone with.
    */
   createAssignment = async (
-    base_repo: IBaseRepo,
+    base_repo: IRepo,
+    namespace: any,
     section: string,
     semester: string,
     username: string
   ): Promise<IGitRepo> => {    
     const params = {
       name: this.build_name(semester, section, base_repo.name, username),
-      namespace: base_repo.namespace.path,
+      namespace: namespace.path,
       namespace_id: base_repo.namespace.id,
-      namespace_path: `${this.gitlab_host}/${base_repo.namespace.name}`,
+      namespace_path: `${this.gitlab_host}/${namespace.name}`,
       path: this.build_name(semester, section, base_repo.name, username)
     };
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)

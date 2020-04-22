@@ -4,9 +4,12 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
-import { CanvasAPI } from '..'; 
-import { IBaseRepo, ICanvasNamespace, IGitUser } from '../../api/interfaces';
+import { CanvasAPI } from '..';
+import { ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
+import baseRepoStore from '../../stores/BaseRepoStore';
+import BaseRepo from '../../stores/BaseRepo';
+import { observer, inject } from 'mobx-react';
 
 const useStyles = makeStyles({
   card: {
@@ -44,12 +47,14 @@ const useStyles = makeStyles({
  * @todo this takes quite some time to load. Need to find a way to make it vrooom
  * @param props courseId - Canvas course id
  */
-export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
+export const CanvasPage = 
+  inject('BaseRepoStore')
+  (observer((props: { course: ICanvasNamespace; }) => {
   const { course } = props;
   const classes = useStyles();
   
   const [assignmentName, setAssignmentName] = React.useState('');
-  const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>([]);
+  const [baseRepos, setBaseRepo] = React.useState<BaseRepo[]>([]);
   const [users, setUsers] = React.useState<IGitUser[]>([]);
   const [open, setOpen] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -71,23 +76,15 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   }, [course.id]); 
 
   React.useEffect(() => {
-    GitLabAPI.getRepos(course.namespace.id, course.section)
-      .then(b => {
-        console.log(b);
-  	    setBaseRepo(b.base_repos);
-      })
-    .catch(console.error);
-  }, []);
+    const repos = baseRepoStore.getRepos(course.namespace.id) || [];
+    console.log(repos);
+    setBaseRepo(repos);
+  }, [baseRepoStore.getRepos(course.namespace.id)]);
 
   const createAssignment = () => {
     if(!assignmentName.includes('-')){
-      GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
-        .then(repo => {
-          setBaseRepo([...baseRepos, repo]);
-        })
-        .catch(console.error);
-      }
-    else{
+      baseRepoStore.createRepo(assignmentName, course.namespace.id);
+    } else {
       setError(true); 
     }
     setOpen(false);
@@ -115,7 +112,9 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
           </h2>
         </div>
 
-        {baseRepos ? baseRepos.map((baseRepo: IBaseRepo) => (
+        { baseRepos ? 
+          baseRepos
+            .map(baseRepo => (
           <Grid item xs={3} key={baseRepo.id} className={classes.card}>
             <RepoCard baseRepo={baseRepo} users={users} course={course} />
           </Grid>
@@ -178,5 +177,4 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
           </Button>
       </Dialog>
     </> 
-  );}; 
- 
+  );}));

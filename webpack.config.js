@@ -58,7 +58,7 @@ module.exports = [
         images: path.join(__dirname, 'src', 'images'),
         modules: path.resolve(__dirname, 'src/modules'),
         stores: path.join(__dirname, 'src', 'stores'),
-        api: path.resolve(__dirname, 'src/api'),
+        api: path.resolve(__dirname, 'src', 'api'),
         time: path.join(__dirname, 'src', 'time'),
         globals: path.join(__dirname, 'src', 'globals')
       }

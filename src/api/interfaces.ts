@@ -21,7 +21,6 @@ export interface IGitNamespace {
   id: string;
   name: string;
   path: string;
-  web_url: string;
 }
 
 /**
@@ -47,9 +46,9 @@ export interface IGitRepo {
 }
 
 /**
- * Base repo information
+ * Basic repo information
  */
-export interface IBaseRepo {
+export interface IRepo {
   id: string;
   name: string;
   created_at: string;
@@ -59,6 +58,10 @@ export interface IBaseRepo {
     path: string;
   };
   ssh_url: string;
+}
+
+export interface IStudentRepo extends IRepo {
+  user_id: number;
 }
 
 /**
@@ -85,7 +88,7 @@ export interface ICanvasNamespace extends ICanvasClass {
 /**
  * Small details about canvas teacher.
  */
-interface ICanvasTeacher {
+export interface ICanvasTeacher {
   id: string;
   display_name: string;
   avatar_image_url: string;
