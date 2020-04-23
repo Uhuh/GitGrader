@@ -75,7 +75,7 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
             <CourseCard course={course} />
           </Link>
           <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Delete</Typography>
+            <Typography color='textSecondary'>X</Typography>
             <Dialog
               open={deleteCheck}
             >

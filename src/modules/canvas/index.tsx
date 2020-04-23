@@ -52,6 +52,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>([]);
   const [users, setUsers] = React.useState<IGitUser[]>([]);
   const [open, setOpen] = React.useState(false);
+  const [error, setError] = React.useState(false);
 
   React.useEffect(() => {
     CanvasAPI.getStudents(course.id)
@@ -79,11 +80,16 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   }, []);
 
   const createAssignment = () => {
-    GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
-      .then(repo => {
-        setBaseRepo([...baseRepos, repo]);
-      })
-      .catch(console.error);
+    if(!assignmentName.includes('-')){
+      GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
+        .then(repo => {
+          setBaseRepo([...baseRepos, repo]);
+        })
+        .catch(console.error);
+      }
+    else{
+      setError(true); 
+    }
     setOpen(false);
   };
 
@@ -123,7 +129,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name of the assignment you are assigning
+            Please enter the name of the assignment you are assigning. Assignment name cannot contain the character '-'
           </DialogContentText>
           <TextField 
             id='outlined-basic' 
@@ -148,7 +154,22 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
           >
             Submit
           </Button>
+
         </DialogActions>
+      </Dialog>
+      <Dialog open={error} onClose={() => setError(false)} aria-labelledby='form-dialog-title'>
+        <DialogContent>
+          <DialogContentText>
+            Assignment name can not contain the character ' - '
+          </DialogContentText>
+        </DialogContent>
+        <Button
+           onClick={() => setError(false)} 
+           variant='outlined'
+           color='primary'
+          >
+            Ok
+          </Button>
       </Dialog>
     </>
   );
