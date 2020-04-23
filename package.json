@@ -4,11 +4,10 @@
   "description": "An Electron app to help combine assigner and grader together to make a friendly ui for teachers/graders to use.",
   "repository": "git@github.com:Uhuh/GitGrader.git",
   "author": "Dylan Warren <duwtgb@mst.edu>",
-  "license": "MIT"
-  },
+  "license": "MIT",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
-    "start": "yarn build && electron ./dist/electron.js",
+    "start": "yarn build && electron ./dist/electron.js"
   },
   "dependencies": {
     "@material-ui/core": "^4.9.5",

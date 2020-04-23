@@ -23,13 +23,35 @@ export class BaseRepoStore {
 
         const repos = await GitLabAPI.getRepos(n.id);
         const usernames = (await CanvasAPI.getStudents(c.id)).map(s => s.sis_user_id);
-        
-        console.log(`Loading ${c.id} : ${n.name} : ${usernames}`);
-        console.log('Repos: ');
-        console.log(repos.base_repos);
-        this.repos.set(n.id, repos.base_repos.map(r => new BaseRepo(
-          r.id, r.name, r.ssh_url, r.created_at, n
-        )));
+        const baseRepos: BaseRepo[] = [];
+
+        for(const b of repos.base_repos) {
+          const user_to_id = new Map();
+          if(repos.user_to_ass_id) {
+            const users = repos.user_to_ass_id.get(b.name);
+            
+            if(users) {
+              for(const u of users) {
+                await GitLabAPI.getUser(u[0])
+                  .then(user => {
+                    const repo_info = users.find(u => u[0] === user.username);
+                    const id = repo_info ? repo_info[1] : undefined;
+                    if(!id) {
+                      // Shouldn't happen but check anyway.
+                      return;
+                    }
+                    user_to_id.set(user.id, id);
+                  })
+                  .catch(console.error);
+              }
+            }
+          }
+          baseRepos.push(new BaseRepo(
+            b.id, b.name, b.ssh_url, b.created_at, b.namespace, user_to_id
+          ));
+        }
+
+        this.repos.set(n.id, baseRepos);
 
         this.usernames.set(c.id, usernames);
 

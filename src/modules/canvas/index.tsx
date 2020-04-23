@@ -63,7 +63,8 @@ export const CanvasPage =
     CanvasAPI.getStudents(course.id)
       .then(s => { // s is all students
         // Need to get all the student's gitlab ids to set up assignments.
-        GitLabAPI.getUser(s)
+        const usernames = s.map(u => u.sis_user_id);
+        GitLabAPI.getUser(usernames)
           .then(u => {
             setUsers(
               Array.isArray(u) ? u : [u]

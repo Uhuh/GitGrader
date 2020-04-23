@@ -12,6 +12,14 @@ import {
 } from './interfaces';
 
 /**
+ * Overloads for getUser
+ */
+type IOverLoad = {
+  (username: string): Promise<IGitUser>;
+  (username: string[]): Promise<IGitUser[]>;
+};
+
+/**
  * @class GitlabBackend
  * Allow us access to gitlab's API
  *
@@ -55,14 +63,19 @@ export class GitlabBackend {
    * @param section The course section id. EG: 101 for "CS 1570 (101)"
    */
   getRepos = async (namespace_id: string): 
-    Promise<{ base_repos: IRepo[], student_repos: IStudentRepo[] }> => {
+    Promise<{ 
+      base_repos: IRepo[], 
+      student_repos: IStudentRepo[], 
+      user_to_ass_id?: Map<string, string[][]> 
+    }> => {
     /**
      * For now the hacky method. Assume no base repo will have the course section
      * in the name.
      */
     let projects: any = [];
     let base_projects: any = [];
-    let student_repos: any = []
+    let student_repos: any = [];
+    const user_to_ass_id = new Map();
     // Basically, `currentYear-semester-section-homework-username`
     const S_Repo = new RegExp(`((${new Date().getFullYear()})-(SP|FS|SS)-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+)`);
     
@@ -83,17 +96,22 @@ export class GitlabBackend {
 
     for(const n of namespace_projects) {
       if (S_Repo.test(n.name)) {
+        const parts: string[] = n.name.split('-');
         student_repos = [...student_repos, n];
+        // base_repo_name -> <username, student repo id>
+        const previous_users = user_to_ass_id.get(parts[3]) || [];
+        user_to_ass_id.set(parts[3], [ ...previous_users, [parts[4], n.id]]);
       } else {
         base_projects = [...base_projects, n];
       }
     }
-
+    
     return new Promise((res, rej) => {
       if (!base_projects || base_projects.length === 0) {  
         res({
           base_repos: [],
-          student_repos
+          student_repos,
+          user_to_ass_id
         });
       }
 
@@ -113,7 +131,8 @@ export class GitlabBackend {
             created_at: new Date(s.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
             namespace_id: s.namespace.id,
             ssh_url: s.ssh_url_to_repo
-          }))
+          })),
+          user_to_ass_id
         }
       );
     });
@@ -365,28 +384,35 @@ export class GitlabBackend {
    * @returns user_id for whoever
    * @throws if user is not found.
    */
-  getUser = async (student: ICanvasUser | ICanvasUser[]): Promise<IGitUser | IGitUser[]> => {
-
+  getUser:IOverLoad = async (username: any): Promise<any> => {
     let users: any = [];
+    let user: any = null;
     
-    if (Array.isArray(student) && student.length) {
-      for (const s of student) {
+    if (Array.isArray(username) && username.length) {
+      for (const u of username) {
         const user =  await this.request(
             'GET', 
             '/users', 
-            { 'search': s.sis_user_id }
+            { 'search': u }
         );
         users = [...users, ...user];
       }
+    } else {
+      users =  await this.request(
+        'GET', 
+        '/users', 
+        { 'search': username }
+      );
+      user = users[0];
     }
 
     return new Promise((res, rej) => {
       if(!users || !users.length) {
-        rej(`Could not find GitLab accounts`);
+        rej(`Could not find GitLab accounts for ${username}`);
       }
 
       res(
-        Array.isArray(users) ?
+        (user === null && Array.isArray(users)) ?
         users.map(u => (
           {
             id: u.id,
@@ -394,7 +420,13 @@ export class GitlabBackend {
             username: u.username,
             avatar_url: u.avatar_url
           }
-        )) : users
+        )) : 
+        {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          avatar_url: user.avatar_url
+        }
       );
     });
   }
@@ -557,7 +589,7 @@ export class CanvasBackend {
       // We don't want teachers
       res(
         people.filter((p: any) =>
-          p.role !== 'TaEnrollment' && p.role !== 'TeacherEnrollment'
+          p.type !== 'TaEnrollment' && p.type !== 'TeacherEnrollment'
         )
       ); 
     });      

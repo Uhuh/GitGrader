@@ -8,20 +8,27 @@ export default class BaseRepo {
   @observable ssh_url: string;
   @observable created_at: string;
   @observable namespace: IGitNamespace;
-  @observable user_to_ass_id: Map<string, string>;
+  // user gitlab id -> assignment id
+  @observable
+  user_to_ass_id!: Map<string, string>;
   constructor (
     id: string,
     name: string,
     ssh_url: string,
     created_at: string,
-    namespace: IGitNamespace
+    namespace: IGitNamespace,
+    user_ass_id?: Map<string, string>
   ) {
     this.id = id;
     this.name = name;
     this.ssh_url = ssh_url;
     this.created_at = created_at;
     this.namespace = namespace;
-    this.user_to_ass_id = new Map();
+    if(user_ass_id && user_ass_id.size) {
+      this.user_to_ass_id = user_ass_id;
+    } else {
+      this.user_to_ass_id = new Map();
+    }
   }
 
   /**
@@ -38,9 +45,10 @@ export default class BaseRepo {
     GitLabAPI.createAssignment(
       this, this.namespace, section, semester, username
     )
-      .then(ass => {
+      .then(async (ass) => {
         // Save for assignment later.
-        this.user_to_ass_id.set(username, ass.id);
+        const user = await GitLabAPI.getUser(username);
+        this.user_to_ass_id.set(user.id, ass.id);
       })
       .catch(console.error);
     
@@ -48,12 +56,13 @@ export default class BaseRepo {
   }
 
   assign = async (): Promise<boolean> => {
-    if (!this.user_to_ass_id.size) {
+    if (!this.user_to_ass_id || !this.user_to_ass_id.size) {
       return new Promise(res => res(false));
     }
 
     for(const username of Array.from(this.user_to_ass_id.keys())) {
       const id = this.user_to_ass_id.get(username);
+      console.log(`Assigning U: ${username} - ID: ${id}`);
       if (!id) {
         continue;
       }
@@ -64,6 +73,7 @@ export default class BaseRepo {
           // I want to have a status / loading bar
         })
         .catch((e: any) => {
+          console.log(`Failed to assign student`);
           console.error(e);
           return new Promise((_res: any, rej: any) => rej(false));
         });
