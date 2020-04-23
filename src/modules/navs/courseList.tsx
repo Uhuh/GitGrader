@@ -118,6 +118,6 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
         </DialogActions>
       </DialogContent>
     </Dialog>
-    </>
+    </> 
   );
 };
