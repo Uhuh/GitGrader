@@ -158,7 +158,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
            variant='outlined'
            color='primary'
           >
-            Submit
+            Submit 
           </Button>
 
         </DialogActions>
