@@ -73,7 +73,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   React.useEffect(() => {
     GitLabAPI.getRepos(course.namespace.id, course.section)
       .then(b => {
-        console.log(b)
+        console.log(b);
   	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
@@ -93,6 +93,12 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
     setOpen(false);
   };
 
+  const dateIndex = course.name.indexOf('SP') != -1 ? course.name.indexOf('SP') : course.name.indexOf('FS');
+  const Semester = course.name.substring(dateIndex,dateIndex+2);
+  const Year = course.name.substring(dateIndex+2,dateIndex+6);
+  
+  const Preview  =  Year + '-' + Semester + '-' + course.section+ '-' + assignmentName + '-user';
+  
   return (
     <>
       <Grid
@@ -129,7 +135,8 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name of the assignment you are assigning. Assignment name cannot contain the character '-'
+            Please enter the name of the assignment you are assigning. Assignment name cannot contain the 
+            character '-'. Student Repo will have the format of <b>{Preview}</b>
           </DialogContentText>
           <TextField 
             id='outlined-basic' 
@@ -148,7 +155,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
             Cancel
           </Button>
           <Button
-           onClick={createAssignment} 
+           onClick={createAssignment}
            variant='outlined'
            color='primary'
           >
@@ -160,7 +167,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
       <Dialog open={error} onClose={() => setError(false)} aria-labelledby='form-dialog-title'>
         <DialogContent>
           <DialogContentText>
-            Assignment name can not contain the character ' - '
+            Assignment name can not contain the character ' - ' 
           </DialogContentText>
         </DialogContent>
         <Button
