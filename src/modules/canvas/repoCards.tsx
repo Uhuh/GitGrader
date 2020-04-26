@@ -64,7 +64,7 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-let filesList = ' ';
+let filesList = '';
 
 export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course: ICanvasNamespace }) => {
   const classes = useStyles();
@@ -110,32 +110,91 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
-  const upload = (file_name: string, file_content: string) => {
-    GitLabAPI.uploadFile(baseRepo.id, file_name, file_content)
-      .then(() => console.log(`Uploaded file`))
+  const upload = (actions: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>) => {
+    GitLabAPI.uploadFile(baseRepo.id, actions)
+      .then(() => console.log(`Uploaded file(s)`))
+      .catch(console.error);
+    setOpen(false);
+  };
+  const edit = (actions: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>) => {
+    GitLabAPI.editFile(baseRepo.id, actions)
+      .then(() => console.log(`Updated file(s)`))
       .catch(console.error);
     setOpen(false);
   };
 
-  const convertBase64 = () => {
-    const reader = new FileReader();
+  const convertBase64Upload = () => {
     const file = document.getElementById('file-upload') as HTMLInputElement;
-    const file_content = file.files;
+    let actionsArray: Array<{
+      action: string, file_path: string, content: string, encoding: string
+      }> = [];
     
-    let file_name = file.value as string;
-    let base64content = 'VXBsb2FkIGVycm9y';
+    if(file.files) {
+      for(let i = 0; i < file.files.length; i++) {
+        if(file.files.item(i)) { 
+          const file_item = file.files.item(i) as File;
+          actionsArray.push(readerSetup(file_item, 'create'));
+        }
+      }
+    }
+
+    setTimeout(() => {
+      console.log(actionsArray);
+      upload(actionsArray);
+    }, 2000);
+  };
+
+  const convertBase64Edit = () => {
+    const file = document.getElementById('file-edit') as HTMLInputElement;
+    let actionsArray: Array<{
+      action: string, file_path: string, content: string, encoding: string
+      }> = [];
     
-    reader.onloadend = () => {
-      file_name = file_name.replace('C:\\fakepath\\', '');
-      base64content = reader.result as string;
-      base64content = base64content.split(',')[1];
-      console.log(base64content);
-      upload(file_name, base64content);
+    if(file.files) {
+      for(let i = 0; i < file.files.length; i++) {
+        if(file.files.item(i)) { 
+          const file_item = file.files.item(i) as File;
+          actionsArray.push(readerSetup(file_item, 'update'));
+        }
+      }
+    }
+
+    setTimeout(() => {
+      console.log(actionsArray);
+      edit(actionsArray);
+    }, 2000);
+  };
+
+  const readerSetup = (file: File, choice: string) => {
+    let action = {
+      action: `${choice}`,
+      file_path: '',
+      content: '',
+      encoding: 'base64'
     };
 
-    if(file_content) {
-      reader.readAsDataURL(file_content[0]);
+    if(file) {
+      const reader = new FileReader();
+      const file_name = file.name;
+      let base64content = 'VXBsb2FkIGVycm9y';
+      
+      reader.onloadend = () => {
+        base64content = reader.result as string;
+        base64content = base64content.split(',')[1];
+        action.file_path = file_name;
+        action.content = base64content;
+      };
+      
+      if(file) {
+        reader.readAsDataURL(file);
+      }
     }
+    
+    return action;
   };
 
   const listRepoFiles = () => {
@@ -151,16 +210,16 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       console.log(files[i]);
     }
 
-    filesList = files.toString();
+    filesList = files;
     console.log(filesList);
   };
   
   /**
    * TO DO:
-   * -- Allow multiple uploads, updates, deletions.
+   * -- Make a better way to delete files
    * -- Change how repo files are listed in dialog
-   * -- Plan A: Let user checklist for multiple actions
-   * -- Plan B: Make user text input filename for multiple actions
+   * -- Plan A: Let user checklist for deletion choices
+   * -- Plan B: Make user text input filename deletion choices
    */
 
   return (
@@ -210,18 +269,26 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
             variant='outlined' 
             color='secondary'
           >
-            Cancel
+            Close
           </Button>
         </DialogActions>
       </Dialog>
       <Dialog open={files} onClose={() => setFiles(false)} aria-labelledby='files-dialog-title'> 
-       <DialogTitle id='files-dialog-title'>{baseRepo.name} files</DialogTitle>
+       <DialogTitle id='files-dialog-title'>{baseRepo.name} Files</DialogTitle>
        <DialogContent>
         <Typography variant='subtitle2'>{filesList}</Typography>
+        <SpacePadding></SpacePadding>
         <form>
-          <input type='file' id='file-upload'/>
-          <Button className={classes.actionButton} onClick={convertBase64} variant='outlined' color='primary'> 
+          <input type='file' id='file-upload' multiple/>
+          <Button className={classes.actionButton} onClick={convertBase64Upload} variant='outlined' color='primary'> 
             Upload
+          </Button>
+        </form>
+        <SpacePadding></SpacePadding>
+        <form>
+          <input type='file' id='file-edit' multiple/>
+          <Button className={classes.actionButton} onClick={convertBase64Edit} variant='outlined' color='primary'> 
+            Update
           </Button>
         </form>
        </DialogContent>
@@ -231,7 +298,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           variant='outlined' 
           color='secondary'
         >
-          Cancel
+          Close
         </Button>
        </DialogActions>
       </Dialog>

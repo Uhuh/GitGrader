@@ -282,21 +282,14 @@ export class GitlabBackend {
   /**
    * Uploads files to repo
    */
-  uploadFile = (assignment_id: string, file_name: string, file_content: string): Promise<any> => {
+  uploadFile = (assignment_id: string, actionsArray: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>): Promise<any> => {
     const params = {
       branch: 'master',
-      commit_message: `Initial ${file_name}`,
-      actions: [
-        {
-          action: 'create',
-          file_path: file_name,
-          content: file_content,
-          encoding: 'base64'
-        }
-      ]
+      commit_message: `Initial upload`,
+      actions: actionsArray
     };
-
-    //TO DO: CHANGE TO ALLOW MULTIPLE UPLOADS AT ONCE
 
     return this.requestPayload(
       'POST',
@@ -307,25 +300,18 @@ export class GitlabBackend {
   /**
    * Allows editing of repo files' content
    */
-  editFile = (assignment_id: string, file_name: string, file_content: string): Promise<any> => {
+  editFile = (assignment_id: string, actionsArray: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>): Promise<any> => {
     const params = {
       branch: 'master',
-      commit_message: `Updated ${file_name}`,
-      actions: [
-        {
-          action: 'update',
-          file_path: file_name,
-          content: file_content,
-          encoding: 'base64'
-        }
-      ]
+      commit_message: `Updated file`,
+      actions: actionsArray
     };
-
-    //TO DO: CHANGE TO ALLOW MULTIPLE CHANGES AT ONCE
 
     return this.requestPayload(
       'POST',
-      `/projects/${assignment_id}/repository/commits`,
+      `${assignment_id}`,
       params
     );
   }
