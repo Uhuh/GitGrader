@@ -182,7 +182,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
             onClick={handleClose}
             variant='outlined' 
             color='secondary'
-          >
+          > 
             Cancel
           </Button>
         </DialogActions>
