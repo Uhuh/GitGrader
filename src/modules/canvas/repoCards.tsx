@@ -9,7 +9,8 @@ import {
   DialogContentText, 
   DialogTitle, 
   makeStyles, 
-  Paper, 
+  Paper,
+  Tooltip, 
   Typography
 } from '@material-ui/core';
 import * as React from 'react';
@@ -19,7 +20,8 @@ import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/in
 
 const useStyles = makeStyles({
   actionButton: {
-    color: 'white'
+    color: 'white',
+    margin: '7px'
   }
 });
 
@@ -132,18 +134,27 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
-          <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Assign</Typography>
-          </Button>
+          <Tooltip title='Action to make a repo for each student with base repo as the outline' placement='top'>
+            <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Assign</Typography>
+            </Button>
+          </Tooltip>
+          <Tooltip title='Action to unlock all student repo to edit' placement='top'>
           <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Unlock</Typography>
           </Button>
+          </Tooltip>
+          <Tooltip title='Action to lock all student repo' placement='top'>
           <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
+          </Tooltip>
+          <Tooltip title='Action to archive base repo' placement='top'>
           <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
+          </Tooltip>
+          <Tooltip title='Action to delete the base repo' placement='top'>
           <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Delete</Typography>
             <Dialog
@@ -164,6 +175,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
               </DialogActions>
             </Dialog>
           </Button>
+          </Tooltip>
         </DialogContent>
         <DialogActions>
           <Button 
