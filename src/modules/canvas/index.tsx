@@ -95,7 +95,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
 
   const dateIndex = course.name.indexOf('SP') != -1 ? course.name.indexOf('SP') : course.name.indexOf('FS');
   const Semester = course.name.substring(dateIndex,dateIndex+2);
-  const Year = course.name.substring(dateIndex+2,dateIndex+6);
+  const Year = new Date().getFullYear();
   
   const Preview  =  Year + '-' + Semester + '-' + course.section+ '-' + assignmentName + '-user';
   
@@ -135,8 +135,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name of the assignment you are assigning. Assignment name cannot contain the 
-            character '-'. Student Repo will have the format of <b>{Preview}</b>
+            Student repo preview : <b>{Preview}</b>
           </DialogContentText>
           <TextField 
             id='outlined-basic' 
