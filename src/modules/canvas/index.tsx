@@ -179,34 +179,5 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
       </Dialog>
     </>
   );
-var data: string[];
-data = [];
 
-const CanvasAPI = new Canvas({
-    canvas_url: 'https://mst.instructure.com',
-    canvas_token: '2006~rBsdDmvmuKgD629IaBL9zKZ3Xe1ggXHhcFWJH4eEiAgE62LUWemgbVrabrx116Rq'
-  });
-
-CanvasAPI.getClasses().then(function(result) {
-    for(let i=0; i<result.length; i++){
-        data.push(result[i].name);
-    }
-    
-});
-
-
-export const CanvasPage = () => {
-
-    return (
-        <ol>
-           {data.map(data => 
-            <li key={data.toString()}>   
-                {data} 
-            </li>)} 
-       </ol>
-      );
-<<<<<<< HEAD
->>>>>>> able to show a list of all the classes onto the canvas page
-=======
->>>>>>> able to show a list of all the classes onto the canvas page
 };
