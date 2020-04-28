@@ -1,33 +1,46 @@
 {
   "name": "GitGrader",
-  "main": "src/electron.ts",
-  "homepage": "./",
   "version": "1.0.0",
+  "main": "dist/electron.js",
   "description": "An Electron app to help combine assigner and grader together to make a friendly ui for teachers/graders to use.",
   "repository": "git@github.com:Uhuh/GitGrader.git",
   "author": "Dylan Warren <duwtgb@mst.edu>",
   "license": "MIT",
   "scripts": {
-    "dist": "electron-builder",
+    "package": "yarn build && electron-builder ./dist/",
     "build": "webpack --config ./webpack.config.js",
-    "start": "yarn build && electron ./dist/electron.js",
-    "view": "electron ./dist/electron.js"
+    "start": "yarn build && electron dist/electron.js"
   },
   "build": {
     "appId": "com.gitgrader.app",
     "productName": "GitGrader",
-    "files": [
-      "build/**/*",
-      "node_modules/**/*",
-      "./src/electron.ts"
-    ],
-    "target": "NSIS",
     "directories": {
-      "output": "build"
+      "output": "build",
+      "buildResources": "dist"
     },
-    "nsis": {
-      "allowToChangeInstallationDirectory": true,
-      "oneClick": false
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
     }
   },
   "dependencies": {
@@ -57,6 +70,7 @@
     "webpack-cli": "^3.3.10"
   },
   "devDependencies": {
+    "asar": "^3.0.3",
     "electron": "^8.0.0",
     "electron-builder": "^22.5.1",
     "electron-packager": "^14.2.1"
