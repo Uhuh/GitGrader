@@ -134,27 +134,27 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
-          <Tooltip title='Action to make a repo for each student with base repo as the outline' placement='top'>
+          <Tooltip title='Give students access to this assignment' placement='top'>
             <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
               <Typography color='textSecondary'>Assign</Typography>
             </Button>
           </Tooltip>
-          <Tooltip title='Action to unlock all student repo to edit' placement='top'>
+          <Tooltip title='Unlock all student repo to' placement='top'>
           <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Unlock</Typography>
           </Button>
           </Tooltip>
-          <Tooltip title='Action to lock all student repo' placement='top'>
+          <Tooltip title='Lock all student repo' placement='top'>
           <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
           </Tooltip>
-          <Tooltip title='Action to archive base repo' placement='top'>
+          <Tooltip title='Archive base repo' placement='top'>
           <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
           </Tooltip>
-          <Tooltip title='Action to delete the base repo' placement='top'>
+          <Tooltip title='Delete the base repo' placement='top'>
           <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Delete</Typography>
             <Dialog
