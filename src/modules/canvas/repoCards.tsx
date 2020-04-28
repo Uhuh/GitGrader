@@ -334,6 +334,11 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
           </Tooltip>
+          <Tooltip title='Show repo files and actions' placement='top'>
+          <Button className={classes.actionButton} onClick={listRepoFiles} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Files</Typography>
+          </Button>
+          </Tooltip>
           <Tooltip title='Delete the base repo' placement='top'>
           <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Delete</Typography>
