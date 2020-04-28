@@ -50,13 +50,6 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
                       localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
                       localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
                       ? true : false;
-  
-  const [deleteCheck, setDeleteCheck] = React.useState(false);
-
-  const deleteClass = (courseID:string) => {
-  localStorage.removeItem('relations');
-  window.location.reload(false);
-  };
 
   return (
     <>
@@ -73,27 +66,7 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
         <Grid item xs={3} key={course.id} className={classes.card}>
           <Link component={RouterLink} to={`/course/${course.id}`}>
             <CourseCard course={course} />
-          </Link>
-          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>X</Typography>
-            <Dialog
-              open={deleteCheck}
-            >
-              <DialogContent>
-                <DialogContentText>
-                  Are you sure you want to delete this class?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={()=> window.location.reload(false)} color='primary'>
-                  Cancel
-                </Button>
-                <Button onClick={() => deleteClass(course.id)} color='primary'>
-                  Delete
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Button>   
+          </Link> 
         </Grid>
       ))}
       <Grid item xs={3} className={classes.addIcon}>
