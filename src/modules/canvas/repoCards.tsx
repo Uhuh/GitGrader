@@ -65,6 +65,10 @@ const ImagePlaceholder = styled.div<IProps>`
 `;
 
 let filesList = '';
+let uploadFilesList: Array<string> = [];
+let editFilesList: Array<string> = [];
+let uploadFiles: string;
+let editFiles: string;
 
 export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course: ICanvasNamespace }) => {
   const classes = useStyles();
@@ -72,6 +76,8 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
   const color = colors[Number(props.baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
   const [files, setFiles] = React.useState(false);
+  const [uploadConf, setUploadConf] = React.useState(false);
+  const [editConf, setEditConf] = React.useState(false);
   const year = new Date().getFullYear();
 
   const assign = async () => {
@@ -146,6 +152,8 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       console.log(actionsArray);
       upload(actionsArray);
     }, 2000);
+
+    setUploadConf(false);
   };
 
   const convertBase64Edit = () => {
@@ -167,6 +175,8 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       console.log(actionsArray);
       edit(actionsArray);
     }, 2000);
+
+    setEditConf(false);
   };
 
   const readerSetup = (file: File, choice: string) => {
@@ -210,17 +220,57 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       console.log(files[i]);
     }
 
-    filesList = files;
+    filesList = files.join(', ');
     console.log(filesList);
   };
-  
-  /**
-   * TO DO:
-   * -- Make a better way to delete files
-   * -- Change how repo files are listed in dialog
-   * -- Plan A: Let user checklist for deletion choices
-   * -- Plan B: Make user text input filename deletion choices
-   */
+
+  const listUploadFiles = () => {
+    setUploadConf(true);
+    uploadFilesList = [];
+    uploadFiles = '';
+
+    const file = document.getElementById('file-upload') as HTMLInputElement;
+    let file_item;
+    let file_name: string;
+
+    if(file.files) {
+      for(let i = 0; i < file.files.length; i++) {
+        if(file.files.item(i)) { 
+          file_item = file.files.item(i);
+          if(file_item) {
+            file_name = file_item.name;
+            uploadFilesList.push(file_name);
+          }
+        }
+      }
+    }
+
+    uploadFiles = uploadFilesList.join(', ');
+  };
+
+  const listUpdateFiles = () => {
+    setEditConf(true);
+    editFilesList = [];
+    editFiles = '';
+
+    const file = document.getElementById('file-edit') as HTMLInputElement;
+    let file_item;
+    let file_name: string;
+
+    if(file.files) {
+      for(let i = 0; i < file.files.length; i++) {
+        if(file.files.item(i)) { 
+          file_item = file.files.item(i);
+          if(file_item) {
+            file_name = file_item.name;
+            editFilesList.push(file_name);
+          }
+        }
+      }
+    }
+
+    editFiles = editFilesList.join(', ');
+  };
 
   return (
     <Paper elevation={3}>
@@ -280,16 +330,52 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         <SpacePadding></SpacePadding>
         <form>
           <input type='file' id='file-upload' multiple/>
-          <Button className={classes.actionButton} onClick={convertBase64Upload} variant='outlined' color='primary'> 
+          <Button className={classes.actionButton} onClick={listUploadFiles} variant='outlined' color='primary'> 
             Upload
           </Button>
+          <Dialog open={uploadConf} onClose={() => setUploadConf(false)}>
+            <DialogContent>
+              <Typography variant='subtitle2'>
+                Upload {uploadFiles} to {baseRepo.name}?
+              </Typography>
+              <Button className={classes.actionButton} onClick={convertBase64Upload} variant='outlined' color='primary'> 
+                Yes
+              </Button>
+              &nbsp;&nbsp;
+              <Button 
+                onClick={() => setUploadConf(false)}
+                variant='outlined' 
+                color='secondary'
+              >
+                No
+              </Button>
+            </DialogContent>
+          </Dialog>
         </form>
         <SpacePadding></SpacePadding>
         <form>
           <input type='file' id='file-edit' multiple/>
-          <Button className={classes.actionButton} onClick={convertBase64Edit} variant='outlined' color='primary'> 
+          <Button className={classes.actionButton} onClick={listUpdateFiles} variant='outlined' color='primary'> 
             Update
           </Button>
+          <Dialog open={editConf} onClose={() => setEditConf(false)}>
+            <DialogContent>
+              <Typography variant='subtitle2'>
+                Update {editFiles} in {baseRepo.name}?
+              </Typography>
+              <Button className={classes.actionButton} onClick={convertBase64Edit} variant='outlined' color='primary'> 
+                Yes
+              </Button>
+              &nbsp;&nbsp;
+              <Button 
+                onClick={() => setEditConf(false)}
+                variant='outlined' 
+                color='secondary'
+              >
+                No
+              </Button>
+            </DialogContent>
+          </Dialog>
         </form>
        </DialogContent>
        <DialogActions>
