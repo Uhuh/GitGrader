@@ -1,5 +1,5 @@
 import {
-  Button,
+  Button, 
   Card,
   CardActionArea,
   CardContent,
@@ -9,7 +9,8 @@ import {
   DialogContentText, 
   DialogTitle, 
   makeStyles, 
-  Paper, 
+  Paper,
+  Tooltip, 
   Typography
 } from '@material-ui/core';
 import * as React from 'react';
@@ -33,7 +34,8 @@ const Centered = styled.div`
 
 const useStyles = makeStyles({
   actionButton: {
-    color: 'white'
+    color: 'white',
+    margin: '7px'
   }
 });
 
@@ -78,6 +80,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
   const [files, setFiles] = React.useState(false);
   const [uploadConf, setUploadConf] = React.useState(false);
   const [editConf, setEditConf] = React.useState(false);
+  const [deleteCheck, setDeleteCheck] = React.useState(false);
   const year = new Date().getFullYear();
 
   const assign = async () => {
@@ -92,6 +95,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         })
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const unlock = () => {
@@ -100,6 +104,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         .then(() => console.log(`Unlocked ${baseRepo.name}`))
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const lock = () => {
@@ -108,14 +113,17 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         .then(() => console.log(`Locked ${baseRepo.name}`))
         .catch(console.error);
     }
+    setDeleteCheck(false);
     setOpen(false);
   };
   const archive = () => {
     GitLabAPI.archiveAssignment(baseRepo.id)
       .then(() => console.log(`Archived ${baseRepo.name}`))
       .catch(console.error);
+    setDeleteCheck(false);
     setOpen(false);
   };
+
   const upload = (actions: Array<{
     action: string, file_path: string, content: string, encoding: string
     }>) => {
@@ -270,11 +278,28 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
     }
 
     editFiles = editFilesList.join(', ');
+
+  const remove = () => {
+    GitLabAPI.removeAssignment(baseRepo.id)
+      .then(() => console.log(`Removed ${baseRepo.name}`))
+      .catch(console.error);
+    setDeleteCheck(false);
+    setOpen(false);
+  };
+
+  const handleClose = () => {
+    setDeleteCheck(false);
+    setOpen(false);
+  };
+
+  const handleOpen = () => {
+    setDeleteCheck(false);
+    setOpen(true);
   };
 
   return (
     <Paper elevation={3}>
-      <Card onClick={() => setOpen(true)}>
+      <Card onClick={handleOpen}>
         <CardActionArea>
           <ImagePlaceholder colors={color} />
           <CardContent>
@@ -285,37 +310,55 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           </CardContent>
         </CardActionArea>
       </Card>
-      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
+      <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
-          <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Assign</Typography>
-          </Button>
-          &nbsp;&nbsp;
+          <Tooltip title='Give students access to this assignment' placement='top'>
+            <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Assign</Typography>
+            </Button>
+          </Tooltip>
+          <Tooltip title='Unlock all student repo to' placement='top'>
           <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Unlock</Typography>
           </Button>
-          &nbsp;&nbsp;
+          </Tooltip>
+          <Tooltip title='Lock all student repo' placement='top'>
           <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
-          &nbsp;&nbsp;
-          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'> 
+          </Tooltip>
+          <Tooltip title='Archive base repo' placement='top'>
+          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
-          &nbsp;&nbsp;
-          <Button 
-            className={classes.actionButton} 
-            onClick={listRepoFiles} 
-            variant='outlined' 
-            color='primary'
-          > 
-            <Typography color='textSecondary'>Files</Typography>
+          </Tooltip>
+          <Tooltip title='Delete the base repo' placement='top'>
+          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
+            <Typography color='textSecondary'>Delete</Typography>
+            <Dialog
+              open={deleteCheck}
+            >
+              <DialogContent>
+                <DialogContentText>
+                  Are you sure you want to delete this repo?
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleClose} color='primary'>
+                  Cancel
+                </Button>
+                <Button onClick={remove} color='primary'>
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Button>
+          </Tooltip>
         </DialogContent>
         <DialogActions>
           <Button 
-            onClick={() => setOpen(false)}
+            onClick={handleClose}
             variant='outlined' 
             color='secondary'
           >

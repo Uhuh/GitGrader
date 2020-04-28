@@ -22,7 +22,7 @@ GitLabAPI.setHost(JSON.parse(localStorage.getItem('GHdata') || 'null') || 'https
 const CanvasAPI = new Canvas();
 export { CanvasAPI };
 CanvasAPI.setToken(JSON.parse(localStorage.getItem('CTdata') || 'null') || '');
-CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || '');
+CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || ''); 
 
 const Centered = styled.div`
   margin: 0;
@@ -47,14 +47,14 @@ const lightTheme = createMuiTheme({
     primary: grey,
   }
 });
-
+ 
 export const App = () => {
   const [courses, setCourses] = React.useState<ICanvasNamespace[]>();
   const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'dark');
   const relations = JSON.parse(localStorage.getItem('relations') || 'null');
 
   console.log(relations);
-
+ 
   const toggleTheme = () => {
     localStorage.setItem('theme', theme == 'dark' ? 'light' : 'dark');
     setTheme(theme == 'dark' ? 'light' : 'dark');
@@ -99,6 +99,8 @@ export const App = () => {
     // The CanvasAPI won't change so this prevents re-rendering.
   }, [CanvasAPI]);
 
+  const [user, setUser] = React.useState(true);
+ 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
@@ -125,7 +127,7 @@ export const App = () => {
           render={() => <SetUp />}
         />
         <Route 
-          exact 
+          exact  
           path='/course/:courseId' 
           render={({ match }) => {
             // Match will be the course id.

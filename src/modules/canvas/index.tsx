@@ -4,7 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
 import { GitLabAPI } from '..';
-import { CanvasAPI } from '..';
+import { CanvasAPI } from '..'; 
 import { IBaseRepo, ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 
@@ -27,17 +27,17 @@ const useStyles = makeStyles({
   },
   pos: {
     marginBottom: 12,
-  },
+  }, 
   addIcon: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   },
   centerItem: {
-    width: '100%',
+    width: '100%', 
     textAlign: 'center'
-  }
-});
+  } 
+}); 
 
 /**
  * We should be able to pass the course as well.
@@ -52,8 +52,9 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   const [baseRepos, setBaseRepo] = React.useState<IBaseRepo[]>([]);
   const [users, setUsers] = React.useState<IGitUser[]>([]);
   const [open, setOpen] = React.useState(false);
-
-  React.useEffect(() => {
+  const [error, setError] = React.useState(false);
+ 
+  React.useEffect(() => { 
     CanvasAPI.getStudents(course.id)
       .then(s => { // s is all students
         // Need to get all the student's gitlab ids to set up assignments.
@@ -61,7 +62,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
           .then(u => {
             setUsers(
               Array.isArray(u) ? u : [u]
-            );
+            ); 
           })
           // Need to log users that don't have gitlab accounts or tell the user a list somehow.
           .catch(console.error);
@@ -72,21 +73,32 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
   React.useEffect(() => {
     GitLabAPI.getRepos(course.namespace.id, course.section)
       .then(b => {
-        console.log(b)
+        console.log(b);
   	    setBaseRepo(b.base_repos);
       })
     .catch(console.error);
   }, []);
 
   const createAssignment = () => {
-    GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
-      .then(repo => {
-        setBaseRepo([...baseRepos, repo]);
-      })
-      .catch(console.error);
+    if(!assignmentName.includes('-')){
+      GitLabAPI.createBaseRepo(assignmentName, course.namespace.id)
+        .then(repo => {
+          setBaseRepo([...baseRepos, repo]);
+        })
+        .catch(console.error);
+      }
+    else{
+      setError(true); 
+    }
     setOpen(false);
   };
 
+  const dateIndex = course.name.indexOf('SP') != -1 ? course.name.indexOf('SP') : course.name.indexOf('FS');
+  const Semester = course.name.substring(dateIndex,dateIndex+2);
+  const Year = new Date().getFullYear();
+  
+  const Preview  =  Year + '-' + Semester + '-' + course.section+ '-' + assignmentName + '-user';
+  
   return (
     <>
       <Grid
@@ -123,7 +135,7 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Please enter the name of the assignment you are assigning
+            Student repo preview : <b>{Preview}</b>
           </DialogContentText>
           <TextField 
             id='outlined-basic' 
@@ -142,14 +154,29 @@ export const CanvasPage = (props: { course: ICanvasNamespace; }) => {
             Cancel
           </Button>
           <Button
-           onClick={createAssignment} 
+           onClick={createAssignment}
            variant='outlined'
            color='primary'
           >
-            Submit
+            Submit 
           </Button>
+
         </DialogActions>
       </Dialog>
-    </>
-  );
-};
+      <Dialog open={error} onClose={() => setError(false)} aria-labelledby='form-dialog-title'>
+        <DialogContent>
+          <DialogContentText>
+            Assignment name can not contain the character ' - ' 
+          </DialogContentText>
+        </DialogContent>
+        <Button
+           onClick={() => setError(false)} 
+           variant='outlined'
+           color='primary'
+          >
+            Ok
+          </Button>
+      </Dialog>
+    </> 
+  );}; 
+ 

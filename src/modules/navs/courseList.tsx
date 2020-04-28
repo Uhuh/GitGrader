@@ -7,7 +7,8 @@ import {
   DialogTitle, 
   Grid, 
   Link, 
-  makeStyles
+  makeStyles,
+  Typography
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';
@@ -36,7 +37,10 @@ const useStyles = makeStyles({
   centerItem: {
     width: '100%',
     textAlign: 'center'
-  }
+  },
+  actionButton: {
+    color: 'white'
+  } 
 });
 
 export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
@@ -62,7 +66,7 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
         <Grid item xs={3} key={course.id} className={classes.card}>
           <Link component={RouterLink} to={`/course/${course.id}`}>
             <CourseCard course={course} />
-          </Link>
+          </Link> 
         </Grid>
       ))}
       <Grid item xs={3} className={classes.addIcon}>
@@ -87,7 +91,6 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
         </DialogActions>
       </DialogContent>
     </Dialog>
-    </>
+    </> 
   );
 };
- 
