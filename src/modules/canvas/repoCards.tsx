@@ -278,6 +278,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
     }
 
     editFiles = editFilesList.join(', ');
+  };
 
   const remove = () => {
     GitLabAPI.removeAssignment(baseRepo.id)

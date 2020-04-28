@@ -325,9 +325,6 @@ export class GitlabBackend {
    * Deletes files
    */
   deleteFile = (assignment_id: string, file_name: string) => {
-
-    //TO DO: CHANGE TO ALLOW MULTIPLE DELETIONS AT ONCE
-
     return this.request(
       'DELETE',
       `/projects/${assignment_id}/repository/files/${file_name}`,
