@@ -1,5 +1,5 @@
 import { observable } from 'mobx';
-import { GitLabAPI } from '../modules';
+import { GitLabAPI } from '../app';
 import { IGitNamespace } from '../api/interfaces';
 
 export default class BaseRepo {

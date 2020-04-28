@@ -17,7 +17,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { inject, observer } from 'mobx-react';
-import baseRepoStore from '../../stores/BaseRepoStore';
 import BaseRepo from '../../stores/BaseRepo';
 import { GitLabAPI } from '../index';
 

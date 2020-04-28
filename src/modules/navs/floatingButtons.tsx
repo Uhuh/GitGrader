@@ -27,7 +27,7 @@ const BackButton = () => {
     <FloatingTop left>
       <Link 
        component={RouterLink} 
-       onClick={() => {window.location.href = '#/'; window.location.reload();}} 
+       onClick={() => {window.location.href = '#/';}} 
        to='/'>
         <HomeIcon fontSize='large'/>
       </Link>

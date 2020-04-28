@@ -1,10 +1,10 @@
 import { Button, Dialog , DialogActions, DialogContent, 
-  DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography } from '@material-ui/core';
+  DialogContentText, DialogTitle ,Grid , makeStyles, TextField, Typography 
+} from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import PersonIcon from '@material-ui/icons/Person';
 import * as React from 'react';
-import { GitLabAPI } from '..';
-import { CanvasAPI } from '..';
+import { CanvasAPI, GitLabAPI } from '../../app';
 import { ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { RepoCard } from './repoCards';
 import baseRepoStore from '../../stores/BaseRepoStore';

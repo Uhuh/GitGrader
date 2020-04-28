@@ -1,6 +1,6 @@
 import { observable, ObservableMap } from 'mobx';
 import { IRepo } from '../api/interfaces';
-import { GitLabAPI, CanvasAPI } from '../modules';
+import { GitLabAPI, CanvasAPI } from '../app';
 import BaseRepo from './BaseRepo';
 
 export class BaseRepoStore {
@@ -48,10 +48,9 @@ export class BaseRepoStore {
           }
           baseRepos.push(new BaseRepo(
             b.id, b.name, b.ssh_url, b.created_at, b.namespace, user_to_id
-          ));
+            ));
+          this.repos.set(n.id, baseRepos);
         }
-
-        this.repos.set(n.id, baseRepos);
 
         this.usernames.set(c.id, usernames);
 

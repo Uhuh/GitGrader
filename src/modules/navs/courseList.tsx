@@ -15,6 +15,7 @@ import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { ICanvasNamespace } from '../../api/interfaces';
 import { CourseCard } from './courseCard';
+import { inject, observer } from 'mobx-react';
 
 const useStyles = makeStyles({
   card: {
@@ -43,13 +44,17 @@ const useStyles = makeStyles({
   } 
 });
 
-export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
+export const CourseList = 
+inject('RelationStore')
+(observer((props: {courses: ICanvasNamespace[]}) => {
   const classes = useStyles();
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
                       localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
                       localStorage.getItem('CHdata') === '' || localStorage.getItem('GHdata') === '' ||
                       localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
                       ? true : false;
+
+  console.log(props.courses);
 
   return (
     <>
@@ -93,4 +98,4 @@ export const CourseList = (props: {courses: ICanvasNamespace[]}) => {
     </Dialog>
     </> 
   );
-};
+}));
