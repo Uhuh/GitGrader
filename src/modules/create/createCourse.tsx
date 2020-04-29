@@ -1,8 +1,15 @@
-import { Button, createStyles, FormControl, Grid, InputLabel, makeStyles, Paper, Select, Theme, TextField } from '@material-ui/core';
+import { Button, createStyles, FormControl, Grid, InputLabel, makeStyles, Paper, Select, Theme, TextField, withStyles } from '@material-ui/core';
 import LinkIcon from '@material-ui/icons/Link';
 import * as React from 'react';
 import { ICanvasClass, IGitNamespace } from '../../api/interfaces';
 import {CanvasAPI, GitLabAPI} from '../../modules';
+
+const MainGrid = withStyles({
+  root: {
+    position: 'absolute',
+    top: '400px'
+  }
+})(Grid);
 
 export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
   const [courses, setCourses] = React.useState<ICanvasClass[]>();
@@ -52,85 +59,87 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
   }, [GitLabAPI]);
 
   return (
-    <Grid
+    <MainGrid
       container
-      spacing={0}
       direction='column'
-      alignItems='center'
       justify='center'
-      style={{ minHeight: '100vh' }}
+      alignItems='center'
+      spacing={3}
     >
-      <Grid item xs={3} style={{ minHeight: '70vh', minWidth: '60vh' }}>
-        <Paper elevation={3} style={{ minHeight: '70vh', minWidth: '60vh', padding: '20px'}}>
-          <Grid item>
-            <FormControl>
-              <InputLabel id='canvasIDlabel'>Canvas ID</InputLabel>
-              <Select
-                native
-                onChange={handleChangeCourse}
-                label='canvasIDlabel'
-                value={selectedCourse}
-                inputProps={{
-                  id: 'canvasID'
-                }}
-                >
-                {
-                  courses ? courses.map(course => (
-                    <option key={course.id} value={course.id}>
-                      {course.name}
-                    </option>
-                  )) : 
+      <Grid
+        container
+        direction='row'
+        justify='center'
+        spacing={3}
+      >
+        <Grid item>
+          <FormControl style={{width: 200}}>
+            <InputLabel id='canvasIDlabel'>Canvas ID</InputLabel>
+            <Select
+              native
+              labelWidth={20}
+              onChange={handleChangeCourse}
+              value={selectedCourse}
+              inputProps={{
+                id: 'canvasID'
+              }}
+            >
+              {
+                courses ? courses.map(course => (
+                  <option key={course.id} value={course.id}>
+                    {course.name}
+                  </option>
+                )) :
                   <option key='null' value='null'>
                     "No courses found"
+                      </option>
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item>
+          <LinkIcon fontSize='large'/>
+        </Grid>
+        <Grid item>
+          <FormControl style={{ width: 200 }}>
+            <InputLabel id='githubIDlabel'>Gitlab ID</InputLabel>
+            <Select
+              native
+              labelWidth={20}
+              onChange={handleChangeNamespace}
+              value={selectedNamespace}
+              inputProps={{
+                id: 'gitlabID'
+              }}
+            >
+              {
+                namespaces ? namespaces.map(namespace => (
+                  <option key={namespace.id} value={namespace.id}>
+                    {namespace.name}
                   </option>
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <LinkIcon />
-          </Grid>
-          <Grid item>
-            <FormControl>
-              <InputLabel id='githubIDlabel'>Gitlab ID</InputLabel>
-              <Select
-                native
-                onChange={handleChangeNamespace}
-                label='githubIDlabel'
-                value={selectedNamespace}
-                inputProps={{
-                  id: 'gitlabID'
-                }}
-                >
-                {
-                  namespaces ? namespaces.map(namespace => (
-                    <option key={namespace.id} value={namespace.id}>
-                      {namespace.name}
-                    </option>
-                  )) :
+                )) :
                   <option key='null' value='null'>
-                      "No namespaces found"
-                  </option>
-                })}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item>
-            <TextField
-              type='text'
-              label='Class Section'
-              onChange={e => setSection(e.target.value)}
-            />
-          </Grid>
-          <Grid item>
-            <FormControl>
-              <Button onClick={handleSubmit} type='submit'>
-                Create
-              </Button>
-            </FormControl>
-          </Grid>
-        </Paper>
+                    "No namespaces found"
+                    </option>
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
-    </Grid>
+      <Grid item>
+        <TextField
+          type='text'
+          label='Class Section'
+          onChange={e => setSection(e.target.value)}
+        />
+      </Grid>
+      <Grid item>
+        <FormControl>
+          <Button onClick={handleSubmit} type='submit'>
+            Create
+              </Button>
+        </FormControl>
+      </Grid>
+    </MainGrid>
   );
 };
