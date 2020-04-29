@@ -1,7 +1,8 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, 
-         FormControl, Grid, InputLabel, Popover, TextField, Typography } from '@material-ui/core';
+         FormControl, Grid, Popover, TextField, Typography } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
+import { GitLabAPI, CanvasAPI } from '../../app';
 
 /*
 THINGS TO DO:
@@ -98,6 +99,12 @@ export const SetUp = () => {
       localStorage.setItem('CTdata', JSON.stringify(canvasToken));}
     if(gitlabToken.length != 0){
       localStorage.setItem('GTdata', JSON.stringify(gitlabToken));}
+    
+    GitLabAPI.setHost(gitlabHost);
+    GitLabAPI.setToken(gitlabToken);
+    CanvasAPI.setToken(canvasToken);
+    CanvasAPI.setUrl(canvasHost);
+    
     setCanvasHost('');
     setGitlabHost('');
     setCanvasToken('');

@@ -7,8 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
-    "start": "yarn build && electron ./dist/electron.js",
-    "view": "electron ./dist/electron.js"
+    "start": "yarn build && electron ./dist/electron.js"
   },
   "dependencies": {
     "@material-ui/core": "^4.9.5",
@@ -20,7 +19,10 @@
     "@types/styled-components": "^5.0.1",
     "axios": "^0.19.2",
     "components": "^0.1.0",
+    "mobx": "^5.15.4",
+    "mobx-react": "^6.2.2",
     "node": "^13.7.0",
+    "react-mobx": "^0.0.4",
     "react-router-dom": "^5.1.2",
     "styled": "^1.0.0",
     "styled-components": "^5.0.1"

@@ -3,26 +3,13 @@ import grey from '@material-ui/core/colors/grey';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import * as React from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
-import styled from 'styled-components';
-import { CanvasBackend as Canvas, GitlabBackend as GL } from '../api';
-import { ICanvasNamespace } from '../api/interfaces';
 import { CanvasPage } from './canvas';
 import { CreateCourse } from './create/createCourse';
 import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
 import { SetUp } from './settings';
-
-/**
- * Make sure to use your token for testing. Might want to use an .env file for this
- */
-const GitLabAPI = new GL();
-export { GitLabAPI };
-GitLabAPI.setToken(JSON.parse(localStorage.getItem('GTdata') || 'null') || '');
-GitLabAPI.setHost(JSON.parse(localStorage.getItem('GHdata') || 'null') || 'https://gitlab.com');
-
-const CanvasAPI = new Canvas();
-export { CanvasAPI };
-CanvasAPI.setToken(JSON.parse(localStorage.getItem('CTdata') || 'null') || '');
-CanvasAPI.setUrl(JSON.parse(localStorage.getItem('CHdata') || 'null') || ''); 
+import { inject, observer } from 'mobx-react';
+import relationStore from '../stores/RelationStore';
+import styled from 'styled-components';
 
 const Centered = styled.div`
   margin: 0;
@@ -31,7 +18,6 @@ const Centered = styled.div`
   left: 50%;
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  text-align: center;
 `;
 
 const darkTheme = createMuiTheme({
@@ -47,60 +33,18 @@ const lightTheme = createMuiTheme({
     primary: grey,
   }
 });
- 
-export const App = () => {
-  const [courses, setCourses] = React.useState<ICanvasNamespace[]>();
-  const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'dark');
-  const relations = JSON.parse(localStorage.getItem('relations') || 'null');
 
-  console.log(relations);
- 
+export const App = 
+inject('RelationStore')
+(observer(
+() => {
+  const [theme, setTheme] = React.useState(localStorage.getItem('theme') || 'dark');
+
   const toggleTheme = () => {
     localStorage.setItem('theme', theme == 'dark' ? 'light' : 'dark');
     setTheme(theme == 'dark' ? 'light' : 'dark');
   };
 
-  //Used for debugging local storage/rerouting
-  //localStorage.clear();
-
-  React.useEffect(() => {
-    GitLabAPI.getNamespaces()
-      .then(namespaces => {
-        CanvasAPI.getClasses()
-          .then(classes => {
-            let connections: ICanvasNamespace[] = [];
-            for(const c of classes) {
-              if(relations[c.id]) {
-                const info = relations[c.id];
-                const n = namespaces.find(n => n.id == info.gitlabID);
-                if (!n) {
-                  continue;
-                }
-                connections = [
-                  ...connections,
-                  {
-                    ...c,
-                    section: info.section,
-                    namespace: {
-                      id: n.id,
-                      name: n.name,
-                      path: n.path
-                    }
-                  }
-                ];
-              }
-            }
-            setCourses(connections);
-          })
-          .catch(console.error);
-      })
-      .catch(console.error);
-      
-    // The CanvasAPI won't change so this prevents re-rendering.
-  }, [CanvasAPI]);
-
-  const [user, setUser] = React.useState(true);
- 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />
@@ -112,7 +56,7 @@ export const App = () => {
           exact
           path='/'
           key='courses'
-          render={() => <CourseList courses={courses || []}/>}
+          render={() => <CourseList courses={relationStore.all() || []}/>}
         />
         <Route
           exact
@@ -130,12 +74,12 @@ export const App = () => {
           exact  
           path='/course/:courseId' 
           render={({ match }) => {
-            // Match will be the course id.
-            if (!courses || courses.length === 0) {
-              return (<div>How did you get here? Wacky.</div>);
+            const course = relationStore.get(match.params.courseId);
+
+            if(!course) {
+              return (<Centered>Course not found.</Centered>);
             }
-            
-            const course = courses.find(c => c.id == match.params.courseId);
+
             return (
               <CanvasPage { ...match.params } course={course} />
             );
@@ -152,4 +96,4 @@ export const App = () => {
       </Switch>
     </ThemeProvider>
   );
-};
+}));

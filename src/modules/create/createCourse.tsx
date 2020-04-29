@@ -2,7 +2,7 @@ import { Button, createStyles, FormControl, Grid, InputLabel, makeStyles, Paper,
 import LinkIcon from '@material-ui/icons/Link';
 import * as React from 'react';
 import { ICanvasClass, IGitNamespace } from '../../api/interfaces';
-import {CanvasAPI, GitLabAPI} from '../../modules';
+import {CanvasAPI, GitLabAPI} from '../../app';
 
 const MainGrid = withStyles({
   root: {
@@ -39,7 +39,6 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
       gitlabID: selectedNamespace
     };
     localStorage.setItem('relations', JSON.stringify(temp));
-    console.log(temp);
   };
   
   React.useEffect(() => {

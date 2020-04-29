@@ -27,7 +27,6 @@
     "no-angle-bracket-type-assertion": true,
     "no-boolean-literal-compare": true,
     "no-unnecessary-callback-wrapper": true,
-    "ordered-imports": true,
     "space-before-function-paren": true,
     "space-within-parens": true,
     "indent": true,

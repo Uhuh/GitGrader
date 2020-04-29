@@ -6,31 +6,25 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText, 
-  DialogTitle, 
+  DialogTitle,
+  Grid,
   makeStyles, 
   Paper,
   Tooltip, 
-  Typography
+  Typography,
+  DialogContentText
 } from '@material-ui/core';
 import * as React from 'react';
 import styled from 'styled-components';
-import { GitLabAPI } from '..';
-import { IBaseRepo, ICanvasNamespace, ICanvasUser, IGitUser } from '../../api/interfaces';
+import { ICanvasNamespace, IGitUser } from '../../api/interfaces';
+import { inject, observer } from 'mobx-react';
+import BaseRepo from '../../stores/BaseRepo';
+import baseRepoStore from '../../stores/BaseRepoStore';
+import { GitLabAPI } from '../../app';
 
 const SpacePadding = styled.div`
   margin-bottom: 20px;
 `;
-
-const Centered = styled.div`
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-`;
-
 
 const useStyles = makeStyles({
   actionButton: {
@@ -66,63 +60,28 @@ const ImagePlaceholder = styled.div<IProps>`
   height: 140px;
 `;
 
-let filesList = '';
-let uploadFilesList: Array<string> = [];
-let editFilesList: Array<string> = [];
-let uploadFiles: string;
-let editFiles: string;
+export const RepoCard = 
+  inject('BaseRepoStore')
+  (observer((props: {
+    baseRepo: BaseRepo, 
+    users: IGitUser[], 
+    course: ICanvasNamespace }
+  ) => {
 
-export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course: ICanvasNamespace }) => {
   const classes = useStyles();
   const { baseRepo, users, course } = props;
-  const color = colors[Number(props.baseRepo.id) % 11];
+  const color = colors[Number(baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
   const [files, setFiles] = React.useState(false);
+  const [filesNames, setFileNames] = React.useState([]);
   const [uploadConf, setUploadConf] = React.useState(false);
   const [editConf, setEditConf] = React.useState(false);
   const [deleteCheck, setDeleteCheck] = React.useState(false);
+  const [uploadFiles, setUpload] = React.useState<string[]>();
+  const [updateFiles, setUpdate] = React.useState<string[]>();
+  const [help, setHelp] = React.useState(false);
+  const [nuke, setNuke] = React.useState(false);
   const year = new Date().getFullYear();
-
-  const assign = async () => {
-    for (const user of users) {
-      await GitLabAPI.createAssignment(baseRepo, course.section, `${year}-SP`, user.username)
-        .then(repo => {
-          GitLabAPI.assignAssignment(repo.id, user.id)
-            .then(() => {
-              console.log(`Created repo ${repo.name} for ${user.username}`);
-            })
-            .catch(console.error);
-        })
-        .catch(console.error);
-    }
-    setDeleteCheck(false);
-    setOpen(false);
-  };
-  const unlock = () => {
-    for (const user of users) {
-      GitLabAPI.unlockAssignment(baseRepo.id, user.id)
-        .then(() => console.log(`Unlocked ${baseRepo.name}`))
-        .catch(console.error);
-    }
-    setDeleteCheck(false);
-    setOpen(false);
-  };
-  const lock = () => {
-    for (const user of users) {
-      GitLabAPI.lockAssignment(baseRepo.id, user.id)
-        .then(() => console.log(`Locked ${baseRepo.name}`))
-        .catch(console.error);
-    }
-    setDeleteCheck(false);
-    setOpen(false);
-  };
-  const archive = () => {
-    GitLabAPI.archiveAssignment(baseRepo.id)
-      .then(() => console.log(`Archived ${baseRepo.name}`))
-      .catch(console.error);
-    setDeleteCheck(false);
-    setOpen(false);
-  };
 
   const upload = (actions: Array<{
     action: string, file_path: string, content: string, encoding: string
@@ -132,6 +91,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
       .catch(console.error);
     setOpen(false);
   };
+
   const edit = (actions: Array<{
     action: string, file_path: string, content: string, encoding: string
     }>) => {
@@ -143,9 +103,9 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
 
   const convertBase64Upload = () => {
     const file = document.getElementById('file-upload') as HTMLInputElement;
-    let actionsArray: Array<{
+    const actionsArray: {
       action: string, file_path: string, content: string, encoding: string
-      }> = [];
+      }[] = [];
     
     if(file.files) {
       for(let i = 0; i < file.files.length; i++) {
@@ -166,16 +126,16 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
 
   const convertBase64Edit = () => {
     const file = document.getElementById('file-edit') as HTMLInputElement;
-    let actionsArray: Array<{
+    const actionsArray: {
       action: string, file_path: string, content: string, encoding: string
-      }> = [];
+      }[] = [];
     
-    if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          const file_item = file.files.item(i) as File;
-          actionsArray.push(readerSetup(file_item, 'update'));
-        }
+    if(file.files && updateFiles) {
+      const files = Array.from(file.files)
+        .filter(f => updateFiles.indexOf(f.name) !== -1);
+
+      for(const f of files) {
+        actionsArray.push(readerSetup(f, 'update'));
       }
     }
 
@@ -188,7 +148,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
   };
 
   const readerSetup = (file: File, choice: string) => {
-    let action = {
+    const action = {
       action: `${choice}`,
       file_path: '',
       content: '',
@@ -215,86 +175,77 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
     return action;
   };
 
-  const listRepoFiles = () => {
-    setFiles(true);
-
-    GitLabAPI.listFiles(baseRepo.id)
+  const listRepoFiles = async () => {
+    await GitLabAPI.listFiles(baseRepo.id)
       .then(() => console.log(`Listing files`))
       .catch(console.error);
-
+    
     const files = JSON.parse(localStorage.getItem('filesList') || 'null');
     
-    for(let i = 0; i < files.length; i++){
-      console.log(files[i]);
-    }
+    const names = files[baseRepo.id] ? files[baseRepo.id].names : [];
 
-    filesList = files.join(', ');
-    console.log(filesList);
+    setFiles(true);
+    setOpen(false);
+    setFileNames(names);
   };
 
   const listUploadFiles = () => {
-    setUploadConf(true);
-    uploadFilesList = [];
-    uploadFiles = '';
-
+    
     const file = document.getElementById('file-upload') as HTMLInputElement;
-    let file_item;
-    let file_name: string;
-
+    
     if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          file_item = file.files.item(i);
-          if(file_item) {
-            file_name = file_item.name;
-            uploadFilesList.push(file_name);
-          }
-        }
-      }
+      setUploadConf(true);
+      setUpload(
+        Array.from(file.files)
+          .map(f => f.name)
+      );
     }
-
-    uploadFiles = uploadFilesList.join(', ');
   };
 
   const listUpdateFiles = () => {
-    setEditConf(true);
-    editFilesList = [];
-    editFiles = '';
-
+    
     const file = document.getElementById('file-edit') as HTMLInputElement;
-    let file_item;
-    let file_name: string;
+    const files = JSON.parse(localStorage.getItem('filesList') || 'null');    
+    const names: string[] = files[baseRepo.id] ? files[baseRepo.id].names : [];
 
     if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          file_item = file.files.item(i);
-          if(file_item) {
-            file_name = file_item.name;
-            editFilesList.push(file_name);
-          }
-        }
+      const files_in_repo = Array.from(file.files)
+        .filter(f => names.indexOf(f.name) !== -1)
+        .map(f => f.name);
+
+      if(files_in_repo.length) {
+        setEditConf(true);
+        setUpdate(files_in_repo);
       }
     }
-
-    editFiles = editFilesList.join(', ');
   };
 
+  /**
+   * @TODO - Add toasties for success / errors.
+   */
   const remove = () => {
-    GitLabAPI.removeAssignment(baseRepo.id)
-      .then(() => console.log(`Removed ${baseRepo.name}`))
-      .catch(console.error);
+    baseRepoStore.delete(baseRepo);
+    
     setDeleteCheck(false);
     setOpen(false);
   };
 
-  const handleClose = () => {
-    setDeleteCheck(false);
+  const nukeAll = () => {
+    baseRepoStore.nuke(baseRepo)
+      .catch(console.error);
+
+    setNuke(false);
     setOpen(false);
+  };
+
+  const handleNuke = () => {
+    setNuke(false);
+    setOpen(true);
   };
 
   const handleOpen = () => {
     setDeleteCheck(false);
+    setNuke(false);
     setOpen(true);
   };
 
@@ -304,67 +255,105 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         <CardActionArea>
           <ImagePlaceholder colors={color} />
           <CardContent>
-            <Typography variant='h6'>{props.baseRepo.name}</Typography>
+            <Typography variant='h6'>{baseRepo.name}</Typography>
             <Typography color='textSecondary'>
               Created: {baseRepo.created_at}
             </Typography>
           </CardContent>
         </CardActionArea>
       </Card>
-      <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
-          <Tooltip title='Give students access to this assignment' placement='top'>
-            <Button className={classes.actionButton} onClick={assign} variant='outlined' color='primary'>
-              <Typography color='textSecondary'>Assign</Typography>
-            </Button>
-          </Tooltip>
-          <Tooltip title='Unlock all student repo to' placement='top'>
-          <Button className={classes.actionButton} onClick={unlock} variant='outlined' color='primary'>
+          <Button 
+            className={classes.actionButton} 
+            onClick={async () => {
+              // If we DON'T await this, then there's a possibility of failing to create.
+              for(const u of users) {
+                await baseRepo.createAssignment(course.section, `${year}-SP`, u.username);
+              }
+            }} 
+            variant='outlined' 
+            color='primary'
+          >
+            <Typography color='textSecondary'>Create</Typography>
+          </Button>
+          <Button 
+            className={classes.actionButton} 
+            onClick={() => {
+              // Currently assigns all students.
+              baseRepo.assign()
+                .catch(console.error);
+            }} 
+            variant='outlined' 
+            color='primary'
+          >
+            <Typography color='textSecondary'>Assign</Typography>
+          </Button>
+          <Button 
+            className={classes.actionButton} 
+            onClick={() => {
+              for(const u of users) {
+                baseRepo.unlock(u.id);
+              }
+            }}
+            variant='outlined' 
+            color='primary'
+          >
             <Typography color='textSecondary'>Unlock</Typography>
           </Button>
-          </Tooltip>
-          <Tooltip title='Lock all student repo' placement='top'>
-          <Button className={classes.actionButton} onClick={lock} variant='outlined' color='primary'>
+          <Button 
+            className={classes.actionButton} 
+            onClick={() => {
+              for(const u of users) {
+                baseRepo.lock(u.id);
+              }
+            }} 
+            variant='outlined' 
+            color='primary'
+          >
             <Typography color='textSecondary'>Lock</Typography>
           </Button>
-          </Tooltip>
-          <Tooltip title='Archive base repo' placement='top'>
-          <Button className={classes.actionButton} onClick={archive} variant='outlined' color='primary'>
+          <Button 
+            className={classes.actionButton} 
+            onClick={() => {
+              baseRepo.archive();
+            }} 
+            variant='outlined' 
+            color='primary'
+          >
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
-          </Tooltip>
           <Tooltip title='Show repo files and actions' placement='top'>
-          <Button className={classes.actionButton} onClick={listRepoFiles} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Files</Typography>
-          </Button>
+            <Button className={classes.actionButton} onClick={listRepoFiles} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Files</Typography>
+            </Button>
           </Tooltip>
           <Tooltip title='Delete the base repo' placement='top'>
-          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Delete</Typography>
-            <Dialog
-              open={deleteCheck}
+            <Button className={classes.actionButton} onClick={()=> {
+              setDeleteCheck(true);
+              setOpen(false);
+            }} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Delete</Typography>
+            </Button>
+          </Tooltip>
+          <Tooltip title='Delete the base and all student repos' placement='top'>
+            <Button 
+              className={classes.actionButton} 
+              onClick={()=> {
+                setNuke(true);
+                setOpen(false);
+              }} 
+              variant='outlined' 
+              color='primary'
             >
-              <DialogContent>
-                <DialogContentText>
-                  Are you sure you want to delete this repo?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose} color='primary'>
-                  Cancel
-                </Button>
-                <Button onClick={remove} color='primary'>
-                  Delete
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Button>
+              <Typography color='textSecondary'>Nuke</Typography>
+            </Button>
           </Tooltip>
         </DialogContent>
         <DialogActions>
           <Button 
-            onClick={handleClose}
+            onClick={() => setOpen(false)}
             variant='outlined' 
             color='secondary'
           >
@@ -372,22 +361,107 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={files} onClose={() => setFiles(false)} aria-labelledby='files-dialog-title'> 
-       <DialogTitle id='files-dialog-title'>{baseRepo.name} Files</DialogTitle>
-       <DialogContent>
-        <Typography variant='subtitle2'>{filesList}</Typography>
+      <Dialog
+        open={deleteCheck}
+        onClose={() => {
+          setDeleteCheck(false);
+          setOpen(true);
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this repo?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setDeleteCheck(false);
+            setOpen(true);
+          }} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={remove} color='primary'>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={nuke}
+        onClose={() => {
+          setNuke(false);
+          setOpen(true);
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove this and all student repos?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNuke} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={nukeAll} color='primary'>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={files} onClose={() => {setFiles(false); setOpen(true);}} aria-labelledby='files-dialog-title'> 
+       <DialogTitle id='files-dialog-title'>Files in {baseRepo.name}</DialogTitle>
+       <DialogContent dividers>
+        {
+          filesNames.length ? 
+          filesNames.map(f => (
+            <div key={`${f}-div`}>
+              <Typography color='textSecondary' variant='subtitle1' key={f}>{f}</Typography>
+              <br/>
+            </div>
+          )) :
+          <Typography variant='subtitle2'>No files in this repo.</Typography>
+        }
         <SpacePadding></SpacePadding>
         <form>
-          <input type='file' id='file-upload' multiple/>
+          <input type='file' id='file-upload' multiple style={{display: 'none'}}/>
+          <label htmlFor='file-upload'>
+            <Button variant='contained' color='primary' component='span'>
+              Choose files
+            </Button>
+          </label>
           <Button className={classes.actionButton} onClick={listUploadFiles} variant='outlined' color='primary'> 
-            Upload
+            <Typography color='textSecondary'>Upload</Typography>
+          </Button>
+          <br/>
+          <input type='file' id='file-edit' multiple style={{display: 'none'}}/>
+          <label htmlFor='file-edit'>
+            <Button variant='contained' color='primary' component='span'>
+              Choose files
+            </Button>
+          </label>
+          <Button 
+            className={classes.actionButton} 
+            onClick={listUpdateFiles} 
+            variant='outlined' 
+            color='primary'
+          >
+            <Typography color='textSecondary'>Update</Typography>
           </Button>
           <Dialog open={uploadConf} onClose={() => setUploadConf(false)}>
-            <DialogContent>
-              <Typography variant='subtitle2'>
-                Upload {uploadFiles} to {baseRepo.name}?
-              </Typography>
-              <Button className={classes.actionButton} onClick={convertBase64Upload} variant='outlined' color='primary'> 
+            <DialogTitle>{'Are you sure you want to upload these files?'}</DialogTitle>
+            <DialogContent dividers>
+                {
+                  uploadFiles ? 
+                  uploadFiles.map(f => (<Typography variant='subtitle2' key={f}>{f}</Typography>)) :
+                  <div>No files to upload.</div>
+                }
+            </DialogContent>
+            <DialogContent dividers>
+              <Button 
+                className={classes.actionButton} 
+                onClick={convertBase64Upload} 
+                variant='outlined' 
+                color='primary'
+              > 
                 Yes
               </Button>
               &nbsp;&nbsp;
@@ -403,16 +477,22 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
         </form>
         <SpacePadding></SpacePadding>
         <form>
-          <input type='file' id='file-edit' multiple/>
-          <Button className={classes.actionButton} onClick={listUpdateFiles} variant='outlined' color='primary'> 
-            Update
-          </Button>
           <Dialog open={editConf} onClose={() => setEditConf(false)}>
-            <DialogContent>
-              <Typography variant='subtitle2'>
-                Update {editFiles} in {baseRepo.name}?
-              </Typography>
-              <Button className={classes.actionButton} onClick={convertBase64Edit} variant='outlined' color='primary'> 
+            <DialogTitle>{'Are you sure you want to update these files?'}</DialogTitle>
+            <DialogContent dividers>
+                {
+                  updateFiles ? 
+                  updateFiles.map(f => (<Typography variant='subtitle2' key={f}>{f}</Typography>)) :
+                  <div>No files to update.</div>
+                }
+            </DialogContent>
+            <DialogContent dividers>
+              <Button 
+                className={classes.actionButton} 
+                onClick={convertBase64Edit} 
+                variant='outlined' 
+                color='primary'
+              > 
                 Yes
               </Button>
               &nbsp;&nbsp;
@@ -427,16 +507,7 @@ export const RepoCard = (props: {baseRepo: IBaseRepo, users: IGitUser[], course:
           </Dialog>
         </form>
        </DialogContent>
-       <DialogActions>
-        <Button 
-          onClick={() => setFiles(false)}
-          variant='outlined' 
-          color='secondary'
-        >
-          Close
-        </Button>
-       </DialogActions>
       </Dialog>
     </Paper>
   );
-};
+}));

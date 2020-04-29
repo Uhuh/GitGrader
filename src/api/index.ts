@@ -2,13 +2,22 @@ import axios, { AxiosRequestConfig } from 'axios';
 import {
   GitAccess,
   GitVisibility,
-  IBaseRepo,
   ICanvasClass,
   ICanvasUser,
   IGitNamespace,
   IGitRepo,
-  IGitUser
+  IGitUser,
+  IRepo,
+  IStudentRepo
 } from './interfaces';
+
+/**
+ * Overloads for getUser
+ */
+type IOverLoad = {
+  (username: string): Promise<IGitUser>;
+  (username: string[]): Promise<IGitUser[]>;
+};
 
 /**
  * @class GitlabBackend
@@ -38,8 +47,6 @@ export class GitlabBackend {
   getNamespaces = async (): Promise<IGitNamespace[]> => {
     const namespaces = await this.request('GET', '/namespaces', {});
 
-    console.log(namespaces);
-
     return new Promise(res => {
       if(!namespaces) {
         res();
@@ -55,15 +62,22 @@ export class GitlabBackend {
    * @param namespace_id ID that belongs to a course.
    * @param section The course section id. EG: 101 for "CS 1570 (101)"
    */
-  getRepos = async (namespace_id: string, section: string): 
-    Promise<{ base_repos: IBaseRepo[], student_repos: Map<string, string>}> => {
+  getRepos = async (namespace_id: string): 
+    Promise<{ 
+      base_repos: IRepo[], 
+      student_repos: IRepo[], 
+      user_to_ass_id?: Map<string, string[][]> 
+    }> => {
     /**
      * For now the hacky method. Assume no base repo will have the course section
      * in the name.
      */
-    let projects: any = [];
-    let base_projects: any = [];
-    const student_repos = new Map<string, string>();
+    let projects: IRepo[] = [];
+    let base_projects: IRepo[] = [];
+    let student_repos: IRepo[] = [];
+    const user_to_ass_id = new Map();
+    // Basically, `currentYear-semester-section-homework-username`
+    const S_Repo = new RegExp(`((${new Date().getFullYear()})-(SP|FS|SS)-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+)`);
     
     // We're limited by how many repos we can grab so we gotta do by page. :(
     for(let i = 1; i <= 10; i++) {
@@ -81,18 +95,23 @@ export class GitlabBackend {
       .filter((p: any) => p.namespace.id == namespace_id);
 
     for(const n of namespace_projects) {
-      if (n.name.includes(section)) {
-        student_repos.set(n.name, n.id);
+      if (S_Repo.test(n.name)) {
+        const parts: string[] = n.name.split('-');
+        student_repos = [...student_repos, n];
+        // base_repo_name -> <username, student repo id>
+        const previous_users = user_to_ass_id.get(parts[3]) || [];
+        user_to_ass_id.set(parts[3], [ ...previous_users, [parts[4], n.id]]);
       } else {
         base_projects = [...base_projects, n];
       }
     }
-
+    
     return new Promise((res, rej) => {
       if (!base_projects || base_projects.length === 0) {  
         res({
           base_repos: [],
-          student_repos
+          student_repos,
+          user_to_ass_id
         });
       }
 
@@ -102,14 +121,17 @@ export class GitlabBackend {
             id: b.id,
             name: b.name,
             created_at: new Date(b.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
-            namespace: {
-              id: b.namespace.id,
-              name: b.namespace.name,
-              path: b.namespace.path
-            },
+            namespace: b.namespace,
             ssh_url: b.ssh_url_to_repo
           })),
-          student_repos
+          student_repos: student_repos.map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            created_at: new Date(s.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
+            namespace: s.namespace,
+            ssh_url: s.ssh_url_to_repo
+          })),
+          user_to_ass_id
         }
       );
     });
@@ -120,7 +142,7 @@ export class GitlabBackend {
   createBaseRepo = async (
     name: string,
     namespace_id: string
-  ): Promise<IBaseRepo> => {
+  ): Promise<IRepo> => {
     // Initialize with readme so we can create student repos
     // without needing any commits.
     const params = {
@@ -154,8 +176,8 @@ export class GitlabBackend {
         name: base_repo.name,
         created_at: new Date(base_repo.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
         namespace: {
-          name: base_repo.namespace.name,
           id: base_repo.namespace.id,
+          name: base_repo.namespace.name,
           path: base_repo.namespace.path
         },
         ssh_url: base_repo.ssh_url_to_repo
@@ -168,17 +190,18 @@ export class GitlabBackend {
    * When creating more than one at a time, make sure to await it so there are no id conflicts
    * @returns The git links to clone with.
    */
-  createAssignment = async (
-    base_repo: IBaseRepo,
+  create = async (
+    base_repo: IRepo,
+    namespace: IGitNamespace,
     section: string,
     semester: string,
     username: string
   ): Promise<IGitRepo> => {    
     const params = {
       name: this.build_name(semester, section, base_repo.name, username),
-      namespace: base_repo.namespace.path,
+      namespace: namespace.path,
       namespace_id: base_repo.namespace.id,
-      namespace_path: `${this.gitlab_host}/${base_repo.namespace.name}`,
+      namespace_path: `${this.gitlab_host}/${namespace.name}`,
       path: this.build_name(semester, section, base_repo.name, username)
     };
     // POST request to gitlab's projects to create a user repo in the selected group. (namespace)
@@ -211,7 +234,7 @@ export class GitlabBackend {
    *
    * @returns Promise<any> // figure out types
    */
-  assignAssignment = async (assignment_id: string, user_id: string): Promise<any> => {
+  assign = async (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -244,19 +267,19 @@ export class GitlabBackend {
   /**
    * Archive project, helps clean users repo list
    */
-  archiveAssignment = (assignment_id: string): Promise<any> => {
+  archive = (assignment_id: string): Promise<any> => {
     return this.request('POST', `/projects/${assignment_id}/archive`, {});
   }
   /**
    * Delete project, remove unnecessary repo
    */
-  removeAssignment = (assignment_id: string): Promise<any> => {
+  remove = (assignment_id: string): Promise<any> => {
     return this.request('DELETE', `/projects/${assignment_id}`, {});
   }
   /**
    * Give a user reporter access to a project
    */
-  lockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
+  lock = (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -272,7 +295,7 @@ export class GitlabBackend {
   /**
    * Give a user developer access to a project.
    */
-  unlockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
+  unlock = (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -288,9 +311,9 @@ export class GitlabBackend {
   /**
    * Uploads files to repo
    */
-  uploadFile = (assignment_id: string, actionsArray: Array<{
+  uploadFile = (assignment_id: string, actionsArray: {
     action: string, file_path: string, content: string, encoding: string
-    }>): Promise<any> => {
+    }[]): Promise<any> => {
     const params = {
       branch: 'master',
       commit_message: `Initial upload`,
@@ -306,9 +329,9 @@ export class GitlabBackend {
   /**
    * Allows editing of repo files' content
    */
-  editFile = (assignment_id: string, actionsArray: Array<{
+  editFile = (assignment_id: string, actionsArray: {
     action: string, file_path: string, content: string, encoding: string
-    }>): Promise<any> => {
+    }[]): Promise<any> => {
     const params = {
       branch: 'master',
       commit_message: `Updated file`,
@@ -347,41 +370,48 @@ export class GitlabBackend {
       {}
     );
     
-    const fileNames = new Array();
+    const temp = JSON.parse(localStorage.getItem('filesList') || '{}');
 
-    for(let i = 0; i < files.length; i++){
-      fileNames.push(files[i].name);
-    }
+    temp[assignment_id] = {
+      names: files.map(f => f.name)
+    };
 
-    localStorage.setItem('filesList', JSON.stringify(fileNames));
+    localStorage.setItem('filesList', JSON.stringify(temp));
   }
   /**
    * Get user_id from username
    * @returns user_id for whoever
    * @throws if user is not found.
    */
-  getUser = async (student: ICanvasUser | ICanvasUser[]): Promise<IGitUser | IGitUser[]> => {
-
+  getUser:IOverLoad = async (username: any): Promise<any> => {
     let users: any = [];
+    let user: any = null;
     
-    if (Array.isArray(student) && student.length) {
-      for (const s of student) {
+    if (Array.isArray(username) && username.length) {
+      for (const u of username) {
         const user =  await this.request(
             'GET', 
             '/users', 
-            { 'search': s.sis_user_id }
+            { 'search': u }
         );
         users = [...users, ...user];
       }
+    } else {
+      users =  await this.request(
+        'GET', 
+        '/users', 
+        { 'search': username }
+      );
+      user = users[0];
     }
 
     return new Promise((res, rej) => {
       if(!users || !users.length) {
-        rej(`Could not find GitLab accounts`);
+        rej(`Could not find GitLab accounts for ${username}`);
       }
 
       res(
-        Array.isArray(users) ?
+        (user === null && Array.isArray(users)) ?
         users.map(u => (
           {
             id: u.id,
@@ -389,7 +419,13 @@ export class GitlabBackend {
             username: u.username,
             avatar_url: u.avatar_url
           }
-        )) : users
+        )) : 
+        {
+          id: user.id,
+          name: user.name,
+          username: user.username,
+          avatar_url: user.avatar_url
+        }
       );
     });
   }
@@ -552,7 +588,7 @@ export class CanvasBackend {
       // We don't want teachers
       res(
         people.filter((p: any) =>
-          p.role !== 'TaEnrollment' && p.role !== 'TeacherEnrollment'
+          p.type !== 'TaEnrollment' && p.type !== 'TeacherEnrollment'
         )
       ); 
     });      
