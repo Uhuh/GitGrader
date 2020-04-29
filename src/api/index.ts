@@ -286,6 +286,76 @@ export class GitlabBackend {
     );
   }
   /**
+   * Uploads files to repo
+   */
+  uploadFile = (assignment_id: string, actionsArray: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>): Promise<any> => {
+    const params = {
+      branch: 'master',
+      commit_message: `Initial upload`,
+      actions: actionsArray
+    };
+
+    return this.requestPayload(
+      'POST',
+      `${assignment_id}`,
+      params
+    );
+  }
+  /**
+   * Allows editing of repo files' content
+   */
+  editFile = (assignment_id: string, actionsArray: Array<{
+    action: string, file_path: string, content: string, encoding: string
+    }>): Promise<any> => {
+    const params = {
+      branch: 'master',
+      commit_message: `Updated file`,
+      actions: actionsArray
+    };
+
+    return this.requestPayload(
+      'POST',
+      `${assignment_id}`,
+      params
+    );
+  }
+  /**
+   * Deletes files
+   */
+  deleteFile = (assignment_id: string, file_name: string) => {
+    return this.request(
+      'DELETE',
+      `/projects/${assignment_id}/repository/files/${file_name}`,
+      {}
+    );
+  }
+  /**
+   * Lists repo files
+   */
+  listFiles = async (assignment_id: string) => {
+    const files: {
+      id: string,
+      name: string,
+      type: string,
+      path: string,
+      mode: string
+    }[] = await this.request(
+      'GET',
+      `/projects/${assignment_id}/repository/tree`,
+      {}
+    );
+    
+    const fileNames = new Array();
+
+    for(let i = 0; i < files.length; i++){
+      fileNames.push(files[i].name);
+    }
+
+    localStorage.setItem('filesList', JSON.stringify(fileNames));
+  }
+  /**
    * Get user_id from username
    * @returns user_id for whoever
    * @throws if user is not found.
@@ -344,6 +414,24 @@ export class GitlabBackend {
         url,
         headers: { 'Private-Token': this.gitlab_token },
         params
+      })
+    ).data;
+  }
+  /**
+   * Creates commit with multiple files and actions
+   */
+  requestPayload = async (
+    method: AxiosRequestConfig['method'],
+    id: string,
+    params: {}
+  ): Promise<any> => {
+    const url = `${this.gitlab_host}/api/v4/projects/${id}/repository/commits`;
+    return (
+      await axios({
+        method,
+        url,
+        headers: { 'Private-Token': this.gitlab_token },
+        data: params
       })
     ).data;
   }
