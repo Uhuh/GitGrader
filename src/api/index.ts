@@ -370,13 +370,13 @@ export class GitlabBackend {
       {}
     );
     
-    const fileNames = new Array();
+    const temp = JSON.parse(localStorage.getItem('filesList') || '{}');
 
-    for(const f of files){
-      fileNames.push(f.name);
-    }
+    temp[assignment_id] = {
+      names: files.map(f => f.name)
+    };
 
-    localStorage.setItem('filesList', JSON.stringify(fileNames));
+    localStorage.setItem('filesList', JSON.stringify(temp));
   }
   /**
    * Get user_id from username

@@ -7,6 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Grid,
   makeStyles, 
   Paper,
   Tooltip, 
@@ -67,20 +68,18 @@ export const RepoCard =
     course: ICanvasNamespace }
   ) => {
 
-  let filesList = '';
-  let uploadFilesList: string[] = [];
-  let editFilesList: string[] = [];
-  let uploadFiles: string = '';
-  let editFiles: string = '';
-  
   const classes = useStyles();
   const { baseRepo, users, course } = props;
   const color = colors[Number(baseRepo.id) % 11];
   const [open, setOpen] = React.useState(false);
   const [files, setFiles] = React.useState(false);
+  const [filesNames, setFileNames] = React.useState([]);
   const [uploadConf, setUploadConf] = React.useState(false);
   const [editConf, setEditConf] = React.useState(false);
   const [deleteCheck, setDeleteCheck] = React.useState(false);
+  const [uploadFiles, setUpload] = React.useState<string[]>();
+  const [updateFiles, setUpdate] = React.useState<string[]>();
+  const [help, setHelp] = React.useState(false);
   const [nuke, setNuke] = React.useState(false);
   const year = new Date().getFullYear();
 
@@ -131,12 +130,12 @@ export const RepoCard =
       action: string, file_path: string, content: string, encoding: string
       }[] = [];
     
-    if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          const file_item = file.files.item(i) as File;
-          actionsArray.push(readerSetup(file_item, 'update'));
-        }
+    if(file.files && updateFiles) {
+      const files = Array.from(file.files)
+        .filter(f => updateFiles.indexOf(f.name) !== -1);
+
+      for(const f of files) {
+        actionsArray.push(readerSetup(f, 'update'));
       }
     }
 
@@ -176,66 +175,49 @@ export const RepoCard =
     return action;
   };
 
-  const listRepoFiles = () => {
-    setFiles(true);
-    setOpen(false);
-
-    GitLabAPI.listFiles(baseRepo.id)
+  const listRepoFiles = async () => {
+    await GitLabAPI.listFiles(baseRepo.id)
       .then(() => console.log(`Listing files`))
       .catch(console.error);
-
+    
     const files = JSON.parse(localStorage.getItem('filesList') || 'null');
+    
+    const names = files[baseRepo.id] ? files[baseRepo.id].names : [];
 
-    filesList = files.join(', ');
-    console.log(filesList);
+    setFiles(true);
+    setOpen(false);
+    setFileNames(names);
   };
 
   const listUploadFiles = () => {
-    setUploadConf(true);
-    uploadFilesList = [];
-    uploadFiles = '';
-
+    
     const file = document.getElementById('file-upload') as HTMLInputElement;
-    let file_item;
-    let file_name: string;
-
+    
     if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          file_item = file.files.item(i);
-          if(file_item) {
-            file_name = file_item.name;
-            uploadFilesList.push(file_name);
-          }
-        }
-      }
+      setUploadConf(true);
+      setUpload(
+        Array.from(file.files)
+          .map(f => f.name)
+      );
     }
-
-    uploadFiles = uploadFilesList.join(', ');
   };
 
   const listUpdateFiles = () => {
-    setEditConf(true);
-    editFilesList = [];
-    editFiles = '';
-
+    
     const file = document.getElementById('file-edit') as HTMLInputElement;
-    let file_item;
-    let file_name: string;
+    const files = JSON.parse(localStorage.getItem('filesList') || 'null');    
+    const names: string[] = files[baseRepo.id] ? files[baseRepo.id].names : [];
 
     if(file.files) {
-      for(let i = 0; i < file.files.length; i++) {
-        if(file.files.item(i)) { 
-          file_item = file.files.item(i);
-          if(file_item) {
-            file_name = file_item.name;
-            editFilesList.push(file_name);
-          }
-        }
+      const files_in_repo = Array.from(file.files)
+        .filter(f => names.indexOf(f.name) !== -1)
+        .map(f => f.name);
+
+      if(files_in_repo.length) {
+        setEditConf(true);
+        setUpdate(files_in_repo);
       }
     }
-
-    editFiles = editFilesList.join(', ');
   };
 
   /**
@@ -254,12 +236,12 @@ export const RepoCard =
 
     setNuke(false);
     setOpen(false);
-  }
+  };
 
   const handleNuke = () => {
     setNuke(false);
     setOpen(true);
-  }
+  };
 
   const handleOpen = () => {
     setDeleteCheck(false);
@@ -426,20 +408,54 @@ export const RepoCard =
         </DialogActions>
       </Dialog>
       <Dialog open={files} onClose={() => {setFiles(false); setOpen(true);}} aria-labelledby='files-dialog-title'> 
-       <DialogTitle id='files-dialog-title'>{baseRepo.name} Files</DialogTitle>
-       <DialogContent>
-        <Typography variant='subtitle2'>{filesList[0]}</Typography>
+       <DialogTitle id='files-dialog-title'>Files in {baseRepo.name}</DialogTitle>
+       <DialogContent dividers>
+        {
+          filesNames.length ? 
+          filesNames.map(f => (
+            <div key={`${f}-div`}>
+              <Typography color='textSecondary' variant='subtitle1' key={f}>{f}</Typography>
+              <br/>
+            </div>
+          )) :
+          <Typography variant='subtitle2'>No files in this repo.</Typography>
+        }
         <SpacePadding></SpacePadding>
         <form>
-          <input type='file' id='file-upload' multiple/>
+          <input type='file' id='file-upload' multiple style={{display: 'none'}}/>
+          <label htmlFor='file-upload'>
+            <Button variant='contained' color='primary' component='span'>
+              Choose files
+            </Button>
+          </label>
           <Button className={classes.actionButton} onClick={listUploadFiles} variant='outlined' color='primary'> 
-            Upload
+            <Typography color='textSecondary'>Upload</Typography>
+          </Button>
+          <br/>
+          <input type='file' id='file-edit' multiple style={{display: 'none'}}/>
+          <label htmlFor='file-edit'>
+            <Button variant='contained' color='primary' component='span'>
+              Choose files
+            </Button>
+          </label>
+          <Button 
+            className={classes.actionButton} 
+            onClick={listUpdateFiles} 
+            variant='outlined' 
+            color='primary'
+          >
+            <Typography color='textSecondary'>Update</Typography>
           </Button>
           <Dialog open={uploadConf} onClose={() => setUploadConf(false)}>
-            <DialogContent>
-              <Typography variant='subtitle2'>
-                Upload {uploadFiles} to {baseRepo.name}?
-              </Typography>
+            <DialogTitle>{'Are you sure you want to upload these files?'}</DialogTitle>
+            <DialogContent dividers>
+                {
+                  uploadFiles ? 
+                  uploadFiles.map(f => (<Typography variant='subtitle2' key={f}>{f}</Typography>)) :
+                  <div>No files to upload.</div>
+                }
+            </DialogContent>
+            <DialogContent dividers>
               <Button 
                 className={classes.actionButton} 
                 onClick={convertBase64Upload} 
@@ -461,16 +477,22 @@ export const RepoCard =
         </form>
         <SpacePadding></SpacePadding>
         <form>
-          <input type='file' id='file-edit' multiple/>
-          <Button className={classes.actionButton} onClick={listUpdateFiles} variant='outlined' color='primary'> 
-            Update
-          </Button>
           <Dialog open={editConf} onClose={() => setEditConf(false)}>
-            <DialogContent>
-              <Typography variant='subtitle2'>
-                Update {editFiles} in {baseRepo.name}?
-              </Typography>
-              <Button className={classes.actionButton} onClick={convertBase64Edit} variant='outlined' color='primary'> 
+            <DialogTitle>{'Are you sure you want to update these files?'}</DialogTitle>
+            <DialogContent dividers>
+                {
+                  updateFiles ? 
+                  updateFiles.map(f => (<Typography variant='subtitle2' key={f}>{f}</Typography>)) :
+                  <div>No files to update.</div>
+                }
+            </DialogContent>
+            <DialogContent dividers>
+              <Button 
+                className={classes.actionButton} 
+                onClick={convertBase64Edit} 
+                variant='outlined' 
+                color='primary'
+              > 
                 Yes
               </Button>
               &nbsp;&nbsp;
@@ -485,18 +507,6 @@ export const RepoCard =
           </Dialog>
         </form>
        </DialogContent>
-       <DialogActions>
-        <Button 
-          onClick={() => {
-            setOpen(true);
-            setFiles(false);
-          }}
-          variant='outlined' 
-          color='secondary'
-        >
-          Close
-        </Button>
-       </DialogActions>
       </Dialog>
     </Paper>
   );

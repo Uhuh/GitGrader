@@ -83,7 +83,8 @@ export const CanvasPage =
 
   const createAssignment = () => {
     if(!assignmentName.includes('-')){
-      baseRepoStore.create(assignmentName, course.namespace.id);
+      baseRepoStore.create(assignmentName, course.namespace.id)
+        .catch(console.error);
     } else {
       setError(true); 
     }
