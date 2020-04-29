@@ -20,7 +20,6 @@ import { inject, observer } from 'mobx-react';
 import BaseRepo from '../../stores/BaseRepo';
 import baseRepoStore from '../../stores/BaseRepoStore';
 import { GitLabAPI } from '../../app';
-import LockIcon from '@material-ui/icons/Lock';
 
 const SpacePadding = styled.div`
   margin-bottom: 20px;
@@ -82,6 +81,7 @@ export const RepoCard =
   const [uploadConf, setUploadConf] = React.useState(false);
   const [editConf, setEditConf] = React.useState(false);
   const [deleteCheck, setDeleteCheck] = React.useState(false);
+  const [nuke, setNuke] = React.useState(false);
   const year = new Date().getFullYear();
 
   const upload = (actions: Array<{
@@ -178,16 +178,13 @@ export const RepoCard =
 
   const listRepoFiles = () => {
     setFiles(true);
+    setOpen(false);
 
     GitLabAPI.listFiles(baseRepo.id)
       .then(() => console.log(`Listing files`))
       .catch(console.error);
 
     const files = JSON.parse(localStorage.getItem('filesList') || 'null');
-    
-    for(const f of files) {
-      console.log(f);
-    }
 
     filesList = files.join(', ');
     console.log(filesList);
@@ -251,13 +248,22 @@ export const RepoCard =
     setOpen(false);
   };
 
-  const handleClose = () => {
-    setDeleteCheck(false);
+  const nukeAll = () => {
+    baseRepoStore.nuke(baseRepo)
+      .catch(console.error);
+
+    setNuke(false);
     setOpen(false);
-  };
+  }
+
+  const handleNuke = () => {
+    setNuke(false);
+    setOpen(true);
+  }
 
   const handleOpen = () => {
     setDeleteCheck(false);
+    setNuke(false);
     setOpen(true);
   };
 
@@ -274,7 +280,7 @@ export const RepoCard =
           </CardContent>
         </CardActionArea>
       </Card>
-      <Dialog open={open} onClose={handleClose} aria-labelledby='form-dialog-title'>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby='form-dialog-title'>
         <DialogTitle id='form-dialog-title'>{baseRepo.name} actions</DialogTitle>
         <DialogContent>
           <Button 
@@ -337,36 +343,35 @@ export const RepoCard =
             <Typography color='textSecondary'>Archive</Typography>
           </Button>
           <Tooltip title='Show repo files and actions' placement='top'>
-          <Button className={classes.actionButton} onClick={listRepoFiles} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Files</Typography>
-          </Button>
+            <Button className={classes.actionButton} onClick={listRepoFiles} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Files</Typography>
+            </Button>
           </Tooltip>
           <Tooltip title='Delete the base repo' placement='top'>
-          <Button className={classes.actionButton} onClick={()=> setDeleteCheck(true)} variant='outlined' color='primary'>
-            <Typography color='textSecondary'>Delete</Typography>
-            <Dialog
-              open={deleteCheck}
+            <Button className={classes.actionButton} onClick={()=> {
+              setDeleteCheck(true);
+              setOpen(false);
+            }} variant='outlined' color='primary'>
+              <Typography color='textSecondary'>Delete</Typography>
+            </Button>
+          </Tooltip>
+          <Tooltip title='Delete the base and all student repos' placement='top'>
+            <Button 
+              className={classes.actionButton} 
+              onClick={()=> {
+                setNuke(true);
+                setOpen(false);
+              }} 
+              variant='outlined' 
+              color='primary'
             >
-              <DialogContent>
-                <DialogContentText>
-                  Are you sure you want to delete this repo?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleClose} color='primary'>
-                  Cancel
-                </Button>
-                <Button onClick={remove} color='primary'>
-                  Delete
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Button>
+              <Typography color='textSecondary'>Nuke</Typography>
+            </Button>
           </Tooltip>
         </DialogContent>
         <DialogActions>
           <Button 
-            onClick={handleClose}
+            onClick={() => setOpen(false)}
             variant='outlined' 
             color='secondary'
           >
@@ -374,10 +379,56 @@ export const RepoCard =
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={files} onClose={() => setFiles(false)} aria-labelledby='files-dialog-title'> 
+      <Dialog
+        open={deleteCheck}
+        onClose={() => {
+          setDeleteCheck(false);
+          setOpen(true);
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this repo?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setDeleteCheck(false);
+            setOpen(true);
+          }} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={remove} color='primary'>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={nuke}
+        onClose={() => {
+          setNuke(false);
+          setOpen(true);
+        }}
+      >
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove this and all student repos?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleNuke} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={nukeAll} color='primary'>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={files} onClose={() => {setFiles(false); setOpen(true);}} aria-labelledby='files-dialog-title'> 
        <DialogTitle id='files-dialog-title'>{baseRepo.name} Files</DialogTitle>
        <DialogContent>
-        <Typography variant='subtitle2'>{filesList}</Typography>
+        <Typography variant='subtitle2'>{filesList[0]}</Typography>
         <SpacePadding></SpacePadding>
         <form>
           <input type='file' id='file-upload' multiple/>
@@ -436,7 +487,10 @@ export const RepoCard =
        </DialogContent>
        <DialogActions>
         <Button 
-          onClick={() => setFiles(false)}
+          onClick={() => {
+            setOpen(true);
+            setFiles(false);
+          }}
           variant='outlined' 
           color='secondary'
         >

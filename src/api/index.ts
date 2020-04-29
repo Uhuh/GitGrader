@@ -65,16 +65,16 @@ export class GitlabBackend {
   getRepos = async (namespace_id: string): 
     Promise<{ 
       base_repos: IRepo[], 
-      student_repos: IStudentRepo[], 
+      student_repos: IRepo[], 
       user_to_ass_id?: Map<string, string[][]> 
     }> => {
     /**
      * For now the hacky method. Assume no base repo will have the course section
      * in the name.
      */
-    let projects: any = [];
-    let base_projects: any = [];
-    let student_repos: any = [];
+    let projects: IRepo[] = [];
+    let base_projects: IRepo[] = [];
+    let student_repos: IRepo[] = [];
     const user_to_ass_id = new Map();
     // Basically, `currentYear-semester-section-homework-username`
     const S_Repo = new RegExp(`((${new Date().getFullYear()})-(SP|FS|SS)-[a-zA-Z0-9]+-[a-zA-Z0-9]+-[a-zA-Z0-9]+)`);
@@ -126,7 +126,6 @@ export class GitlabBackend {
           })),
           student_repos: student_repos.map((s: any) => ({
             id: s.id,
-            user_id: s.user_id,
             name: s.name,
             created_at: new Date(s.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
             namespace: s.namespace,
@@ -191,9 +190,9 @@ export class GitlabBackend {
    * When creating more than one at a time, make sure to await it so there are no id conflicts
    * @returns The git links to clone with.
    */
-  createAssignment = async (
+  create = async (
     base_repo: IRepo,
-    namespace: any,
+    namespace: IGitNamespace,
     section: string,
     semester: string,
     username: string
@@ -235,7 +234,7 @@ export class GitlabBackend {
    *
    * @returns Promise<any> // figure out types
    */
-  assignAssignment = async (assignment_id: string, user_id: string): Promise<any> => {
+  assign = async (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -268,19 +267,19 @@ export class GitlabBackend {
   /**
    * Archive project, helps clean users repo list
    */
-  archiveAssignment = (assignment_id: string): Promise<any> => {
+  archive = (assignment_id: string): Promise<any> => {
     return this.request('POST', `/projects/${assignment_id}/archive`, {});
   }
   /**
    * Delete project, remove unnecessary repo
    */
-  removeAssignment = (assignment_id: string): Promise<any> => {
+  remove = (assignment_id: string): Promise<any> => {
     return this.request('DELETE', `/projects/${assignment_id}`, {});
   }
   /**
    * Give a user reporter access to a project
    */
-  lockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
+  lock = (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -296,7 +295,7 @@ export class GitlabBackend {
   /**
    * Give a user developer access to a project.
    */
-  unlockAssignment = (assignment_id: string, user_id: string): Promise<any> => {
+  unlock = (assignment_id: string, user_id: string): Promise<any> => {
     const params = {
       id: assignment_id,
       user_id: user_id,
@@ -312,9 +311,9 @@ export class GitlabBackend {
   /**
    * Uploads files to repo
    */
-  uploadFile = (assignment_id: string, actionsArray: Array<{
+  uploadFile = (assignment_id: string, actionsArray: {
     action: string, file_path: string, content: string, encoding: string
-    }>): Promise<any> => {
+    }[]): Promise<any> => {
     const params = {
       branch: 'master',
       commit_message: `Initial upload`,
@@ -330,9 +329,9 @@ export class GitlabBackend {
   /**
    * Allows editing of repo files' content
    */
-  editFile = (assignment_id: string, actionsArray: Array<{
+  editFile = (assignment_id: string, actionsArray: {
     action: string, file_path: string, content: string, encoding: string
-    }>): Promise<any> => {
+    }[]): Promise<any> => {
     const params = {
       branch: 'master',
       commit_message: `Updated file`,
@@ -373,8 +372,8 @@ export class GitlabBackend {
     
     const fileNames = new Array();
 
-    for(let i = 0; i < files.length; i++){
-      fileNames.push(files[i].name);
+    for(const f of files){
+      fileNames.push(f.name);
     }
 
     localStorage.setItem('filesList', JSON.stringify(fileNames));

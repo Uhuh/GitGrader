@@ -11,23 +11,33 @@ export default class BaseRepo {
   // user gitlab id -> assignment id
   @observable
   user_to_ass_id!: Map<string, string>;
+  // username -> gitlab id
+  username_to_git_id: Map<string, string>;
   constructor (
     id: string,
     name: string,
     ssh_url: string,
     created_at: string,
     namespace: IGitNamespace,
-    user_ass_id?: Map<string, string>
+    user_ass_id?: Map<string, string>,
+    username_to_git_id?: Map<string, string>
   ) {
     this.id = id;
     this.name = name;
     this.ssh_url = ssh_url;
     this.created_at = created_at;
     this.namespace = namespace;
+    
     if(user_ass_id && user_ass_id.size) {
       this.user_to_ass_id = user_ass_id;
     } else {
       this.user_to_ass_id = new Map();
+    }
+
+    if(username_to_git_id && username_to_git_id.size) {
+      this.username_to_git_id = username_to_git_id;
+    } else {
+      this.username_to_git_id = new Map();
     }
   }
 
@@ -42,13 +52,16 @@ export default class BaseRepo {
     /**
      * @TODO Store student repos based on this repo.
      */
-    GitLabAPI.createAssignment(
+    GitLabAPI.create(
       this, this.namespace, section, semester, username
     )
       .then(async (ass) => {
         // Save for assignment later.
-        const user = await GitLabAPI.getUser(username);
-        this.user_to_ass_id.set(user.id, ass.id);
+        const user_id = this.username_to_git_id.get(username);
+        if(!user_id) {
+          return;
+        }
+        this.user_to_ass_id.set(user_id, ass.id);
       })
       .catch(console.error);
     
@@ -68,7 +81,7 @@ export default class BaseRepo {
       }
 
       // Need to await or it'll be too fast for Gitlab
-      await GitLabAPI.assignAssignment(id, username)
+      await GitLabAPI.assign(id, username)
         .then(() => {
           // I want to have a status / loading bar
         })
@@ -83,17 +96,17 @@ export default class BaseRepo {
   }
 
   lock = (user_id: string) => {
-    GitLabAPI.lockAssignment(this.id, user_id)
+    GitLabAPI.lock(this.id, user_id)
       .catch(console.error);
   }
 
   unlock = (user_id: string) => {
-    GitLabAPI.unlockAssignment(this.id, user_id)
+    GitLabAPI.unlock(this.id, user_id)
       .catch(console.error);
   }
 
   archive = () => {
-    GitLabAPI.archiveAssignment(this.id)
+    GitLabAPI.archive(this.id)
       .then(() => console.log(`Archived ${this.name}`))
       .catch(console.error);
   }
