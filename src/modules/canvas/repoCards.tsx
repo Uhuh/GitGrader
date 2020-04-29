@@ -18,19 +18,12 @@ import styled from 'styled-components';
 import { ICanvasNamespace, IGitUser } from '../../api/interfaces';
 import { inject, observer } from 'mobx-react';
 import BaseRepo from '../../stores/BaseRepo';
+import baseRepoStore from '../../stores/BaseRepoStore';
 import { GitLabAPI } from '../../app';
+import LockIcon from '@material-ui/icons/Lock';
 
 const SpacePadding = styled.div`
   margin-bottom: 20px;
-`;
-
-const Centered = styled.div`
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  -ms-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
 `;
 
 const useStyles = makeStyles({
@@ -99,6 +92,7 @@ export const RepoCard =
       .catch(console.error);
     setOpen(false);
   };
+
   const edit = (actions: Array<{
     action: string, file_path: string, content: string, encoding: string
     }>) => {
@@ -247,10 +241,12 @@ export const RepoCard =
     editFiles = editFilesList.join(', ');
   };
 
+  /**
+   * @TODO - Add toasties for success / errors.
+   */
   const remove = () => {
-    GitLabAPI.removeAssignment(baseRepo.id)
-      .then(() => console.log(`Removed ${baseRepo.name}`))
-      .catch(console.error);
+    baseRepoStore.delete(baseRepo);
+    
     setDeleteCheck(false);
     setOpen(false);
   };

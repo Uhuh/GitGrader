@@ -54,8 +54,6 @@ inject('RelationStore')
                       localStorage.getItem('CTdata') === '' || localStorage.getItem('GTdata') === '') 
                       ? true : false;
 
-  console.log(props.courses);
-
   return (
     <>
     <Grid

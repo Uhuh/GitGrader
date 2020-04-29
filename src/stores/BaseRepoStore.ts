@@ -59,7 +59,7 @@ export class BaseRepoStore {
     }
   }
 
-  addRepos = (
+  add = (
     namespace_id: string,
     base_repos: IRepo[]
   ) => {
@@ -77,7 +77,7 @@ export class BaseRepoStore {
     this.usernames.set(course_id, usernames);
   }
 
-  createRepo = (
+  create = (
     name: string,
     namespace_id: string
   ) => {
@@ -97,17 +97,23 @@ export class BaseRepoStore {
   /**
    * namespace id required
    */
-  getRepos = (n_id: string) => {
+  get = (n_id: string) => {
     return this.repos.get(n_id);
   }
 
-  deleteRepo = (
-    repo_id: string,
-    namespace_id: string
+  delete = (
+    repo: BaseRepo
   ) => {
-    /**
-     * Do this eventually
-     */
+    GitLabAPI.removeAssignment(repo.id)
+      .then(() => {
+        const repos = this.repos.get(repo.namespace.id) || [];
+        const r = repos.find(re => re.id === repo.id);
+        if(r) {
+          const index = repos.indexOf(r);
+          repos.splice(index, 1);
+        }
+      })
+      .catch(console.error);
   }
 
   counter = () => this.count;

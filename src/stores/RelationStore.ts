@@ -61,12 +61,7 @@ export class RelationStore {
   all = () => Array.from(this.relations.values());
 
   get = (course_id: string) => {
-    return this.relations.find(r => {
-      console.log(r);
-      console.log(r.id);
-
-      return r.id == course_id;
-    });
+    return this.relations.find(r => r.id == course_id);
   }
 }
 

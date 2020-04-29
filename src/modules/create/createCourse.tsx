@@ -39,7 +39,6 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
       gitlabID: selectedNamespace
     };
     localStorage.setItem('relations', JSON.stringify(temp));
-    console.log(temp);
   };
   
   React.useEffect(() => {

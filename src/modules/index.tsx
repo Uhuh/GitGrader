@@ -9,6 +9,16 @@ import { BackButton, CourseList, SettingsButton, ThemeButton } from './navs';
 import { SetUp } from './settings';
 import { inject, observer } from 'mobx-react';
 import relationStore from '../stores/RelationStore';
+import styled from 'styled-components';
+
+const Centered = styled.div`
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+`;
 
 const darkTheme = createMuiTheme({
   palette: {
@@ -66,12 +76,8 @@ inject('RelationStore')
           render={({ match }) => {
             const course = relationStore.get(match.params.courseId);
 
-            console.log(match.params.courseId);
-            console.log(relationStore.all());
-            console.log(course);
-
             if(!course) {
-              return (<div>Course not found.</div>);
+              return (<Centered>Course not found.</Centered>);
             }
 
             return (

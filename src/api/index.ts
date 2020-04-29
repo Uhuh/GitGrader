@@ -121,7 +121,7 @@ export class GitlabBackend {
             id: b.id,
             name: b.name,
             created_at: new Date(b.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
-            namespace_id: b.namespace.id,
+            namespace: b.namespace,
             ssh_url: b.ssh_url_to_repo
           })),
           student_repos: student_repos.map((s: any) => ({
@@ -129,7 +129,7 @@ export class GitlabBackend {
             user_id: s.user_id,
             name: s.name,
             created_at: new Date(s.created_at).toLocaleDateString('en-US', {timeZone: 'America/Denver'}),
-            namespace_id: s.namespace.id,
+            namespace: s.namespace,
             ssh_url: s.ssh_url_to_repo
           })),
           user_to_ass_id

@@ -77,14 +77,13 @@ export const CanvasPage =
   }, [course.id]); 
 
   React.useEffect(() => {
-    const repos = baseRepoStore.getRepos(course.namespace.id) || [];
-    console.log(repos);
+    const repos = baseRepoStore.get(course.namespace.id) || [];
     setBaseRepo(repos);
-  }, [baseRepoStore.getRepos(course.namespace.id)]);
+  }, [baseRepoStore.get(course.namespace.id)]);
 
   const createAssignment = () => {
     if(!assignmentName.includes('-')){
-      baseRepoStore.createRepo(assignmentName, course.namespace.id);
+      baseRepoStore.create(assignmentName, course.namespace.id);
     } else {
       setError(true); 
     }
