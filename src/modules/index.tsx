@@ -56,7 +56,7 @@ inject('RelationStore')
           exact
           path='/'
           key='courses'
-          render={() => <CourseList courses={relationStore.all() || []}/>}
+          render={() => <CourseList/>}
         />
         <Route
           exact

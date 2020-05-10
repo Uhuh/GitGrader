@@ -1,5 +1,5 @@
 import { observable, ObservableMap } from 'mobx';
-import { IRepo } from '../api/interfaces';
+import { IRepo, ICanvasClass } from '../api/interfaces';
 import { GitLabAPI, CanvasAPI } from '../app';
 import BaseRepo from './BaseRepo';
 
@@ -11,10 +11,9 @@ export class BaseRepoStore {
     this.ns_to_username_to_git_id = new Map();
   }
 
-  loadData = async () => {
+  loadData = async (classes: ICanvasClass[]) => {
     const relations = JSON.parse(localStorage.getItem('relations') || 'null');
     const namespaces = await GitLabAPI.getNamespaces();
-    const classes = await CanvasAPI.getClasses();
 
     for(const c of classes) {
       if(relations[c.id]) {

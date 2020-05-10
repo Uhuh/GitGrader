@@ -91,7 +91,7 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
                 )) :
                   <option key='null' value='null'>
                     "No courses found"
-                      </option>
+                  </option>
               })}
             </Select>
           </FormControl>
@@ -136,7 +136,7 @@ export const CreateCourse = (canvasIDs: any[], gitlabIDs: any[]) => {
         <FormControl>
           <Button onClick={handleSubmit} type='submit'>
             Create
-              </Button>
+          </Button>
         </FormControl>
       </Grid>
     </MainGrid>

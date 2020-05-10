@@ -16,6 +16,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ICanvasNamespace } from '../../api/interfaces';
 import { CourseCard } from './courseCard';
 import { inject, observer } from 'mobx-react';
+import RelationStore from '../../stores/RelationStore';
 
 const useStyles = makeStyles({
   card: {
@@ -46,7 +47,7 @@ const useStyles = makeStyles({
 
 export const CourseList = 
 inject('RelationStore')
-(observer((props: {courses: ICanvasNamespace[]}) => {
+(observer(() => {
   const classes = useStyles();
   const noSettings = (localStorage.getItem('CHdata') === null || localStorage.getItem('GHdata') === null ||
                       localStorage.getItem('CTdata') === null || localStorage.getItem('GTdata') === null ||
@@ -65,7 +66,7 @@ inject('RelationStore')
       <div className={classes.centerItem}>
         <h1>Courses you grade for</h1>
       </div>
-      {props.courses.map((course: ICanvasNamespace) => (
+      {RelationStore.relations.map((course: ICanvasNamespace) => (
         <Grid item xs={3} key={course.id} className={classes.card}>
           <Link component={RouterLink} to={`/course/${course.id}`}>
             <CourseCard course={course} />

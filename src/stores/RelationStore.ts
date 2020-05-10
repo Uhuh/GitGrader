@@ -1,14 +1,13 @@
 import { observable, IObservableArray } from 'mobx';
-import { ICanvasNamespace } from '../api/interfaces';
-import { GitLabAPI, CanvasAPI } from '../app';
+import { ICanvasNamespace, ICanvasClass } from '../api/interfaces';
+import { GitLabAPI } from '../app';
 
 export class RelationStore {
   @observable relations: IObservableArray<ICanvasNamespace> = observable.array();
 
-  loadData = async () => {
+  loadData = async (classes: ICanvasClass[]) => {
     const storedRelations = JSON.parse(localStorage.getItem('relations') || 'null');
     const namespaces = await GitLabAPI.getNamespaces();
-    const classes = await CanvasAPI.getClasses();
 
     for(const c of classes) {
       if(storedRelations[c.id]) {

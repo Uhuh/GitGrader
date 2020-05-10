@@ -545,12 +545,16 @@ export class CanvasBackend {
     path: string,
     params: { [k: string]: string | string[] }
   ): Promise<any> => {
-    const url = `${this.canvas_url}/api/v1/${path}`;
+    // CORS stuff
+    const origin = `${this.canvas_url}/api/v1/${path}`;
+    const url = `https://cors-anywhere.herokuapp.com/${origin}`;
+    // I'm not sure how to send this securely right now. :(
     params.access_token = this.canvas_token;
     return (
       await axios({
         method,
         url,
+        headers: { 'Origin': origin },
         params
       })
     ).data;
@@ -567,7 +571,8 @@ export class CanvasBackend {
     method: AxiosRequestConfig['method'],
     course_id: string
   ): Promise<any> => {
-    const url = `${this.canvas_url}/api/v1/courses/${course_id}/enrollments`;
+    const origin = `${this.canvas_url}/api/v1/courses/${course_id}/enrollments`;
+    const url = `https://cors-anywhere.herokuapp.com/${origin}`;
 
     if (method !== 'GET') {
       return Promise.reject('Didn\'t use GET method');
@@ -576,6 +581,7 @@ export class CanvasBackend {
     const people = (await axios({
       method,
       url,
+      headers: { 'Origin': origin },
       params: { access_token: this.canvas_token, per_page: 1000 }
     })).data;
 

@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --config ./webpack.config.js",
-    "start": "yarn build && electron ./dist/electron.js"
+    "start": "webpack-dev-server"
   },
   "dependencies": {
     "@material-ui/core": "^4.9.5",
@@ -25,7 +25,8 @@
     "react-mobx": "^0.0.4",
     "react-router-dom": "^5.1.2",
     "styled": "^1.0.0",
-    "styled-components": "^5.0.1"
+    "styled-components": "^5.0.1",
+    "webpack-dev-server": "^3.11.0"
   },
   "devDependencies": {
     "@types/react": "^16.9.19",

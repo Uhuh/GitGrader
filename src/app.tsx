@@ -30,9 +30,13 @@ const load = async () => {
     </div>,
     document.getElementById('app')
   );
-  BaseRepoStore.loadData()
-    .catch(console.error);
-  await RelationStore.loadData()
+  CanvasAPI.getClasses()
+    .then(async classes => {
+      BaseRepoStore.loadData(classes)
+        .catch(console.error);
+      await RelationStore.loadData(classes)
+        .catch(console.error);
+    })
     .catch(console.error);
 
   ReactDOM.render(
