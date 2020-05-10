@@ -8,7 +8,6 @@ import {
   Grid, 
   Link, 
   makeStyles,
-  Typography
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import * as React from 'react';

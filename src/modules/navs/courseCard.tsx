@@ -49,7 +49,6 @@ const ImagePlaceholder = styled.div<IProps>`
 `;
 
 export const CourseCard = (props: { course: ICanvasNamespace }) => {
-  const classes = useStyles();
   const color = colors[Number(props.course.id) % 11];
 
   return (
